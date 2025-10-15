@@ -16,8 +16,8 @@ public class ReviewInfo {
     @Schema(description = "작성자 ID", example = "1")
     private Long userId;
 
-    @Schema(description = "작성자 닉네임", example = "멍멍이집사")
-    private String userNickname;
+    @Schema(description = "작성자 이름", example = "멍멍이집사")
+    private String userName;
 
     @Schema(description = "리뷰 내용", example = "정말 좋은 곳이었어요! 강아지가 좋아하네요.")
     private String content;

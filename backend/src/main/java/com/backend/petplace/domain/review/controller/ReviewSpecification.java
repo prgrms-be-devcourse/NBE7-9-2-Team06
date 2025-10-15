@@ -19,7 +19,7 @@ public interface ReviewSpecification {
 
   @Operation(summary = "리뷰 등록", description = "특정 장소에 대한 리뷰를 등록합니다. 내용, 별점은 필수이며 이미지는 선택입니다.")
   ResponseEntity<ApiResponse<Void>> createReview(
-      @Parameter(description = "리뷰 정보", required = true) ReviewCreateRequest request,
+      @Parameter(description = "리뷰 정보 - 장소ID, 내용, 별점", required = true) ReviewCreateRequest request,
       @Parameter(description = "업로드할 이미지 파일 (선택)") MultipartFile image
   );
 

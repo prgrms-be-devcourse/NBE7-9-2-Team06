@@ -1,0 +1,41 @@
+spring:
+  profiles:
+    active: h2
+  thymeleaf:
+    cache: false
+    prefix: file:src/main/resources/templates/
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    hikari:
+      auto-commit: false
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        use_sql_comments: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+
+springdoc:
+  default-produces-media-type: application/json
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.springframework.transaction.interceptor: TRACE
+    com.rest1 : DEBUG
+
+custom:
+  jwt:
+    expire-seconds: "#{24*60*60}"
+    secretPattern: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890

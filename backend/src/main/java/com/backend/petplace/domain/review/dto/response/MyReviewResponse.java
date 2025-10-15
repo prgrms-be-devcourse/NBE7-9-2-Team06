@@ -1,11 +1,9 @@
 package com.backend.petplace.domain.review.dto.response;
 
 import com.backend.petplace.domain.review.dto.PlaceInfo;
-import com.backend.petplace.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-
 import java.time.LocalDate;
+import lombok.Getter;
 
 @Getter
 @Schema(description = "내 리뷰 목록 조회 응답 DTO")

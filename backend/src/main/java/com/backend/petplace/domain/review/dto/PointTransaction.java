@@ -1,9 +1,8 @@
 package com.backend.petplace.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-
 import java.time.LocalDate;
+import lombok.Getter;
 
 @Getter
 @Schema(description = "개별 포인트 거래 내역 정보")

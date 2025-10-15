@@ -10,34 +10,34 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reviewId")
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "reviewId")
+  private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+  @ManyToOne
+  @JoinColumn(name = "userId", nullable = false)
+  private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "placeId", nullable = false)
-    private Place place;
+  @ManyToOne
+  @JoinColumn(name = "placeId", nullable = false)
+  private Place place;
 
-    @Column(nullable = false)
-    private int rating;
+  @Column(nullable = false)
+  private int rating;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
+  @Column(columnDefinition = "TEXT", nullable = false)
+  private String content;
 
-    private String imageUrl;
+  private String imageUrl;
 
-    @Builder
-    public Review(Long id, User user, Place place, String content, int rating, String imageUrl) {
-        this.id = id;
-        this.user = user;
-        this.place = place;
-        this.content = content;
-        this.rating = rating;
-        this.imageUrl = imageUrl;
-    }
+  @Builder
+  public Review(Long id, User user, Place place, String content, int rating, String imageUrl) {
+    this.id = id;
+    this.user = user;
+    this.place = place;
+    this.content = content;
+    this.rating = rating;
+    this.imageUrl = imageUrl;
+  }
 }

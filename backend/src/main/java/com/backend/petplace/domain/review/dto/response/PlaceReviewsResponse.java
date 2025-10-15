@@ -10,12 +10,12 @@ import java.util.List;
 @Schema(description = "장소 리뷰 목록 응답 DTO")
 public class PlaceReviewsResponse {
 
-    @Schema(description = "장소의 평균 별점", example = "4.5")
-    private double averageRating;
+  @Schema(description = "장소의 평균 별점", example = "4.5")
+  private double averageRating;
 
-    @Schema(description = "장소의 전체 리뷰 수", example = "120")
-    private int totalReviewCount;
+  @Schema(description = "장소의 전체 리뷰 수", example = "120")
+  private int totalReviewCount;
 
-    @Schema(description = "리뷰 목록")
-    private List<ReviewInfo> reviews;
+  @Schema(description = "리뷰 목록")
+  private List<ReviewInfo> reviews;
 }

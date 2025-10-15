@@ -1,9 +1,4 @@
 spring:
-  profiles:
-    active: h2
-  thymeleaf:
-    cache: false
-    prefix: file:src/main/resources/templates/
   output:
     ansi:
       enabled: always
@@ -24,7 +19,6 @@ spring:
       filter:
         enabled: true
 
-
 springdoc:
   default-produces-media-type: application/json
 
@@ -33,9 +27,4 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
-    com.rest1 : DEBUG
-
-custom:
-  jwt:
-    expire-seconds: "#{24*60*60}"
-    secretPattern: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
+    com.rest1: DEBUG

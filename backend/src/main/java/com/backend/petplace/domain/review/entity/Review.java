@@ -2,6 +2,7 @@ package com.backend.petplace.domain.review.entity;
 
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.user.entity.User;
+import com.backend.petplace.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Review {
+public class Review extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

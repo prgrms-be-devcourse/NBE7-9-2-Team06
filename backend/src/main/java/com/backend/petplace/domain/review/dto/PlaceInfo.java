@@ -13,4 +13,6 @@ public class PlaceInfo {
   @Schema(description = "장소 이름", example = "멍멍카페")
   private String placeName;
 
+  @Schema(description = "장소 전체 주소", example = "서울시 강남구 테헤란로 123, 1층")
+  private String fullAddress;
 }

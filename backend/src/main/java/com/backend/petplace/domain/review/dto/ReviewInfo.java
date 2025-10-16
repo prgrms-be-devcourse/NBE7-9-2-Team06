@@ -1,10 +1,8 @@
 package com.backend.petplace.domain.review.dto;
 
-import com.backend.petplace.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-
 import java.time.LocalDate;
+import lombok.Getter;
 
 @Getter
 @Schema(description = "장소 리뷰 목록에 포함될 개별 리뷰 정보")

@@ -13,7 +13,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class OrderProduct {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 }

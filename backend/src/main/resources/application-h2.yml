@@ -15,6 +15,6 @@ spring:
       enabled: true      # 콘솔 켜기
       path: /h2-console  # 접속 URL
     settings:
-        web-allow-others: true  # 외부 접속 허용
+      web-allow-others: true  # 외부 접속 허용
 
 

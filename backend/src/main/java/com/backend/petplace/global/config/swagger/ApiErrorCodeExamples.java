@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiErrorCodeExamples {
 
-    ErrorCode[] value();
+  ErrorCode[] value();
 }

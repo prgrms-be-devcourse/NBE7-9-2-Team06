@@ -2,10 +2,8 @@ package com.backend.petplace.domain.review.dto.response;
 
 import com.backend.petplace.domain.review.dto.PointTransaction;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-
 import java.util.List;
-import java.util.stream.Collectors;
+import lombok.Getter;
 
 @Getter
 @Schema(description = "내 포인트 내역 응답 DTO")

@@ -4,6 +4,7 @@ import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
 import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
 import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
 import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
+import com.backend.petplace.domain.review.service.ReviewService;
 import com.backend.petplace.global.response.ApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ReviewController implements ReviewSpecification {
 
+  private final ReviewService reviewService;
+
   @PostMapping(value = "/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ApiResponse<Void>> createReview(
       @RequestPart("request") ReviewCreateRequest request,
       @RequestPart(value = "image", required = false) MultipartFile image) {
 
-    // TODO: 리뷰 생성 및 포인트 적립 로직 구현
+    reviewService.createReview(request, image);
 
     return ResponseEntity.ok(ApiResponse.success());
   }

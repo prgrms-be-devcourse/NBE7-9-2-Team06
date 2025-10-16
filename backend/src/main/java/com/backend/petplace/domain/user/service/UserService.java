@@ -21,13 +21,13 @@ public class UserService {
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
 
-    if (userRepository.existByUserName(request.getName())) {
+    if (userRepository.existsByName(request.getName())) {
       throw new BusinessException(ErrorCode.DUPLICATE_USERNAME);
     }
 
     // TODO:이메일 인증 기능 추가
 
-    if (userRepository.existByEmail(request.getEmail())) {
+    if (userRepository.existsByEmail(request.getEmail())) {
       throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
     }
 

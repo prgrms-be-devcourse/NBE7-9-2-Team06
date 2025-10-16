@@ -1,0 +1,19 @@
+# IntelliJ 설정 무시
+.idea/
+
+# Node modules (프론트엔드)
+frontend/node_modules/
+
+
+# 빌드 출력물
+frontend/.next/
+backend/build/
+
+# 로그 파일
+*.log
+
+# 환경 변수 파일
+*.env
+
+# package-lock
+frontend/package-lock.json

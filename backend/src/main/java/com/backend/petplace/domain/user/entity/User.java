@@ -11,7 +11,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "users")
-<<<<<<< HEAD
 public class User extends BaseEntity {
 
   @Id
@@ -37,11 +36,4 @@ public class User extends BaseEntity {
   private String addressDetail;
 
   private Integer totalPoint;
-=======
-public class User {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
->>>>>>> f53c08b29f21e7962bf9ab0b704c850153a5084c
 }

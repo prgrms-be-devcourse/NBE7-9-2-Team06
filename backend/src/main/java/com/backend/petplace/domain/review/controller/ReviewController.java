@@ -5,14 +5,17 @@ import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
 import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
 import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
 import com.backend.petplace.global.response.ApiResponse;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")

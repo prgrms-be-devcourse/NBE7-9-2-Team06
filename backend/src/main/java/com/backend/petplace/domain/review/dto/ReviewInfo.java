@@ -1,10 +1,8 @@
 package com.backend.petplace.domain.review.dto;
 
-import com.backend.petplace.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-
 import java.time.LocalDate;
+import lombok.Getter;
 
 @Getter
 @Schema(description = "장소 리뷰 목록에 포함될 개별 리뷰 정보")
@@ -12,9 +10,6 @@ public class ReviewInfo {
 
   @Schema(description = "리뷰 ID", example = "10")
   private Long reviewId;
-
-  @Schema(description = "작성자 ID", example = "1")
-  private Long userId;
 
   @Schema(description = "작성자 이름", example = "멍멍이집사")
   private String userName;

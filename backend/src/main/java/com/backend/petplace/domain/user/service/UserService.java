@@ -2,6 +2,7 @@ package com.backend.petplace.domain.user.service;
 
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
+import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
@@ -18,23 +19,29 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
 
   @Transactional
-  public UserSignupResponse signup(UserSignupRequest user) {
-    // TODO: 이름 중복 체크, 길이 체크(2~12), 문자 형식 체크(영어, 한글, 숫자만 허용)
-    // TODO: 비밀번호 형식 체크(프론트), 암호화
-    // TODO: 이메일 중복 검사, 길이, 이메일 형식 등 검사 -> 이건 메일 인증 기능을 넣으면 안해도 됨
-    // TODO: 주소지 검사는 딱히 안해도?
-    // TODO: @Builder 사용 -> 암호화 때문에
+  public UserSignupResponse signup(UserSignupRequest request) {
 
-
-    if (userRepository.existByUserName(user.getUserName())){
+    if (userRepository.existByUserName(request.getName())) {
       throw new BusinessException(ErrorCode.DUPLICATE_USERNAME);
     }
 
-    // 이메일 인증 후에 실행
-    if (userRepository.existByEmail(user.getUserEmail())) {
+    // TODO:이메일 인증 기능 추가
+
+    if (userRepository.existByEmail(request.getEmail())) {
       throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
     }
 
-    return new UserSignupResponse();
+    User user = User.builder()
+        .name(request.getName())
+        .password(passwordEncoder.encode(request.getPassword()))
+        .email(request.getEmail())
+        .address(request.getAddress())
+        .zipcode(request.getZipcode())
+        .addressDetail(request.getAddressDetail())
+        .build();
+
+    userRepository.save(user);
+
+    return new UserSignupResponse(user.getId());
   }
 }

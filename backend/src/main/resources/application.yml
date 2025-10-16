@@ -19,6 +19,19 @@ spring:
       filter:
         enabled: true
 
+cloud:
+  aws:
+    s3:
+      bucket: ${Bucket-Name}
+    credentials:
+      access-key: ${IAM-Access-Key}
+      secret-key: ${IAM-Secret-Key}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
 springdoc:
   default-produces-media-type: application/json
 

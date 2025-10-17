@@ -10,8 +10,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
   // 회원
-  CONFLICT_REGISTER("U001", HttpStatus.CONFLICT, "이미 가입된 회원입니다."),
-  NOT_FOUND_MEMBER("U002", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+  DUPLICATE_NICKNAME("U001", HttpStatus.CONFLICT, "이미 사용 중인 이름입니다."),
+  DUPLICATE_EMAIL("U002", HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
+  NOT_FOUND_MEMBER("U003", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
   BAD_CREDENTIAL("U004", HttpStatus.UNAUTHORIZED, "아이디나 비밀번호가 틀렸습니다."),
   INVALID_TOKEN("U005", HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   EXPIRED_TOKEN("U006", HttpStatus.UNAUTHORIZED, "엑세스 토큰이 만료되었습니다. 토큰을 갱신해주세요."),

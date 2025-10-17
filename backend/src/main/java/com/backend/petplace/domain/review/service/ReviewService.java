@@ -4,6 +4,7 @@ import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
 import com.backend.petplace.domain.point.entity.Point;
 import com.backend.petplace.domain.point.repository.PointRepository;
+import com.backend.petplace.domain.point.service.PointService;
 import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.review.repository.ReviewRepository;
@@ -23,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReviewService {
 
   private final ReviewRepository reviewRepository;
-  private final PointRepository pointRepository;
+  private final PointService pointService;
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
   private final S3Uploader s3Uploader;
@@ -40,14 +41,7 @@ public class ReviewService {
         imageUrl);
     Review savedReview = reviewRepository.save(review);
 
-    addPointsForReview(user, savedReview);
-  }
-
-  private void addPointsForReview(User user, Review review) {
-    Point point = Point.createFromReview(review);
-    pointRepository.save(point);
-
-    user.addPoints(point.getAmount());
+    pointService.addPointsForReview(user, savedReview);
   }
 
   private User findUserById(Long userId) {

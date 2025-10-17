@@ -24,7 +24,11 @@ public enum ErrorCode {
   // S3 - 이미지 업로드
   FAIL_TO_UPLOAD_IMAGE("S001", HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
   INVALID_FILE_NAME("S002", HttpStatus.BAD_REQUEST, "잘못된 형식의 파일 이름입니다."),
-  ;
+
+  // 주문, 주문상품, 상품
+  NOT_FOUND_USER("ORO001", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+  NOT_FOUND_PRODUCT("ORO002", HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다.");
+
 
   private final String code;
   private final HttpStatus status;

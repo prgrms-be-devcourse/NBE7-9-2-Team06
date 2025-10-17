@@ -50,4 +50,15 @@ public class Review extends BaseEntity {
     this.rating = rating;
     this.imageUrl = imageUrl;
   }
+
+  public static Review createNewReview(User user, Place place, String content, int rating,
+      String imageUrl) {
+    return Review.builder()
+        .user(user)
+        .place(place)
+        .content(content)
+        .rating(rating)
+        .imageUrl(imageUrl)
+        .build();
+  }
 }

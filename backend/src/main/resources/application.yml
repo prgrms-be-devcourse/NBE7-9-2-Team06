@@ -18,6 +18,23 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+
+cloud:
+  aws:
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
 
 springdoc:
   default-produces-media-type: application/json

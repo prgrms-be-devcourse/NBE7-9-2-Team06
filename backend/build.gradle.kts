@@ -39,7 +39,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
 	// ✅ AWS (S3 업로드 등)
-	implementation("com.amazonaws:aws-java-sdk-s3:1.12.568")
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
 
 	// ✅ JWT (인증/인가)
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")

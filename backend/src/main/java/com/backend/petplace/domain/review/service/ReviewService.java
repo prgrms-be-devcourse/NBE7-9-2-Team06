@@ -29,18 +29,29 @@ public class ReviewService {
   private static final String REVIEW_IMAGE_DIR = "reviews";
 
   public void createReview(Long userId,ReviewCreateRequest request, MultipartFile image) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
+    User user = findUserById(userId);
+    Place place = findPlaceById(request.getPlaceId());
 
-    Place place = placeRepository.findById(request.getPlaceId())
-        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PLACE));
-
-    String imageUrl = null;
-    if (image != null && !image.isEmpty()) {
-      imageUrl = s3Uploader.upload(image, REVIEW_IMAGE_DIR);
-    }
+    String imageUrl = uploadImageIfPresent(image);
 
     Review review = Review.createNewReview(user, place, request.getContent(), request.getRating(), imageUrl);
     reviewRepository.save(review);
+  }
+
+  private User findUserById(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
+  }
+
+  private Place findPlaceById(Long placeId) {
+    return placeRepository.findById(placeId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PLACE));
+  }
+
+  private String uploadImageIfPresent(MultipartFile image) {
+    if (image != null && !image.isEmpty()) {
+      return s3Uploader.upload(image, REVIEW_IMAGE_DIR);
+    }
+    return null;
   }
 }

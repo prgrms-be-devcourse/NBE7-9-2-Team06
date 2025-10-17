@@ -2,7 +2,6 @@ package com.backend.petplace.domain.user.controller;
 
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
-import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.service.UserService;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserSpecification {
 
   private final UserService userService;
 
@@ -29,7 +28,7 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public void login(@RequestBody User user) {
+  public void login(@RequestBody UserSignupRequest user) {
     // TODO: user 로그인
   }
 }

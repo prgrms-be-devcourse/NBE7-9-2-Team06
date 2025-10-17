@@ -54,4 +54,11 @@ public class User extends BaseEntity {
     this.addressDetail = addressDetail;
     this.totalPoint = 0;
   }
+
+  public void addPoints(Integer amount) {
+    if(this.totalPoint == null) {
+      this.totalPoint = 0;
+    }
+    this.totalPoint += amount;
+  }
 }

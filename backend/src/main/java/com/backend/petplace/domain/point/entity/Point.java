@@ -58,4 +58,22 @@ public class Point {
     this.amount = amount;
     this.description = description;
   }
+
+  private static final int POINTS_FOR_PHOTO_REVIEW = 100;
+  private static final int POINTS_FOR_TEXT_REVIEW = 50;
+
+  public static Point createFromReview(Review review) {
+    boolean hasImage = (review.getImageUrl() != null && !review.getImageUrl().isBlank());
+
+    int amount = hasImage ? POINTS_FOR_PHOTO_REVIEW : POINTS_FOR_TEXT_REVIEW;
+    PointDescription description = hasImage ? PointDescription.REVIEW_PHOTO : PointDescription.REVIEW_TEXT;
+
+    return Point.builder()
+        .user(review.getUser())
+        .place(review.getPlace())
+        .review(review)
+        .amount(amount)
+        .description(description)
+        .build();
+  }
 }

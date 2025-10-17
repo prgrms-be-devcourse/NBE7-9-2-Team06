@@ -1,5 +1,6 @@
 package com.backend.petplace.domain.product.entity;
 
+import com.backend.petplace.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,9 +13,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Product {
+public class Product extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long productId;
+  private Long price;
+  private Long stock;
+  private String description;
 }

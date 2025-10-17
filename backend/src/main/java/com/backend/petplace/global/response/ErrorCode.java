@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
   // 회원
-  DUPLICATE_USERNAME("U001", HttpStatus.CONFLICT, "이미 사용 중인 이름입니다."),
+  DUPLICATE_NICKNAME("U001", HttpStatus.CONFLICT, "이미 사용 중인 이름입니다."),
   DUPLICATE_EMAIL("U002", HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
   NOT_FOUND_MEMBER("U003", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
   BAD_CREDENTIAL("U004", HttpStatus.UNAUTHORIZED, "아이디나 비밀번호가 틀렸습니다."),

@@ -21,8 +21,8 @@ public class UserService {
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
 
-    if (userRepository.existsByName(request.getName())) {
-      throw new BusinessException(ErrorCode.DUPLICATE_USERNAME);
+    if (userRepository.existsByNickName(request.getNickName())) {
+      throw new BusinessException(ErrorCode.DUPLICATE_NICKNAME);
     }
 
     // TODO:이메일 인증 기능 추가
@@ -32,7 +32,7 @@ public class UserService {
     }
 
     User user = User.builder()
-        .name(request.getName())
+        .nickName(request.getNickName())
         .password(passwordEncoder.encode(request.getPassword()))
         .email(request.getEmail())
         .address(request.getAddress())

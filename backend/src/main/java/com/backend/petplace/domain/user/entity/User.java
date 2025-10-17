@@ -30,7 +30,7 @@ public class User extends BaseEntity {
   private String password;
 
   @Column(unique = true, nullable = false, name = "userName")
-  private String name;
+  private String nickName;
 
   @Column(nullable = false)
   private String address;
@@ -43,10 +43,10 @@ public class User extends BaseEntity {
   private Integer totalPoint;
 
   @Builder
-  public User(String name, String password, String email, String address,
+  public User(String nickName, String password, String email, String address,
       String zipcode, String addressDetail) {
 
-    this.name = name;
+    this.nickName = nickName;
     this.password = password;
     this.email = email;
     this.address = address;

@@ -18,6 +18,9 @@ public enum ErrorCode {
   EXPIRED_TOKEN("U006", HttpStatus.UNAUTHORIZED, "엑세스 토큰이 만료되었습니다. 토큰을 갱신해주세요."),
   NOT_LOGIN_ACCESS("U007", HttpStatus.UNAUTHORIZED, "로그인되어 있지 않습니다. 로그인 해 주십시오."),
 
+  // 장소
+  NOT_FOUND_PLACE("P001", HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),
+
   // S3 - 이미지 업로드
   FAIL_TO_UPLOAD_IMAGE("S001", HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
   INVALID_FILE_NAME("S002", HttpStatus.BAD_REQUEST, "잘못된 형식의 파일 이름입니다."),

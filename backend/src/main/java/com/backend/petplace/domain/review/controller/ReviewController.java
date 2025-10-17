@@ -6,6 +6,7 @@ import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
 import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
 import com.backend.petplace.domain.review.service.ReviewService;
 import com.backend.petplace.global.response.ApiResponse;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -27,12 +28,15 @@ public class ReviewController implements ReviewSpecification {
 
   @PostMapping(value = "/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ApiResponse<Void>> createReview(
-      @RequestPart("request") ReviewCreateRequest request,
+      @Valid @RequestPart("request") ReviewCreateRequest request,
       @RequestPart(value = "image", required = false) MultipartFile image) {
 
-    reviewService.createReview(request, image);
+    // TODO: Spring Security 도입 후, 실제 인증된 사용자 정보 넘겨주기
+    Long currentUserId = 1L;
 
-    return ResponseEntity.ok(ApiResponse.success());
+    reviewService.createReview(currentUserId, request, image);
+
+    return ResponseEntity.ok(ApiResponse.create());
   }
 
   @GetMapping("/places/{placeId}/reviews")

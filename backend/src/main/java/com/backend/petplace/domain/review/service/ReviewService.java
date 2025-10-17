@@ -9,6 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ReviewService {
 
-  public void createReview(ReviewCreateRequest request, MultipartFile image) {
+  public void createReview(Long userId,ReviewCreateRequest request, MultipartFile image) {
   }
 }

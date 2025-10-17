@@ -13,4 +13,8 @@ public enum Category1Type {
   Category1Type(String koLabel) {
     this.koLabel = koLabel;
   }
+
+  public String koLabel() {
+    return koLabel;
+  }
 }

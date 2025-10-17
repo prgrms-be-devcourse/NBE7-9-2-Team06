@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 @Schema(description = "주문 생성 요청 DTO")
 public class OrderCreateRequest {
   private Long totalPrice;

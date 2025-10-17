@@ -29,23 +29,34 @@ public class OrderService {
 
   @Transactional
   public void createOrder(OrderCreateRequest request, Long userId) {
-    User user = userRepository
-        .findById(userId)
-        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+    User user = createUser(userId);
 
     Order order = Order.createOrder(user, request.getTotalPrice());
     orderRepository.save(order);
 
     for (OrderProductCreateRequest orderProductCreateRequest : request.getOrderProducts()) {
-      Product product = productRepository
-          .findById(orderProductCreateRequest.getProductId())
-          .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PRODUCT));
+
+      Product product = createProduct(orderProductCreateRequest);
 
       OrderProduct orderProduct = createOrderProduct(
-          order, product, orderProductCreateRequest.getQuantity()
+          order,
+          product,
+          orderProductCreateRequest.getQuantity()
       );
 
       orderProductRepository.save(orderProduct);
     }
+  }
+
+  private User createUser(Long userId) {
+    return userRepository
+        .findById(userId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
+  }
+
+  private Product createProduct(OrderProductCreateRequest orderProductCreateRequest) {
+    return productRepository
+        .findById(orderProductCreateRequest.getProductId())
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PRODUCT));
   }
 }

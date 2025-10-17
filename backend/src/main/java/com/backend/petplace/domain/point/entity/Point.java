@@ -5,6 +5,8 @@ import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,11 +44,13 @@ public class Point {
   @Column(nullable = false)
   private Integer amount;
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private String description;
+  private PointDescription description;
 
   @Builder
-  public Point(Long id, User user, Place place, Review review, Integer amount, String description) {
+  public Point(Long id, User user, Place place, Review review, Integer amount,
+      PointDescription description) {
     this.id = id;
     this.user = user;
     this.place = place;

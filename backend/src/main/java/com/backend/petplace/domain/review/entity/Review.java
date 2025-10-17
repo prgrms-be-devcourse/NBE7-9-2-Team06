@@ -10,13 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 
 @Entity
 @Getter
@@ -54,7 +51,8 @@ public class Review extends BaseEntity {
     this.imageUrl = imageUrl;
   }
 
-  public static Review createNewReview(User user, Place place, String content, int rating, String imageUrl) {
+  public static Review createNewReview(User user, Place place, String content, int rating,
+      String imageUrl) {
     return Review.builder()
         .user(user)
         .place(place)

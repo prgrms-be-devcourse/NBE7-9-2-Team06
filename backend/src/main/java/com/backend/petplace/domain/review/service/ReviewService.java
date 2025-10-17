@@ -7,7 +7,6 @@ import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.review.repository.ReviewRepository;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
-import com.backend.petplace.domain.user.service.UserService;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import com.backend.petplace.global.s3.S3Uploader;
@@ -28,14 +27,17 @@ public class ReviewService {
 
   private static final String REVIEW_IMAGE_DIR = "reviews";
 
-  public void createReview(Long userId,ReviewCreateRequest request, MultipartFile image) {
+  public void createReview(Long userId, ReviewCreateRequest request, MultipartFile image) {
     User user = findUserById(userId);
     Place place = findPlaceById(request.getPlaceId());
 
     String imageUrl = uploadImageIfPresent(image);
 
-    Review review = Review.createNewReview(user, place, request.getContent(), request.getRating(), imageUrl);
+    Review review = Review.createNewReview(user, place, request.getContent(), request.getRating(),
+        imageUrl);
     reviewRepository.save(review);
+
+    // TODO: 포인트 적립 로직
   }
 
   private User findUserById(Long userId) {

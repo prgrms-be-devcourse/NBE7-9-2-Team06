@@ -2,6 +2,9 @@ package com.backend.petplace.domain.review.service;
 
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
+import com.backend.petplace.domain.point.entity.Point;
+import com.backend.petplace.domain.point.repository.PointRepository;
+import com.backend.petplace.domain.point.service.PointService;
 import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.review.repository.ReviewRepository;
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReviewService {
 
   private final ReviewRepository reviewRepository;
+  private final PointService pointService;
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
   private final S3Uploader s3Uploader;
@@ -35,9 +39,9 @@ public class ReviewService {
 
     Review review = Review.createNewReview(user, place, request.getContent(), request.getRating(),
         imageUrl);
-    reviewRepository.save(review);
+    Review savedReview = reviewRepository.save(review);
 
-    // TODO: 포인트 적립 로직
+    pointService.addPointsForReview(user, savedReview);
   }
 
   private User findUserById(Long userId) {

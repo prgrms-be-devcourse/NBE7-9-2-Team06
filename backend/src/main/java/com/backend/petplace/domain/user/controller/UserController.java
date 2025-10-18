@@ -28,7 +28,10 @@ public class UserController implements UserSpecification {
   }
 
   @PostMapping("/login")
-  public void login(@RequestBody UserSignupRequest user) {
-    // TODO: user 로그인
+  public ResponseEntity<ApiResponse<UserLoginResponse>> login(
+      @RequestBody UserLoginRequest request) {
+
+    UserLoginResponse response = userService.login(request);
+    return ResponseEntity.ok(ApiResponse.success(response));
   }
 }

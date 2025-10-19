@@ -3,8 +3,6 @@ package com.backend.petplace.global.component;
 import com.backend.petplace.domain.place.entity.Category1Type;
 import com.backend.petplace.domain.place.entity.Category2Type;
 import java.util.regex.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 public class KcisaParser {
 
@@ -23,26 +21,24 @@ public class KcisaParser {
   // 반려동물 제한사항 패턴
   private static final Pattern PET_LIMIT_P = Pattern.compile("^\\s*반려동물\\s*제한사항\\s*:?\\s*(.+)$");
 
-  @Getter
-  @AllArgsConstructor
-  public static class Parsed {
-    private final String name;
-    private final Category1Type category1;
-    private final Category2Type category2;
-    private final String openingHours;
-    private final String closedDays;
-    private final Boolean parking;
-    private final Boolean petAllowed;
-    private final String petRestriction;
-    private final String tel;
-    private final String url;
-    private final String postalCode;
-    private final String address;
-    private final Double latitude;
-    private final Double longitude;
-    private final String rawDescription;
-    private final String uniqueKey;
-  }
+  public record Parsed(
+      String name,
+      Category1Type category1,
+      Category2Type category2,
+      String openingHours,
+      String closedDays,
+      Boolean parking,
+      Boolean petAllowed,
+      String petRestriction,
+      String tel,
+      String url,
+      String postalCode,
+      String address,
+      Double latitude,
+      Double longitude,
+      String rawDescription,
+      String uniqueKey
+  ) {}
 
 
 }

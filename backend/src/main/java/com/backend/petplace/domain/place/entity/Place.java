@@ -69,4 +69,16 @@ public class Place extends BaseEntity {
 
   @Column(length = 1000)
   private String rawDescription; // 원본 description
+
+  @Builder.Default
+  private Double averageRating = 0.0;
+
+  @Builder.Default
+  private Integer totalReviewCount = 0;
+
+  public void updateReviewStats(int newRating) {
+    double totalScore = this.averageRating * this.totalReviewCount;
+    this.totalReviewCount++;
+    this.averageRating = (totalScore + newRating) / this.totalReviewCount;
+  }
 }

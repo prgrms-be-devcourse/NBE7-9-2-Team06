@@ -1,7 +1,9 @@
 package com.backend.petplace.domain.order.entity;
 
+import com.backend.petplace.domain.orderproduct.entity.OrderProduct;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.global.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,9 +13,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +36,7 @@ public class Order extends BaseEntity {
   private Long orderId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "userId", nullable = false)
   private User user;
 
   @NotNull
@@ -42,18 +47,26 @@ public class Order extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private OrderStatus orderStatus;
 
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  private List<OrderProduct> orderProducts = new ArrayList<>();
+
   @Builder
   public Order(User user, Long totalPrice, OrderStatus orderStatus) {
     this.user = user;
     this.totalPrice = totalPrice;
     this.orderStatus = orderStatus;
   }
-
+  //정적 팩토리 메서드를 통한 Order 객체 생성
   public static Order createOrder(User user, Long totalPrice) {
     return Order.builder()
         .user(user)
         .totalPrice(totalPrice)
         .orderStatus(OrderStatus.ORDERED)
         .build();
+  }
+  //객체 생성 후 orderProducts에 order 추가 메소드
+  public void addOrderProducts(OrderProduct orderProduct) {
+    this.orderProducts.add(orderProduct);
+    orderProduct.setOrder(this);
   }
 }

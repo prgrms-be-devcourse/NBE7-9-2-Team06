@@ -26,11 +26,11 @@ public class OrderProduct extends BaseEntity {
   private Long orderProductId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "orders", nullable = false)
+  @JoinColumn(name = "orderId", nullable = false)
   Order order;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "product")
+  @JoinColumn(name = "productId", nullable = false)
   Product product;
 
   private long quantity;
@@ -42,6 +42,7 @@ public class OrderProduct extends BaseEntity {
     this.quantity = quantity;
   }
 
+  //정적 팩토리 메서드를 통한 orderProduct 객체 생성
   public static OrderProduct createOrderProduct(Order order, Product product, long quantity) {
     return OrderProduct.builder()
         .order(order)

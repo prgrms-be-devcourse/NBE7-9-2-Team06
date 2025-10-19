@@ -36,6 +36,13 @@ cloud:
     stack:
       auto: false
 
+import:
+  enabled: true         # 로컬 최초 적재 시 true, 이후 false로 끄기
+  base-url: https://api.kcisa.kr/openapi/API_TOU_050/request
+  service-key: ${KCISA_SERVICE_KEY}
+  page-size: ${KCISA_PAGE_SIZE}
+  sleep-ms: ${KCISA_SLEEP_MS}
+
 springdoc:
   default-produces-media-type: application/json
 

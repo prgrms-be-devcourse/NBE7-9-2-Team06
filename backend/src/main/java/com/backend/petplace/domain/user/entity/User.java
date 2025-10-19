@@ -79,13 +79,13 @@ public class User extends BaseEntity {
         .build();
   }
 
-  //객체 생성 후 orders에 order 추가 메소드
   public void addOrder(Order order) {
     orders.add(order);
     order.setUser(this);
+  }
 
   public void addPoints(Integer amount) {
-    if(this.totalPoint == null) {
+    if (this.totalPoint == null) {
       this.totalPoint = 0;
     }
     this.totalPoint += amount;

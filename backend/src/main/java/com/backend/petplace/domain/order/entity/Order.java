@@ -22,11 +22,9 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @Table(name = "orders")
 public class Order extends BaseEntity {
@@ -56,6 +54,7 @@ public class Order extends BaseEntity {
     this.totalPrice = totalPrice;
     this.orderStatus = orderStatus;
   }
+
   //정적 팩토리 메서드를 통한 Order 객체 생성
   public static Order createOrder(User user, Long totalPrice) {
     return Order.builder()
@@ -64,9 +63,17 @@ public class Order extends BaseEntity {
         .orderStatus(OrderStatus.ORDERED)
         .build();
   }
+
   //객체 생성 후 orderProducts에 order 추가 메소드
-  public void addOrderProducts(OrderProduct orderProduct) {
-    this.orderProducts.add(orderProduct);
-    orderProduct.setOrder(this);
+  public void addOrderProducts(List<OrderProduct> orderProducts) {
+    for (OrderProduct orderProduct : orderProducts) {
+      this.orderProducts.add(orderProduct);
+      orderProduct.setOrder(this);
+    }
+  }
+
+  //객체 생성 후 orders에 order 추가 메소드
+  public void setUser(User user) {
+    this.user = user;
   }
 }

@@ -13,11 +13,9 @@ import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 public class OrderProduct extends BaseEntity {
 
@@ -49,5 +47,9 @@ public class OrderProduct extends BaseEntity {
         .product(product)
         .quantity(quantity)
         .build();
+  }
+
+  public void setOrder(Order order) {
+    this.order = order;
   }
 }

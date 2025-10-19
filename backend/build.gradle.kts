@@ -54,6 +54,9 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
+	// WebClient
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
 	// ✅ Test 관련
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")

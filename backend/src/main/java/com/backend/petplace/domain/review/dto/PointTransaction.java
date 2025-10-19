@@ -26,5 +26,4 @@ public class PointTransaction {
   @Schema(description = "적립 설명", example = "멍멍카페 리뷰 작성")
   private String description;
 
-
 }

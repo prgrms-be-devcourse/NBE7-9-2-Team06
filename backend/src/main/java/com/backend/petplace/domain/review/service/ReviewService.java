@@ -41,6 +41,8 @@ public class ReviewService {
         imageUrl);
     Review savedReview = reviewRepository.save(review);
 
+    place.updateReviewStats(savedReview.getRating());
+
     pointService.addPointsForReview(user, savedReview);
   }
 

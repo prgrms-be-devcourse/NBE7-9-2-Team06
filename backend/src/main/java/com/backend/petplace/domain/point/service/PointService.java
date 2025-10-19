@@ -32,15 +32,13 @@ public class PointService {
   }
 
   private boolean isEligibleForPoints(User user, Review review) {
-    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-    LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
+    LocalDate today = LocalDate.now();
 
-    if (pointRepository.existsByUserAndPlaceAndCreatedDateBetween(user, review.getPlace(),
-        startOfDay, endOfDay)) {
+    if (pointRepository.existsByUserAndPlaceAndRewardDate(user, review.getPlace(), today)) {
       return false;
     }
 
-    Integer todaysPoints = pointRepository.findTodaysPointsSumByUser(user, startOfDay, endOfDay);
+    Integer todaysPoints = pointRepository.findTodaysPointsSumByUser(user, today);
     if (todaysPoints >= DAILY_POINT_LIMIT) {
       return false;
     }

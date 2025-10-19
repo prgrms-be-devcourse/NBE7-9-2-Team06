@@ -15,11 +15,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(name = "point", uniqueConstraints = {
+    @UniqueConstraint(name = "UK_point_review_id", columnNames = {"reviewId"}),
+    @UniqueConstraint(name = "UK_point_user_place_date", columnNames = {"userId", "placeId",
+        "rewardDate"})
+})
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,15 +57,19 @@ public class Point extends BaseEntity {
   @Column(nullable = false)
   private PointDescription description;
 
+  @Column(nullable = false)
+  private LocalDate rewardDate;
+
   @Builder
   public Point(Long id, User user, Place place, Review review, Integer amount,
-      PointDescription description) {
+      PointDescription description, LocalDate rewardDate) {
     this.id = id;
     this.user = user;
     this.place = place;
     this.review = review;
     this.amount = amount;
     this.description = description;
+    this.rewardDate = rewardDate;
   }
 
   private static final int POINTS_FOR_PHOTO_REVIEW = 100;
@@ -67,7 +79,8 @@ public class Point extends BaseEntity {
     boolean hasImage = (review.getImageUrl() != null && !review.getImageUrl().isBlank());
 
     int amount = hasImage ? POINTS_FOR_PHOTO_REVIEW : POINTS_FOR_TEXT_REVIEW;
-    PointDescription description = hasImage ? PointDescription.REVIEW_PHOTO : PointDescription.REVIEW_TEXT;
+    PointDescription description =
+        hasImage ? PointDescription.REVIEW_PHOTO : PointDescription.REVIEW_TEXT;
 
     return Point.builder()
         .user(review.getUser())
@@ -75,6 +88,7 @@ public class Point extends BaseEntity {
         .review(review)
         .amount(amount)
         .description(description)
+        .rewardDate(LocalDate.now())
         .build();
   }
 }

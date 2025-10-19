@@ -3,8 +3,11 @@ package com.backend.petplace.domain.point.entity;
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.user.entity.User;
+import com.backend.petplace.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Point {
+public class Point extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,16 +45,36 @@ public class Point {
   @Column(nullable = false)
   private Integer amount;
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private String description;
+  private PointDescription description;
 
   @Builder
-  public Point(Long id, User user, Place place, Review review, Integer amount, String description) {
+  public Point(Long id, User user, Place place, Review review, Integer amount,
+      PointDescription description) {
     this.id = id;
     this.user = user;
     this.place = place;
     this.review = review;
     this.amount = amount;
     this.description = description;
+  }
+
+  private static final int POINTS_FOR_PHOTO_REVIEW = 100;
+  private static final int POINTS_FOR_TEXT_REVIEW = 50;
+
+  public static Point createFromReview(Review review) {
+    boolean hasImage = (review.getImageUrl() != null && !review.getImageUrl().isBlank());
+
+    int amount = hasImage ? POINTS_FOR_PHOTO_REVIEW : POINTS_FOR_TEXT_REVIEW;
+    PointDescription description = hasImage ? PointDescription.REVIEW_PHOTO : PointDescription.REVIEW_TEXT;
+
+    return Point.builder()
+        .user(review.getUser())
+        .place(review.getPlace())
+        .review(review)
+        .amount(amount)
+        .description(description)
+        .build();
   }
 }

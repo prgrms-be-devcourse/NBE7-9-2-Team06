@@ -83,5 +83,12 @@ public class User extends BaseEntity {
   public void addOrder(Order order) {
     orders.add(order);
     order.setUser(this);
+
+  public void addPoints(Integer amount) {
+    if(this.totalPoint == null) {
+      this.totalPoint = 0;
+    }
+    this.totalPoint += amount;
+
   }
 }

@@ -50,6 +50,17 @@ public class OrderProduct extends BaseEntity {
   }
 
   public void setOrder(Order order) {
+    //기존 order와의 연관관계 제거
+    if (this.order != null) {
+      this.order.getOrderProducts().remove(this);
+    }
+
+    //새로운 order와의 연관관계 설정
     this.order = order;
+
+    //새로운 order의 orderProducts 리스트에 현재 객체 추가
+    if (order != null && !order.getOrderProducts().contains(this)) {
+      order.getOrderProducts().add(this);
+    }
   }
 }

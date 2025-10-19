@@ -79,9 +79,11 @@ public class User extends BaseEntity {
         .build();
   }
 
-  public void addOrder(Order order) {
-    orders.add(order);
-    order.setUser(this);
+  public void addOrders(List<Order> orders) {
+    for(Order order : orders) {
+      this.orders.add(order);
+      order.setUser(this);
+    }
   }
 
   public void addPoints(Integer amount) {

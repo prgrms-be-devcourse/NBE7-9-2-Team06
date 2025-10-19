@@ -25,6 +25,10 @@ public class Place extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  // uniqueKey = 장소명 + 우편번호 (중복되는 데이터가 생기는 걸 방지하기 위한 컬럼)
+  @Column(nullable = false, length = 100, unique = true)
+  private String uniqueKey;
+
   @Column(nullable = false, length = 200)
   private String name;
 

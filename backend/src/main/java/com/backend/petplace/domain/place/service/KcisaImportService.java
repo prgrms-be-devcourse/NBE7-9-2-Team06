@@ -53,32 +53,32 @@ public class KcisaImportService {
 
   /** uniqueKey 기준 업서트 */
   private void upsert(KcisaParser.Parsed f) {
-    var opt = placeRepository.findByUniqueKey(f.getUniqueKey());
+    var opt = placeRepository.findByUniqueKey(f.uniqueKey());
     if (opt.isPresent()) {
       Place e = opt.get();
       e.apply(
-          f.getName(), f.getCategory1(), f.getCategory2(),
-          f.getOpeningHours(), f.getClosedDays(), f.getParking(), f.getPetAllowed(), f.getPetRestriction(),
-          f.getTel(), f.getUrl(), f.getPostalCode(), f.getAddress(), f.getLatitude(), f.getLongitude(), f.getRawDescription()
+          f.name(), f.category1(), f.category2(),
+          f.openingHours(), f.closedDays(), f.parking(), f.petAllowed(), f.petRestriction(),
+          f.tel(), f.url(), f.postalCode(), f.address(), f.latitude(), f.longitude(), f.rawDescription()
       );
     } else {
       Place e = Place.builder()
-          .uniqueKey(f.getUniqueKey())
-          .name(f.getName())
-          .category1(f.getCategory1())
-          .category2(f.getCategory2())
-          .openingHours(f.getOpeningHours())
-          .closedDays(f.getClosedDays())
-          .parking(f.getParking())
-          .petAllowed(f.getPetAllowed())
-          .petRestriction(f.getPetRestriction())
-          .tel(f.getTel())
-          .url(f.getUrl())
-          .postalCode(f.getPostalCode())
-          .address(f.getAddress())
-          .latitude(f.getLatitude())
-          .longitude(f.getLongitude())
-          .rawDescription(f.getRawDescription())
+          .uniqueKey(f.uniqueKey())
+          .name(f.name())
+          .category1(f.category1())
+          .category2(f.category2())
+          .openingHours(f.openingHours())
+          .closedDays(f.closedDays())
+          .parking(f.parking())
+          .petAllowed(f.petAllowed())
+          .petRestriction(f.petRestriction())
+          .tel(f.tel())
+          .url(f.url())
+          .postalCode(f.postalCode())
+          .address(f.address())
+          .latitude(f.latitude())
+          .longitude(f.longitude())
+          .rawDescription(f.rawDescription())
           .build();
       placeRepository.save(e);
     }

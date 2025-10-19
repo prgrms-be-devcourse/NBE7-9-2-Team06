@@ -85,4 +85,27 @@ public class Place extends BaseEntity {
     this.totalReviewCount++;
     this.averageRating = (totalScore + newRating) / this.totalReviewCount;
   }
+
+  // 업서트 업데이트 시 필드 동기화 메서드
+  public void apply(String name, Category1Type c1, Category2Type c2, String openingHours,
+      String closedDays, Boolean parking, Boolean petAllowed, String petRestriction,
+      String tel, String url, String postalCode, String address, Double lat, Double lng,
+      String rawDescription
+  ) {
+    this.name = name;
+    this.category1 = c1;
+    this.category2 = c2;
+    this.openingHours = openingHours;
+    this.closedDays = closedDays;
+    this.parking = parking;
+    this.petAllowed = petAllowed;
+    this.petRestriction = petRestriction;
+    this.tel = tel;
+    this.url = url;
+    this.postalCode = postalCode;
+    this.address = address;
+    this.latitude = lat;
+    this.longitude = lng;
+    this.rawDescription = rawDescription;
+  }
 }

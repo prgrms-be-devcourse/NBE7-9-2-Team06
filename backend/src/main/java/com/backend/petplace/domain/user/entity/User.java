@@ -1,6 +1,7 @@
 package com.backend.petplace.domain.user.entity;
 
 import com.backend.petplace.domain.order.entity.Order;
+import com.backend.petplace.domain.pet.entity.Pet;
 import com.backend.petplace.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -49,6 +50,9 @@ public class User extends BaseEntity {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<Order> orders = new ArrayList<>();
+
+  @OneToMany(mappedBy = "user")
+  private List<Pet> pets = new ArrayList<>();
 
   @Builder
   public User(String nickName, String password, String email, String address,

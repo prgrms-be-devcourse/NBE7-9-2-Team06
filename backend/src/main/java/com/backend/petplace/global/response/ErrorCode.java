@@ -27,10 +27,10 @@ public enum ErrorCode {
 
   // 주문, 주문상품, 상품
   NOT_FOUND_PRODUCT("ORO002", HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
-
+  NOT_ENOUGH_STOCK("ORO003", HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
+  NOT_ENOUGH_POINT("ORO004", HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
   // 반려동물
   NOT_FOUND_PET("PET001", HttpStatus.NOT_FOUND, "존재하지 않는 반려동물입니다.");
-
 
   private final String code;
   private final HttpStatus status;

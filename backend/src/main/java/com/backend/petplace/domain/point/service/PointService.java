@@ -6,8 +6,6 @@ import com.backend.petplace.domain.point.type.PointAddResult;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.user.entity.User;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

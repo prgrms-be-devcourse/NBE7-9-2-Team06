@@ -1,6 +1,8 @@
 package com.backend.petplace.global.jwt;
 
 import com.backend.petplace.global.exception.BusinessException;
+import com.backend.petplace.global.response.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,8 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
     } catch (BusinessException ex) {
-      response.setStatus(ex.getErrorCode().getStatus().value());
-      response.getWriter().write(ex.getErrorCode().getMessage());
+      ApiResponse<Void> apiResponse = ApiResponse.error(ex.getErrorCode());
+      response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
       return;
     }
 

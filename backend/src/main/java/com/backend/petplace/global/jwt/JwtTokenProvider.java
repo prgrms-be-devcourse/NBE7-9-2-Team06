@@ -72,9 +72,9 @@ public class JwtTokenProvider {
   }
 
   public Authentication getAuthentication(String token) {
-    String nickName = getNickName(token);
+    String userId = getUserId(token);
     // DB에서 사용자 정보 로드
-    UserDetails userDetails = this.userDetailsService.loadUserByUsername(nickName);
+    UserDetails userDetails = this.userDetailsService.loadUserByUsername(userId);
 
     return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
   }

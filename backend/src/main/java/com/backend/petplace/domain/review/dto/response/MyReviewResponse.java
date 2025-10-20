@@ -1,11 +1,14 @@
 package com.backend.petplace.domain.review.dto.response;
 
 import com.backend.petplace.domain.review.dto.PlaceInfo;
+import com.backend.petplace.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @Schema(description = "내 리뷰 목록 조회 응답 DTO")
 public class MyReviewResponse {
 
@@ -29,4 +32,16 @@ public class MyReviewResponse {
 
   @Schema(description = "해당 리뷰로 적립된 포인트", example = "100")
   private int pointsAwarded;
+
+  public static MyReviewResponse from(Review review, int pointsAwarded) {
+    MyReviewResponse response = new MyReviewResponse();
+    response.reviewId = review.getId();
+    response.place = new PlaceInfo(review.getPlace());
+    response.rating = review.getRating();
+    response.content = review.getContent();
+    response.imageUrl = review.getImageUrl();
+    response.createdDate = review.getCreatedDate().toLocalDate();
+    response.pointsAwarded = pointsAwarded;
+    return response;
+  }
 }

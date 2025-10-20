@@ -1,9 +1,11 @@
 package com.backend.petplace.domain.review.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 @Schema(description = "리뷰 등록 응답 DTO")
 public class ReviewCreateResponse {
 

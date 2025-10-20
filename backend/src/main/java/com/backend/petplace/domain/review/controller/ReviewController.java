@@ -10,6 +10,7 @@ import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +36,8 @@ public class ReviewController implements ReviewSpecification {
     // TODO: Spring Security 도입 후, 실제 인증된 사용자 정보 넘겨주기
     Long currentUserId = 1L;
 
-    reviewService.createReview(currentUserId, request, image);
-
-    return ResponseEntity.ok(ApiResponse.create());
+    ReviewCreateResponse response = reviewService.createReview(currentUserId, request, image);
+    return ResponseEntity.ok(ApiResponse.create(response));
   }
 
   @GetMapping("/places/{placeId}/reviews")

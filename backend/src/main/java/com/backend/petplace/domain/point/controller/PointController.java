@@ -1,5 +1,6 @@
 package com.backend.petplace.domain.point.controller;
 
+import com.backend.petplace.domain.point.service.PointService;
 import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
 import com.backend.petplace.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/")
 @RequiredArgsConstructor
-public class PointController {
+public class PointController implements PointSpecification {
+
+  private final PointService pointService;
 
   @GetMapping("/my/points")
   public ResponseEntity<ApiResponse<PointHistoryResponse>> getMyPointHistory() {
 
-    // TODO: 현재 사용자의 포인트 적립 내역 조회 로직 구현
+    // TODO: Spring Security 도입 후, 실제 인증된 사용자 정보 넘겨주기
+    Long currentUserId = 1L;
 
-    return ResponseEntity.ok(ApiResponse.success(new PointHistoryResponse()));
+    PointHistoryResponse response = pointService.getPointHistory(currentUserId);
+    return ResponseEntity.ok(ApiResponse.success(response));
   }
 }

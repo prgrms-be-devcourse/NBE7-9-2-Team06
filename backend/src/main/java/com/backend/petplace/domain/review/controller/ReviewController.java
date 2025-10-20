@@ -4,6 +4,7 @@ import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
 import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
 import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
 import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
+import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
 import com.backend.petplace.domain.review.service.ReviewService;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ public class ReviewController implements ReviewSpecification {
   private final ReviewService reviewService;
 
   @PostMapping(value = "/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<ApiResponse<Void>> createReview(
+  public ResponseEntity<ApiResponse<ReviewCreateResponse>> createReview(
       @Valid @RequestPart("request") ReviewCreateRequest request,
       @RequestPart(value = "image", required = false) MultipartFile image) {
 

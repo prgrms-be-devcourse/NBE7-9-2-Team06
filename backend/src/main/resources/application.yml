@@ -45,6 +45,7 @@ import:
   service-key: ${KCISA_SERVICE_KEY}
   page-size: ${KCISA_PAGE_SIZE}
   sleep-ms: ${KCISA_SLEEP_MS}
+  max-in-memory-mb: ${KCISA_MAX_IN_MEMORY_MB}
 
 springdoc:
   default-produces-media-type: application/json

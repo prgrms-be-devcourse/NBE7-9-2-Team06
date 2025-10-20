@@ -2,9 +2,14 @@ package com.backend.petplace.domain.review.service;
 
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
+import com.backend.petplace.domain.point.entity.Point;
+import com.backend.petplace.domain.point.repository.PointRepository;
 import com.backend.petplace.domain.point.service.PointService;
 import com.backend.petplace.domain.point.type.PointAddResult;
+import com.backend.petplace.domain.review.dto.ReviewInfo;
 import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
+import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
+import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
 import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.review.repository.ReviewRepository;
@@ -13,6 +18,8 @@ import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import com.backend.petplace.global.s3.S3Uploader;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +30,17 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class ReviewService {
 
-  private final ReviewRepository reviewRepository;
   private final PointService pointService;
+  private final PointRepository pointRepository;
+  private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
   private final S3Uploader s3Uploader;
 
   private static final String REVIEW_IMAGE_DIR = "reviews";
 
-  public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request, MultipartFile image) {
+  public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request,
+      MultipartFile image) {
     User user = findUserById(userId);
     Place place = findPlaceById(request.getPlaceId());
 
@@ -47,6 +56,36 @@ public class ReviewService {
     String resultMessage = result.getMessage();
 
     return new ReviewCreateResponse(savedReview.getId(), resultMessage);
+  }
+
+  @Transactional(readOnly = true)
+  public List<MyReviewResponse> getMyReviews(Long currentUserId) {
+    User user = findUserById(currentUserId);
+
+    List<Review> reviews = reviewRepository.findByUserOrderByIdDesc(user);
+
+    return reviews.stream()
+        .map(review -> {
+          int points = pointRepository.findByReview(review)
+              .map(Point::getAmount)
+              .orElse(0);
+
+          return MyReviewResponse.from(review, points);
+        })
+        .collect(Collectors.toList());
+  }
+
+  public PlaceReviewsResponse getReviewByPlace(Long placeId) {
+
+    Place place = findPlaceById(placeId);
+
+    List<Review> reviews = reviewRepository.findByPlaceOrderByIdDesc(place);
+
+    List<ReviewInfo> reviewInfos = reviews.stream()
+        .map(ReviewInfo::from)
+        .collect(Collectors.toList());
+
+    return new PlaceReviewsResponse(place, reviewInfos);
   }
 
   private User findUserById(Long userId) {

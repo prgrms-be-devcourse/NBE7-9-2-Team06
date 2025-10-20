@@ -1,10 +1,13 @@
 package com.backend.petplace.domain.review.dto;
 
+import com.backend.petplace.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @Schema(description = "장소 리뷰 목록에 포함될 개별 리뷰 정보")
 public class ReviewInfo {
 
@@ -25,4 +28,15 @@ public class ReviewInfo {
 
   @Schema(description = "작성일", example = "2025-10-15")
   private LocalDate createdDate;
+
+  public static ReviewInfo from(Review review) {
+    ReviewInfo reviewInfo = new ReviewInfo();
+    reviewInfo.reviewId = review.getId();
+    reviewInfo.userName = review.getUser().getNickName();
+    reviewInfo.content = review.getContent();
+    reviewInfo.rating = review.getRating();
+    reviewInfo.imageUrl = review.getImageUrl();
+    reviewInfo.createdDate = review.getCreatedDate().toLocalDate();
+    return reviewInfo;
+  }
 }

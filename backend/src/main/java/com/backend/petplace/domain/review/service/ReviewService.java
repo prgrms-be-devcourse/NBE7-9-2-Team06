@@ -56,6 +56,7 @@ public class ReviewService {
     return new ReviewCreateResponse(savedReview.getId(), resultMessage);
   }
 
+  @Transactional(readOnly = true)
   public List<MyReviewResponse> getMyReviews(Long currentUserId) {
     User user = findUserById(currentUserId);
 

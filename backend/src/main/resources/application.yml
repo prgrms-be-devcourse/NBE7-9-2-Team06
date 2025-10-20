@@ -45,3 +45,6 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
     com.rest1: DEBUG
+
+jwt:
+  secret-key: ${jwt.secret-key}

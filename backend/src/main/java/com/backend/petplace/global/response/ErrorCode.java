@@ -17,6 +17,7 @@ public enum ErrorCode {
   INVALID_TOKEN("U005", HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   EXPIRED_TOKEN("U006", HttpStatus.UNAUTHORIZED, "엑세스 토큰이 만료되었습니다. 토큰을 갱신해주세요."),
   NOT_LOGIN_ACCESS("U007", HttpStatus.UNAUTHORIZED, "로그인되어 있지 않습니다. 로그인 해 주십시오."),
+  MEMBER_ACCESS_DENIED("U008", HttpStatus.UNAUTHORIZED, "올바른 사용자가 아닙니다. 접근할 수 없습니다."),
 
   // 장소
   NOT_FOUND_PLACE("P001", HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),
@@ -27,10 +28,14 @@ public enum ErrorCode {
 
   // 주문, 주문상품, 상품
   NOT_FOUND_PRODUCT("ORO002", HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
+  NOT_ENOUGH_STOCK("ORO003", HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
+  NOT_ENOUGH_POINT("ORO004", HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
+  NOT_FOUND_ORDER("ORO005", HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
+  INVALID_ORDER_STATUS("ORO006", HttpStatus.BAD_REQUEST, "취소할 수 없는 주문 상태입니다."),
 
   // 반려동물
-  NOT_FOUND_PET("PET001", HttpStatus.NOT_FOUND, "존재하지 않는 반려동물입니다.");
-
+  NOT_FOUND_PET("PET001", HttpStatus.NOT_FOUND, "존재하지 않는 반려동물입니다."),
+  ALREADY_DELETED("PET002", HttpStatus.BAD_REQUEST, "이미 삭제된 데이터입니다.");
 
   private final String code;
   private final HttpStatus status;

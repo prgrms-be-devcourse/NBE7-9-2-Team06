@@ -22,6 +22,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
+    if (isPermitUrl(request.getRequestURI())) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     String token = resolveToken(request);
 
     try {
@@ -37,6 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  private boolean isPermitUrl(String path) {
+    return path.startsWith("/h2-console")
+        || path.startsWith("/swagger-ui")
+        || path.startsWith("/v3/api-docs")
+        || path.startsWith("/api/v1/login")
+        || path.startsWith("/api/v1/signup");
   }
 
   private String resolveToken(HttpServletRequest request) {

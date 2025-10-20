@@ -17,6 +17,8 @@ public enum ErrorCode {
   INVALID_TOKEN("U005", HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   EXPIRED_TOKEN("U006", HttpStatus.UNAUTHORIZED, "엑세스 토큰이 만료되었습니다. 토큰을 갱신해주세요."),
   NOT_LOGIN_ACCESS("U007", HttpStatus.UNAUTHORIZED, "로그인되어 있지 않습니다. 로그인 해 주십시오."),
+  UNSUPPORTED_TOKEN("U009", HttpStatus.UNAUTHORIZED, "지원되지 않는 토큰 형식입니다."),
+  EMPTY_TOKEN("U010", HttpStatus.BAD_REQUEST, "토큰이 비어있습니다."),
 
   // 장소
   NOT_FOUND_PLACE("P001", HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),

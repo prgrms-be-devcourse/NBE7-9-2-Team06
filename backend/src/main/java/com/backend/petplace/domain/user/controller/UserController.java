@@ -27,11 +27,11 @@ public class UserController implements UserSpecification {
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
-  @PostMapping("/login")
+  /*@PostMapping("/login")
   public ResponseEntity<ApiResponse<UserLoginResponse>> login(
       @RequestBody UserLoginRequest request) {
 
     UserLoginResponse response = userService.login(request);
     return ResponseEntity.ok(ApiResponse.success(response));
-  }
+  }*/
 }

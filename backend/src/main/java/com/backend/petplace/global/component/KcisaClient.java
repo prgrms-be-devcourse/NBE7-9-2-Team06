@@ -5,8 +5,7 @@ import com.backend.petplace.global.config.ImportProperties;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -16,24 +15,14 @@ public class KcisaClient {
 
   private final ImportProperties props;
 
-  private WebClient webClient() {
-    int bytes = props.getMaxInMemoryMb() * 1024 * 1024;
-
-    return WebClient.builder()
-        .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-        .defaultHeader(HttpHeaders.ACCEPT_ENCODING, "gzip")
-        .codecs(c -> c.defaultCodecs().maxInMemorySize(bytes))
-        .build();
-  }
+  @Qualifier("kcisaWebClient")
+  private final WebClient client;
 
   public List<KcisaDto.Item> fetchPage(int pageNo) {
     URI uri = URI.create(String.format(
         "%s?serviceKey=%s&numOfRows=%d&pageNo=%d",
-        props.getBaseUrl(), props.getServiceKey(), props.getPageSize(), pageNo
+        props.baseUrl(), props.serviceKey(), props.pageSize(), pageNo
     ));
-
-    // builder를 매번 새로 만들 필요는 없지만, props 변경 적용 위해 메서드로 분리
-    WebClient client = webClient();
 
     KcisaDto root = client.get()
         .uri(uri)

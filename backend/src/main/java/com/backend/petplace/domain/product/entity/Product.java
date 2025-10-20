@@ -20,6 +20,9 @@ public class Product extends BaseEntity {
   private Long productId;
 
   @Column(nullable = false)
+  private String productName;
+
+  @Column(nullable = false)
   private Long price;
 
   @Column(nullable = false)
@@ -29,15 +32,17 @@ public class Product extends BaseEntity {
 
 
   @Builder
-  public Product(Long price, Long stock, String description) {
+  public Product(String productName, Long price, Long stock, String description) {
+    this.productName = productName;
     this.price = price;
     this.stock = stock;
     this.description = description;
   }
 
   //정적 팩토리 메서드를 통한 product 객체 생성
-  public static Product createProduct(Long price, Long stock, String description) {
+  public static Product createProduct(String productName, Long price, Long stock, String description) {
     return Product.builder()
+        .productName(productName)
         .price(price)
         .stock(stock)
         .description(description)

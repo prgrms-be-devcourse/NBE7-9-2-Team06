@@ -13,16 +13,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
+
+  private final UserDetailsService userDetailsService;
 
   @Value("${jwt.secret-key}")
   private String secretKey;
-
   @Value("${jwt.access-expiration-ms}")
   private long accessTokenExpirationMilliseconds;
 
@@ -66,6 +72,10 @@ public class JwtTokenProvider {
   }
 
   public Authentication getAuthentication(String token) {
-    return null;
+    String nickName = getNickName(token);
+    // DB에서 사용자 정보 로드
+    UserDetails userDetails = this.userDetailsService.loadUserByUsername(nickName);
+
+    return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
   }
 }

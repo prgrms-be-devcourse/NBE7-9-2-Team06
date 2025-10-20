@@ -22,6 +22,9 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 50MB
+  http:
+    codecs:
+      max-in-memory-size: 16MB
 
 cloud:
   aws:
@@ -35,6 +38,14 @@ cloud:
       auto: false
     stack:
       auto: false
+
+import:
+  enabled: false         # 로컬 최초 적재 시 true, 이후 false로 끄기
+  base-url: https://api.kcisa.kr/openapi/API_TOU_050/request
+  service-key: ${KCISA_SERVICE_KEY}
+  page-size: ${KCISA_PAGE_SIZE}
+  sleep-ms: ${KCISA_SLEEP_MS}
+  max-in-memory-mb: ${KCISA_MAX_IN_MEMORY_MB}
 
 springdoc:
   default-produces-media-type: application/json

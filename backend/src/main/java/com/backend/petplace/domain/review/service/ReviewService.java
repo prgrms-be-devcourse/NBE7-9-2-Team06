@@ -2,10 +2,10 @@ package com.backend.petplace.domain.review.service;
 
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
-import com.backend.petplace.domain.point.entity.Point;
-import com.backend.petplace.domain.point.repository.PointRepository;
 import com.backend.petplace.domain.point.service.PointService;
+import com.backend.petplace.domain.point.type.PointAddResult;
 import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
+import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.review.repository.ReviewRepository;
 import com.backend.petplace.domain.user.entity.User;
@@ -31,7 +31,7 @@ public class ReviewService {
 
   private static final String REVIEW_IMAGE_DIR = "reviews";
 
-  public void createReview(Long userId, ReviewCreateRequest request, MultipartFile image) {
+  public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request, MultipartFile image) {
     User user = findUserById(userId);
     Place place = findPlaceById(request.getPlaceId());
 
@@ -43,7 +43,10 @@ public class ReviewService {
 
     place.updateReviewStats(savedReview.getRating());
 
-    pointService.addPointsForReview(user, savedReview);
+    PointAddResult result = pointService.addPointsForReview(user, savedReview);
+    String resultMessage = result.getMessage();
+
+    return new ReviewCreateResponse(savedReview.getId(), resultMessage);
   }
 
   private User findUserById(Long userId) {

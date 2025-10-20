@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -62,5 +63,9 @@ public class JwtTokenProvider {
     } catch (JwtException e) {
       throw new BusinessException(ErrorCode.INVALID_TOKEN);
     }
+  }
+
+  public Authentication getAuthentication(String token) {
+    return null;
   }
 }

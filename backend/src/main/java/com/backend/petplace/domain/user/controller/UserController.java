@@ -27,6 +27,11 @@ public class UserController implements UserSpecification {
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
+  // 테스트를 위해 임시로 넣어놨습니다.
+  @PostMapping("/login")
+  public ResponseEntity<Void> login(){
+    return  ResponseEntity.ok().build();
+  }
   /*@PostMapping("/login")
   public ResponseEntity<ApiResponse<UserLoginResponse>> login(
       @RequestBody UserLoginRequest request) {

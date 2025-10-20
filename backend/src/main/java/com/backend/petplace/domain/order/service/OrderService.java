@@ -98,11 +98,11 @@ public class OrderService {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
 
-    order.cancelOrder();
-
     if (order.getOrderStatus() != OrderStatus.ORDERED) {
       throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
     }
+
+    order.cancelOrder();
 
     orderRepository.save(order);
   }

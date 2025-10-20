@@ -4,7 +4,6 @@ import com.backend.petplace.domain.orderproduct.dto.request.OrderProductCreateRe
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Schema(description = "주문 생성 요청 DTO")

@@ -1,9 +1,10 @@
-package com.backend.petplace.global.component;
+package com.backend.petplace.domain.place.importer;
 
 import com.backend.petplace.domain.place.dto.KcisaDto;
 import com.backend.petplace.domain.place.entity.Category1Type;
 import com.backend.petplace.domain.place.entity.Category2Type;
 import com.backend.petplace.domain.place.entity.mapper.CategoryMapper;
+import com.backend.petplace.domain.place.importer.model.ImportParsed;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -30,26 +31,7 @@ public class KcisaParser {
   // 반려동물 제한사항 패턴
   private static final Pattern PET_LIMIT_P = Pattern.compile("^\\s*반려동물\\s*제한사항\\s*:?\\s*(.+)$");
 
-  public record Parsed(
-      String name,
-      Category1Type category1,
-      Category2Type category2,
-      String openingHours,
-      String closedDays,
-      Boolean parking,
-      Boolean petAllowed,
-      String petRestriction,
-      String tel,
-      String url,
-      String postalCode,
-      String address,
-      Double latitude,
-      Double longitude,
-      String rawDescription,
-      String uniqueKey
-  ) {}
-
-  public Parsed parse(KcisaDto.Item it) {
+  public ImportParsed parse(KcisaDto.Item it) {
     //  주소/우편번호
     String postal = null, addr = null;
     if (it.address() != null) {
@@ -108,7 +90,7 @@ public class KcisaParser {
     // uniqueKey: title + 우편번호(없으면 주소) → SHA-256 해싱
     String uniqueKey = buildUniqueKey(it.title(), postal, addr);
 
-    return new Parsed(
+    return new ImportParsed(
         it.title(), c1, c2, opening, closed, parking, petAllowed, petLimit, tel, url, postal, addr,
         lat, lng, it.description(), uniqueKey
     );

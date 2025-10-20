@@ -29,6 +29,9 @@ public enum ErrorCode {
   NOT_FOUND_PRODUCT("ORO002", HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
   NOT_ENOUGH_STOCK("ORO003", HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
   NOT_ENOUGH_POINT("ORO004", HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
+  NOT_FOUND_ORDER("ORO005", HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
+  INVALID_ORDER_STATUS("ORO006", HttpStatus.BAD_REQUEST, "취소할 수 없는 주문 상태입니다."),
+
   // 반려동물
   NOT_FOUND_PET("PET001", HttpStatus.NOT_FOUND, "존재하지 않는 반려동물입니다.");
 

@@ -1,12 +1,10 @@
-package com.backend.petplace.domain.place.service;
+package com.backend.petplace.domain.place.importer;
 
 import com.backend.petplace.domain.place.dto.KcisaDto;
 import com.backend.petplace.domain.place.dto.KcisaDto.Item;
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.place.importer.model.ImportParsed;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
-import com.backend.petplace.global.component.KcisaClient;
-import com.backend.petplace.global.component.KcisaParser;
 import com.backend.petplace.global.config.ImportProperties;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

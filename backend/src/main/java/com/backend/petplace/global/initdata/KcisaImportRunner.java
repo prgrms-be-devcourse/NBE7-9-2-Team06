@@ -1,6 +1,6 @@
 package com.backend.petplace.global.initdata;
 
-import com.backend.petplace.domain.place.service.KcisaImportService;
+import com.backend.petplace.domain.place.importer.KcisaImportService;
 import com.backend.petplace.global.config.ImportProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;

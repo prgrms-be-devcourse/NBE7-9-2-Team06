@@ -1,4 +1,4 @@
-package com.backend.petplace.global.component;
+package com.backend.petplace.domain.place.importer;
 
 import com.backend.petplace.domain.place.dto.KcisaDto;
 import com.backend.petplace.domain.place.entity.Category1Type;

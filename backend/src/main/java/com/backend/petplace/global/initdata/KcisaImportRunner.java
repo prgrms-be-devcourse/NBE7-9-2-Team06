@@ -19,6 +19,6 @@ public class KcisaImportRunner implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) {
     int count = service.importAll();
-    System.out.printf("[KCISA IMPORT] imported=%d (pageSize=%d)%n", count, props.getPageSize());
+    System.out.printf("[KCISA IMPORT] imported=%d (pageSize=%d)%n", count, props.pageSize());
   }
 }

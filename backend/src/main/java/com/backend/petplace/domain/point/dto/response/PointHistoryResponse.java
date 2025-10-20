@@ -1,6 +1,6 @@
 package com.backend.petplace.domain.point.dto.response;
 
-import com.backend.petplace.domain.review.dto.PointTransaction;
+import com.backend.petplace.domain.point.dto.PointTransaction;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Getter;

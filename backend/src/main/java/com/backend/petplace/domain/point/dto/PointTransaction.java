@@ -1,7 +1,8 @@
-package com.backend.petplace.domain.review.dto;
+package com.backend.petplace.domain.point.dto;
 
 import com.backend.petplace.domain.point.entity.Point;
 import com.backend.petplace.domain.point.entity.PointDescription;
+import com.backend.petplace.domain.review.dto.PlaceInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Getter;

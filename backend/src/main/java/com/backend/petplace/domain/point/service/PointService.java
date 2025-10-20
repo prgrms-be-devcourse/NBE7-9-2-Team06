@@ -1,10 +1,10 @@
 package com.backend.petplace.domain.point.service;
 
+import com.backend.petplace.domain.point.dto.PointTransaction;
 import com.backend.petplace.domain.point.dto.response.PointHistoryResponse;
 import com.backend.petplace.domain.point.entity.Point;
 import com.backend.petplace.domain.point.repository.PointRepository;
 import com.backend.petplace.domain.point.type.PointAddResult;
-import com.backend.petplace.domain.review.dto.PointTransaction;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;

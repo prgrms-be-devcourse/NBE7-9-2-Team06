@@ -1,10 +1,14 @@
 package com.backend.petplace.domain.review.dto;
 
+import com.backend.petplace.domain.point.entity.Point;
+import com.backend.petplace.domain.point.entity.PointDescription;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @Schema(description = "개별 포인트 거래 내역 정보")
 public class PointTransaction {
 
@@ -23,7 +27,17 @@ public class PointTransaction {
   @Schema(description = "적립된 포인트", example = "100")
   private int points;
 
-  @Schema(description = "적립 설명", example = "멍멍카페 리뷰 작성")
+  @Schema(description = "적립 설명", example = "사진 리뷰 작성")
   private String description;
 
+  public static PointTransaction from(Point point) {
+    PointTransaction transaction = new PointTransaction();
+    transaction.pointId = point.getId();
+    transaction.place = new PlaceInfo(point.getPlace());
+    transaction.hasImage = point.getDescription() == PointDescription.REVIEW_PHOTO;
+    transaction.createdDate = point.getRewardDate();
+    transaction.points = point.getAmount();
+    transaction.description = point.getDescription().getDescription();
+    return transaction;
+  }
 }

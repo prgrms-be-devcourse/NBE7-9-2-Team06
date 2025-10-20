@@ -3,6 +3,7 @@ package com.backend.petplace.domain.order.service;
 import com.backend.petplace.domain.order.dto.request.OrderCreateRequest;
 import com.backend.petplace.domain.order.dto.response.OrderReadByIdResponse;
 import com.backend.petplace.domain.order.entity.Order;
+import com.backend.petplace.domain.order.entity.OrderStatus;
 import com.backend.petplace.domain.order.repository.OrderRepository;
 import com.backend.petplace.domain.orderproduct.dto.request.OrderProductCreateRequest;
 import com.backend.petplace.domain.orderproduct.entity.OrderProduct;
@@ -98,6 +99,10 @@ public class OrderService {
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
 
     order.cancelOrder();
+
+    if (order.getOrderStatus() != OrderStatus.ORDERED) {
+      throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
+    }
 
     orderRepository.save(order);
   }

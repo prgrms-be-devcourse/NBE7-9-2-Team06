@@ -95,9 +95,7 @@ public class Order extends BaseEntity {
   }
 
   public void cancelOrder() {
-    if (this.orderStatus != OrderStatus.ORDERED) {
-      throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
-    }
+
     this.orderStatus = OrderStatus.CANCELED;
   }
 }

@@ -3,6 +3,8 @@ package com.backend.petplace.domain.order.entity;
 import com.backend.petplace.domain.orderproduct.entity.OrderProduct;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.global.entity.BaseEntity;
+import com.backend.petplace.global.exception.BusinessException;
+import com.backend.petplace.global.response.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -90,5 +92,12 @@ public class Order extends BaseEntity {
     if (user != null && !user.getOrders().contains(this)) { // 아직 연결 안 되어 있으면
       user.getOrders().add(this);        // User 쪽 리스트에도 추가
     }
+  }
+
+  public void cancelOrder() {
+    if (this.orderStatus != OrderStatus.ORDERED) {
+      throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
+    }
+    this.orderStatus = OrderStatus.CANCELED;
   }
 }

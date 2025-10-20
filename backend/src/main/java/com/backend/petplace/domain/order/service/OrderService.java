@@ -92,4 +92,15 @@ public class OrderService {
         .map(OrderReadByIdResponse::new) // Order -> DTO 변환
         .toList();
   }
+
+  public void cancelOrder(Long userId, Long orderId) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
+
+    order.cancelOrder();
+
+    orderRepository.save(order);
+  }
+
+
 }

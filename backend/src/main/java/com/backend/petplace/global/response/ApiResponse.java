@@ -19,6 +19,10 @@ public class ApiResponse<T> {
     return new ApiResponse<>(ResponseCode.OK.getCode(), ResponseCode.OK.getMessage(), null);
   }
 
+  public static <T> ApiResponse<T> create() {
+    return new ApiResponse<>(ResponseCode.CREATED.getCode(), ResponseCode.CREATED.getMessage(), null);
+  }
+
   public static <T> ApiResponse<T> error(ResponseCode code) {
     return new ApiResponse<>(code.getCode(), code.getMessage(), null);
   }

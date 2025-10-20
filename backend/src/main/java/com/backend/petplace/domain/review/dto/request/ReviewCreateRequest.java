@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Schema(description = "리뷰 등록 요청 DTO")
@@ -20,7 +21,7 @@ public class ReviewCreateRequest {
   private String content;
 
   @Schema(description = "별점 (1~5)", example = "5")
-  @NotBlank
+  @Range(min = 1, max = 5, message = "별점은 1점에서 5점 사이여야 합니다.")
   private int rating;
 
 }

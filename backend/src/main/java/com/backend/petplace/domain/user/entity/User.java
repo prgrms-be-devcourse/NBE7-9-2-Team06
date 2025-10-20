@@ -1,22 +1,100 @@
 package com.backend.petplace.domain.user.entity;
 
+import com.backend.petplace.domain.order.entity.Order;
+import com.backend.petplace.global.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
-public class User {
+public class User extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "userId")
   private Long id;
+
+  @Column(unique = true, nullable = false, name = "userEmail")
+  private String email;
+
+  @Column(nullable = false) // 암호화
+  private String password;
+
+  @Column(unique = true, nullable = false, name = "userName")
+  private String nickName;
+
+  @Column(nullable = false)
+  private String address;
+
+  @Column(nullable = false)
+  private String zipcode;
+
+  private String addressDetail;
+
+  private Integer totalPoint;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<Order> orders = new ArrayList<>();
+
+  @Builder
+  public User(String nickName, String password, String email, String address,
+      String zipcode, String addressDetail) {
+
+    this.nickName = nickName;
+    this.password = password;
+    this.email = email;
+    this.address = address;
+    this.zipcode = zipcode;
+    this.addressDetail = addressDetail;
+    this.totalPoint = 0;
+  }
+
+  //정적 팩토리 메서드를 통한 User 객체 생성
+  public static User createUser(
+      String nickName, String password,
+      String email, String address,
+      String zipcode, String addressDetail) {
+
+    return User.builder()
+        .nickName(nickName)
+        .password(password)
+        .email(email)
+        .address(address)
+        .zipcode(zipcode)
+        .addressDetail(addressDetail)
+        .build();
+  }
+
+  public void addOrders(List<Order> orders) {
+    for (Order order : orders) {
+      addOrder(order);
+    }
+  }
+
+  public void addOrder(Order order) {
+    this.orders.add(order);
+    order.setUser(this);
+  }
+
+  public void addPoints(Integer amount) {
+    if (this.totalPoint == null) {
+      this.totalPoint = 0;
+    }
+    this.totalPoint += amount;
+
+  }
 }

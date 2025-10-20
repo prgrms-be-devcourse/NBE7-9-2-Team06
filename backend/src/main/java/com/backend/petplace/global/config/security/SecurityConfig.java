@@ -1,5 +1,7 @@
 package com.backend.petplace.global.config.security;
 
+import com.backend.petplace.global.jwt.JwtAuthenticationFilter;
+import com.backend.petplace.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,11 +10,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+  private final JwtTokenProvider jwtTokenProvider;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -25,6 +30,8 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/**").permitAll()
             .anyRequest().authenticated()
         )
+        .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+            UsernamePasswordAuthenticationFilter.class)
         .httpBasic(httpBasic -> httpBasic.disable());
 
     return http.build();

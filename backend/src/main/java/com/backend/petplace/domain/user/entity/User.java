@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -51,6 +52,7 @@ public class User extends BaseEntity {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<Order> orders = new ArrayList<>();
 
+  @BatchSize(size = 100)
   @OneToMany(mappedBy = "user")
   private List<Pet> pets = new ArrayList<>();
 

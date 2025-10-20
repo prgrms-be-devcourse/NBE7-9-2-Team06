@@ -3,7 +3,6 @@ package com.backend.petplace.domain.review.controller;
 import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
 import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
 import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
-import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
 import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
 import com.backend.petplace.domain.review.service.ReviewService;
 import com.backend.petplace.global.response.ApiResponse;
@@ -55,13 +54,5 @@ public class ReviewController implements ReviewSpecification {
 
     List<MyReviewResponse> myReviews = reviewService.getMyReviews(currentUserId);
     return ResponseEntity.ok(ApiResponse.success(myReviews));
-  }
-
-  @GetMapping("/my/points")
-  public ResponseEntity<ApiResponse<PointHistoryResponse>> getMyPointHistory() {
-
-    // TODO: 현재 사용자의 포인트 적립 내역 조회 로직 구현
-
-    return ResponseEntity.ok(ApiResponse.success(new PointHistoryResponse()));
   }
 }

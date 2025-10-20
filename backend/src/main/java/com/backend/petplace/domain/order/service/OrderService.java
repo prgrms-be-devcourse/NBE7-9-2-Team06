@@ -107,5 +107,13 @@ public class OrderService {
     orderRepository.save(order);
   }
 
+  @Transactional
+  public void updateAllOrderStatus() {
 
+    List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.ORDERED);
+
+    for (Order order : orders) {
+      order.setOrderStatusDelivered();
+    }
+  }
 }

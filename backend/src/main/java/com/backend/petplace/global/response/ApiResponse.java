@@ -23,6 +23,10 @@ public class ApiResponse<T> {
     return new ApiResponse<>(ResponseCode.CREATED.getCode(), ResponseCode.CREATED.getMessage(), null);
   }
 
+  public static <T> ApiResponse<T> create(T data) {
+    return new ApiResponse<>(ResponseCode.CREATED.getCode(), ResponseCode.CREATED.getMessage(), data);
+  }
+
   public static <T> ApiResponse<T> error(ResponseCode code) {
     return new ApiResponse<>(code.getCode(), code.getMessage(), null);
   }

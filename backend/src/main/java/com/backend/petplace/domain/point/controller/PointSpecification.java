@@ -1,6 +1,6 @@
 package com.backend.petplace.domain.point.controller;
 
-import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
+import com.backend.petplace.domain.point.dto.response.PointHistoryResponse;
 import com.backend.petplace.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

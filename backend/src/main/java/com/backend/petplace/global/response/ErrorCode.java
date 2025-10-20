@@ -26,9 +26,8 @@ public enum ErrorCode {
   INVALID_FILE_NAME("S002", HttpStatus.BAD_REQUEST, "잘못된 형식의 파일 이름입니다."),
 
   // 주문, 주문상품, 상품
-  NOT_FOUND_PRODUCT("ORO002", HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
-  NOT_ENOUGH_POINT("OR003", HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
-  NOT_ENOUGH_STOCK("OR004", HttpStatus.BAD_REQUEST, "재고가 부족합니다.");
+  NOT_FOUND_PRODUCT("ORO002", HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다.");
+
 
   private final String code;
   private final HttpStatus status;

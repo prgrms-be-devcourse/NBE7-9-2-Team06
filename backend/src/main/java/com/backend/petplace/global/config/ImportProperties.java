@@ -14,7 +14,7 @@ public class ImportProperties {
   private boolean enabled;
   private String baseUrl;
   private String serviceKey;
-  private int pageSize = 10_000;
-  private long sleepMs = 200L;
-  private int maxInMemoryMb = 16;
+  private int pageSize;
+  private long sleepMs;
+  private int maxInMemoryMb;
 }

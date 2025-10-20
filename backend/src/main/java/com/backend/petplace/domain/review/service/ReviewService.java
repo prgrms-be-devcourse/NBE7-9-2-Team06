@@ -37,7 +37,8 @@ public class ReviewService {
 
   private static final String REVIEW_IMAGE_DIR = "reviews";
 
-  public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request, MultipartFile image) {
+  public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request,
+      MultipartFile image) {
     User user = findUserById(userId);
     Place place = findPlaceById(request.getPlaceId());
 

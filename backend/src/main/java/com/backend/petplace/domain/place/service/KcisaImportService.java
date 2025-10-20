@@ -3,6 +3,7 @@ package com.backend.petplace.domain.place.service;
 import com.backend.petplace.domain.place.dto.KcisaDto;
 import com.backend.petplace.domain.place.dto.KcisaDto.Item;
 import com.backend.petplace.domain.place.entity.Place;
+import com.backend.petplace.domain.place.importer.model.ImportParsed;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
 import com.backend.petplace.global.component.KcisaClient;
 import com.backend.petplace.global.component.KcisaParser;
@@ -52,7 +53,7 @@ public class KcisaImportService {
   }
 
   /** uniqueKey 기준 업서트 */
-  private void upsert(KcisaParser.Parsed f) {
+  private void upsert(ImportParsed f) {
     var opt = placeRepository.findByUniqueKey(f.uniqueKey());
     if (opt.isPresent()) {
       Place e = opt.get();

@@ -2,6 +2,7 @@ package com.backend.petplace.global.jwt;
 
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -77,5 +78,16 @@ public class JwtTokenProvider {
     UserDetails userDetails = this.userDetailsService.loadUserByUsername(userId);
 
     return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+  }
+
+  // 이 부분 중복되어서 좀 리팩토링 해야할 것 같습니다.
+  private String getUserId(String token) {
+    Claims claims = Jwts.parser()
+        .verifyWith(key)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return String.valueOf(claims.get("userId"));
   }
 }

@@ -6,8 +6,10 @@ import com.backend.petplace.domain.point.entity.Point;
 import com.backend.petplace.domain.point.repository.PointRepository;
 import com.backend.petplace.domain.point.service.PointService;
 import com.backend.petplace.domain.point.type.PointAddResult;
+import com.backend.petplace.domain.review.dto.ReviewInfo;
 import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
 import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
+import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
 import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.review.repository.ReviewRepository;
@@ -71,6 +73,19 @@ public class ReviewService {
           return MyReviewResponse.from(review, points);
         })
         .collect(Collectors.toList());
+  }
+
+  public PlaceReviewsResponse getReviewByPlace(Long placeId) {
+
+    Place place = findPlaceById(placeId);
+
+    List<Review> reviews = reviewRepository.findByPlaceOrderByIdDesc(place);
+
+    List<ReviewInfo> reviewInfos = reviews.stream()
+        .map(ReviewInfo::from)
+        .collect(Collectors.toList());
+
+    return new PlaceReviewsResponse(place, reviewInfos);
   }
 
   private User findUserById(Long userId) {

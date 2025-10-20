@@ -51,9 +51,11 @@ public class ReviewController implements ReviewSpecification {
   @GetMapping("/my/reviews")
   public ResponseEntity<ApiResponse<List<MyReviewResponse>>> getMyReviews() {
 
-    // TODO: 현재 사용자의 리뷰 목록 조회 로직 구현
+    // TODO: Spring Security 도입 후, 실제 인증된 사용자 정보 넘겨주기
+    Long currentUserId = 1L;
 
-    return ResponseEntity.ok(ApiResponse.success(List.of(new MyReviewResponse())));
+    List<MyReviewResponse> myReviews = reviewService.getMyReviews(currentUserId);
+    return ResponseEntity.ok(ApiResponse.success(myReviews));
   }
 
   @GetMapping("/my/points")

@@ -1,12 +1,17 @@
 package com.backend.petplace.domain.user.entity;
 
+import com.backend.petplace.domain.order.entity.Order;
 import com.backend.petplace.global.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +47,9 @@ public class User extends BaseEntity {
 
   private Integer totalPoint;
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<Order> orders = new ArrayList<>();
+
   @Builder
   public User(String nickName, String password, String email, String address,
       String zipcode, String addressDetail) {
@@ -55,10 +63,38 @@ public class User extends BaseEntity {
     this.totalPoint = 0;
   }
 
+  //정적 팩토리 메서드를 통한 User 객체 생성
+  public static User createUser(
+      String nickName, String password,
+      String email, String address,
+      String zipcode, String addressDetail) {
+
+    return User.builder()
+        .nickName(nickName)
+        .password(password)
+        .email(email)
+        .address(address)
+        .zipcode(zipcode)
+        .addressDetail(addressDetail)
+        .build();
+  }
+
+  public void addOrders(List<Order> orders) {
+    for (Order order : orders) {
+      addOrder(order);
+    }
+  }
+
+  public void addOrder(Order order) {
+    this.orders.add(order);
+    order.setUser(this);
+  }
+
   public void addPoints(Integer amount) {
-    if(this.totalPoint == null) {
+    if (this.totalPoint == null) {
       this.totalPoint = 0;
     }
     this.totalPoint += amount;
+
   }
 }

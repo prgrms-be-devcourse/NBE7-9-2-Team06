@@ -36,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
     } catch (BusinessException ex) {
+      // 메서드로 분리할 예정
       response.setCharacterEncoding("UTF-8");
       response.setStatus(ex.getErrorCode().getStatus().value());
       ApiResponse<Void> apiResponse = ApiResponse.error(ex.getErrorCode());

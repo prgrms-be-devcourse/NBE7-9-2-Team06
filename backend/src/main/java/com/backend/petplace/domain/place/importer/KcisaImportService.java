@@ -1,11 +1,10 @@
-package com.backend.petplace.domain.place.service;
+package com.backend.petplace.domain.place.importer;
 
 import com.backend.petplace.domain.place.dto.KcisaDto;
 import com.backend.petplace.domain.place.dto.KcisaDto.Item;
 import com.backend.petplace.domain.place.entity.Place;
+import com.backend.petplace.domain.place.importer.model.ImportParsed;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
-import com.backend.petplace.global.component.KcisaClient;
-import com.backend.petplace.global.component.KcisaParser;
 import com.backend.petplace.global.config.ImportProperties;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,12 +38,12 @@ public class KcisaImportService {
       }
 
       // 페이징 종료 판단: 응답 아이템 수가 page-size 미만이면 마지막
-      if (items.size() < props.getPageSize())
+      if (items.size() < props.pageSize())
         break;
 
       // 다음 호출 전 sleep
       try {
-        Thread.sleep(props.getSleepMs());
+        Thread.sleep(props.sleepMs());
       } catch (InterruptedException ignored) {
       }
     }
@@ -52,7 +51,7 @@ public class KcisaImportService {
   }
 
   /** uniqueKey 기준 업서트 */
-  private void upsert(KcisaParser.Parsed f) {
+  private void upsert(ImportParsed f) {
     var opt = placeRepository.findByUniqueKey(f.uniqueKey());
     if (opt.isPresent()) {
       Place e = opt.get();

@@ -3,7 +3,6 @@ package com.backend.petplace.domain.review.controller;
 import com.backend.petplace.domain.review.dto.request.ReviewCreateRequest;
 import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
 import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
-import com.backend.petplace.domain.review.dto.response.PointHistoryResponse;
 import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
 import com.backend.petplace.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +29,4 @@ public interface ReviewSpecification {
 
   @Operation(summary = "내 리뷰 목록 조회", description = "현재 로그인한 사용자가 작성한 모든 리뷰 목록을 조회합니다.")
   ResponseEntity<ApiResponse<List<MyReviewResponse>>> getMyReviews();
-
-  @Operation(summary = "내 포인트 내역 조회", description = "현재 로그인한 사용자의 총 보유 포인트와 포인트 적립 내역을 조회합니다.")
-  ResponseEntity<ApiResponse<PointHistoryResponse>> getMyPointHistory();
 }

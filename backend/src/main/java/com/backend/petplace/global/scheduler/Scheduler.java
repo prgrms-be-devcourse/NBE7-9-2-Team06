@@ -14,7 +14,6 @@ public class Scheduler {
 
   @Scheduled(fixedRate = 1000 * 60 * 1) //1분마다 실행
   public void updateOrderStatusEveryDay() {
-    System.out.println("Scheduler works! : " + LocalDateTime.now());
     orderService.updateAllOrderStatus();
   }
 }

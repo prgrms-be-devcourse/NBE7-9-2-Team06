@@ -32,20 +32,20 @@ public class PetController implements PetSpecification{
     //로그인 구현되면 입력값 변경 예정
     String nickname = "test"; //로컬에서 만든 db 사용 (임시)
     CreatePetResponse response = petService.createPet(nickname, request);
-    return new ResponseEntity<>(ApiResponse.success(response), HttpStatus.CREATED);
+    return ResponseEntity.ok(ApiResponse.create(response));
   }
 
   @PatchMapping("/update-pet/{id}")
   public ResponseEntity<ApiResponse<UpdatePetResponse>> updatePet(@PathVariable("id") Long id, @RequestBody @Valid UpdatePetRequest request){
     String nickname = "test"; //로컬에서 만든 db 사용 (임시)
     UpdatePetResponse response = petService.updatePet(nickname, id, request);
-    return new ResponseEntity<>(ApiResponse.success(response), HttpStatus.OK);
+    return ResponseEntity.ok(ApiResponse.success(response));
   }
 
   @DeleteMapping("/delete-pet/{id}")
   public ResponseEntity<ApiResponse<Void>> deletePet(@PathVariable("id") Long id) {
     String nickname = "test"; //로컬에서 만든 db 사용 (임시)
     petService.deletePet(nickname, id);
-    return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
+    return ResponseEntity.ok(ApiResponse.success());
   }
 }

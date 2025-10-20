@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PetService {
 
   private final PetRepository petRepository;
@@ -33,7 +34,6 @@ public class PetService {
     }
   }
 
-  @Transactional
   public CreatePetResponse createPet(String nickname, CreatePetRequest request){
     User user = findUser(nickname);
     Pet pet = Pet.createPet(user, request);
@@ -43,7 +43,6 @@ public class PetService {
     return CreatePetResponse.from(pet);
   }
 
-  @Transactional
   public UpdatePetResponse updatePet(String nickname, Long id, UpdatePetRequest request){
     User user = findUser(nickname);
     Pet pet = petRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PET));
@@ -54,7 +53,6 @@ public class PetService {
     return UpdatePetResponse.from(pet);
   }
 
-  @Transactional
   public void deletePet(String nickname, Long id){
     User user = findUser(nickname);
     Pet pet = petRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PET));

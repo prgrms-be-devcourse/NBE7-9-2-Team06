@@ -12,13 +12,11 @@ import lombok.Getter;
 public class CreatePetRequest {
 
   @NotBlank(message = "이름은 필수로 입력해야 합니다.")
-  @NotNull(message = "이름 데이터는 필수적으로 포함되어야 합니다.")
   @Pattern(regexp = "^[a-zA-Z0-9가-힣]*$", message = "특수문자는 입력할 수 없습니다.")
   @Schema(description = "반려동물 이름 (특수문자 불가)")
   private final String name;
 
   @NotBlank(message = "성별은 필수로 입력해야 합니다.")
-  @NotNull(message = "성별 데이터는 필수적으로 포함되어야 합니다.")
   @Pattern(regexp = "Male|Female", message = "성별은, 남자, 여자 중 하나만 입력할 수 있습니다.")
   @Schema(description = "반려동물 성별 (남, 여 하나 선택 가능)")
   private final String gender;

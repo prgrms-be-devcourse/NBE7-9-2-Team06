@@ -12,14 +12,12 @@ import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PointService {
 
   private final PointRepository pointRepository;
@@ -27,6 +25,7 @@ public class PointService {
 
   private static final int DAILY_POINT_LIMIT = 1000;
 
+  @Transactional
   public PointAddResult addPointsForReview(User user, Review review) {
     LocalDate today = LocalDate.now();
 
@@ -46,6 +45,7 @@ public class PointService {
     return PointAddResult.SUCCESS;
   }
 
+  @Transactional(readOnly = true)
   public PointHistoryResponse getPointHistory(Long userId) {
     User user = findUserById(userId);
 

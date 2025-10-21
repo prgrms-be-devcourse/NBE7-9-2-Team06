@@ -19,7 +19,6 @@ import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import com.backend.petplace.global.s3.S3Uploader;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReviewService {
 
   private final PointService pointService;
@@ -39,6 +37,7 @@ public class ReviewService {
 
   private static final String REVIEW_IMAGE_DIR = "reviews";
 
+  @Transactional
   public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request,
       MultipartFile image) {
     User user = findUserById(userId);
@@ -75,6 +74,7 @@ public class ReviewService {
         .toList();
   }
 
+  @Transactional(readOnly = true)
   public PlaceReviewsResponse getReviewByPlace(Long placeId) {
 
     Place place = findPlaceById(placeId);

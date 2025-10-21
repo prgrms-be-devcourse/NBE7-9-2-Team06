@@ -63,4 +63,11 @@ public class PlaceService {
 
   private record BBox(double minLat, double maxLat, double minLon, double maxLon) {}
 
+  // 바운딩박스 계산
+  private static BBox bbox(double lat, double lon, double radiusKm) {
+    double R = 6371.0; // km
+    double dLat = Math.toDegrees(radiusKm / R);
+    double dLon = Math.toDegrees(radiusKm / (R * Math.cos(Math.toRadians(lat))));
+    return new BBox(lat - dLat, lat + dLat, lon - dLon, lon + dLon);
+  }
 }

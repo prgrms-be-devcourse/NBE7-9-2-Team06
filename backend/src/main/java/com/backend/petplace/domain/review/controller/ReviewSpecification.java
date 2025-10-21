@@ -5,7 +5,6 @@ import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
 import com.backend.petplace.domain.review.dto.response.PlaceReviewsResponse;
 import com.backend.petplace.domain.review.dto.response.PresignedUrlResponse;
 import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
-import com.backend.petplace.domain.review.service.S3Service;
 import com.backend.petplace.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Review", description = "리뷰 API")
 public interface ReviewSpecification {

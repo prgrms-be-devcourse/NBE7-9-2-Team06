@@ -39,7 +39,7 @@ public class ReviewController implements ReviewSpecification {
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
-  @PostMapping
+  @PostMapping("/reviews")
   public ResponseEntity<ApiResponse<ReviewCreateResponse>> createReview(
       @Valid @RequestBody ReviewCreateRequest request) {
 

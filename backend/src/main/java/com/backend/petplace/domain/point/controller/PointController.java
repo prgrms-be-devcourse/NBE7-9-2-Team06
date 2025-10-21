@@ -16,6 +16,7 @@ public class PointController implements PointSpecification {
 
   private final PointService pointService;
 
+  @Override
   @GetMapping("/my/points")
   public ResponseEntity<ApiResponse<PointHistoryResponse>> getMyPointHistory() {
 

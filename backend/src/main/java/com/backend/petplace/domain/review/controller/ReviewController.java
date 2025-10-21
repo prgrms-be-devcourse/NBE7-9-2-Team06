@@ -31,6 +31,7 @@ public class ReviewController implements ReviewSpecification {
   /**
    * 리뷰 이미지를 업로드할 Presigned URL을 요청하는 API
    */
+  @Override
   @PostMapping("/presigned-url")
   public ResponseEntity<ApiResponse<PresignedUrlResponse>> getPresignedUrl(
       @RequestParam String filename) {
@@ -39,6 +40,7 @@ public class ReviewController implements ReviewSpecification {
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
+  @Override
   @PostMapping("/reviews")
   public ResponseEntity<ApiResponse<ReviewCreateResponse>> createReview(
       @Valid @RequestBody ReviewCreateRequest request) {
@@ -51,6 +53,7 @@ public class ReviewController implements ReviewSpecification {
     return ResponseEntity.ok(ApiResponse.create(response));
   }
 
+  @Override
   @GetMapping("/places/{placeId}/reviews")
   public ResponseEntity<ApiResponse<PlaceReviewsResponse>> getReviewsByPlace(
       @PathVariable Long placeId) {
@@ -59,6 +62,7 @@ public class ReviewController implements ReviewSpecification {
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
+  @Override
   @GetMapping("/my/reviews")
   public ResponseEntity<ApiResponse<List<MyReviewResponse>>> getMyReviews() {
 

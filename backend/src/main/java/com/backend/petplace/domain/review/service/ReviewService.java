@@ -72,7 +72,7 @@ public class ReviewService {
 
           return MyReviewResponse.from(review, points);
         })
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public PlaceReviewsResponse getReviewByPlace(Long placeId) {
@@ -83,7 +83,7 @@ public class ReviewService {
 
     List<ReviewInfo> reviewInfos = reviews.stream()
         .map(ReviewInfo::from)
-        .collect(Collectors.toList());
+        .toList();
 
     return new PlaceReviewsResponse(place, reviewInfos);
   }

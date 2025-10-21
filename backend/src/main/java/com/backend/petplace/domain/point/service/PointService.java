@@ -53,7 +53,7 @@ public class PointService {
 
     List<PointTransaction> history = points.stream()
         .map(PointTransaction::from)
-        .collect(Collectors.toList());
+        .toList();
 
     return new PointHistoryResponse(user.getTotalPoint(), history);
   }

@@ -14,12 +14,12 @@ public class PlaceInfo {
   @Schema(description = "장소 이름", example = "멍멍카페")
   private String placeName;
 
-  @Schema(description = "장소 전체 주소", example = "[06123] 서울 강남구 테헤란로 123")
+  @Schema(description = "장소 전체 주소 -  우편번호 제외", example = "서울 강남구 테헤란로 123")
   private String fullAddress;
 
-  public PlaceInfo(Place place) {
-    this.placeId = place.getId();
-    this.placeName = place.getName();
-    this.fullAddress = String.format("[%s] %s", place.getPostalCode(), place.getAddress());
+  public PlaceInfo(Long placeId, String placeName, String address) {
+    this.placeId = placeId;
+    this.placeName = placeName;
+    this.fullAddress = address;
   }
 }

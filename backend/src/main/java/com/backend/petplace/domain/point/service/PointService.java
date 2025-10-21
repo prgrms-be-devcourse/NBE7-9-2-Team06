@@ -49,12 +49,7 @@ public class PointService {
   public PointHistoryResponse getPointHistory(Long userId) {
     User user = findUserById(userId);
 
-    List<Point> points = pointRepository.findByUserOrderByIdDesc(user);
-
-    List<PointTransaction> history = points.stream()
-        .map(PointTransaction::from)
-        .toList();
-
+    List<PointTransaction> history = pointRepository.findPointHistoryByUser(user);
     return new PointHistoryResponse(user.getTotalPoint(), history);
   }
 

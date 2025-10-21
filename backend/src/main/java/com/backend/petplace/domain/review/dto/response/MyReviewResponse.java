@@ -4,6 +4,7 @@ import com.backend.petplace.domain.review.dto.PlaceInfo;
 import com.backend.petplace.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,15 +34,13 @@ public class MyReviewResponse {
   @Schema(description = "해당 리뷰로 적립된 포인트", example = "100")
   private int pointsAwarded;
 
-  public static MyReviewResponse from(Review review, int pointsAwarded) {
-    MyReviewResponse response = new MyReviewResponse();
-    response.reviewId = review.getId();
-    response.place = new PlaceInfo(review.getPlace());
-    response.rating = review.getRating();
-    response.content = review.getContent();
-    response.imageUrl = review.getImageUrl();
-    response.createdDate = review.getCreatedDate().toLocalDate();
-    response.pointsAwarded = pointsAwarded;
-    return response;
+  public MyReviewResponse(Long reviewId, Long placeId, String placeName, String placeAddress, int rating, String content, String imageUrl, LocalDateTime createdDate, Integer pointsAwarded) {
+    this.reviewId = reviewId;
+    this.place = new PlaceInfo(placeId, placeName, placeAddress);
+    this.rating = rating;
+    this.content = content;
+    this.imageUrl = imageUrl;
+    this.createdDate = createdDate.toLocalDate();
+    this.pointsAwarded = (pointsAwarded != null) ? pointsAwarded : 0;
   }
 }

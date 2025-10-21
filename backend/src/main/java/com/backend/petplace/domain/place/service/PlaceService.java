@@ -24,7 +24,7 @@ public class PlaceService {
   private static final int DEFAULT_SIZE = 50;
 
   @Transactional(readOnly = true)
-  public List<PlaceSearchResponse> search(
+  public List<PlaceSearchResponse> searchPlaces(
       double lat, double lon,
       Integer radiusKm,
       List<Category2Type> category2List,

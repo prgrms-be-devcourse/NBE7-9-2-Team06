@@ -32,7 +32,7 @@ public class PlaceController implements PlaceSpecification {
       @RequestParam(required = false) String keyword
   ) {
 
-    List<PlaceSearchResponse> results = placeService.search(lat, lon, radiusKm, category2,
+    List<PlaceSearchResponse> results = placeService.searchPlaces(lat, lon, radiusKm, category2,
         keyword);
 
     return ResponseEntity.ok(ApiResponse.success(results));

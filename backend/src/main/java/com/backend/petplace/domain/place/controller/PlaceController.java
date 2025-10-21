@@ -17,9 +17,9 @@ public class PlaceController implements PlaceSpecification{
 
   private final PlaceService placeService;
 
-  @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetail(@PathVariable Long id) {
+  @GetMapping("/{placeId}")
+  public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetail(@PathVariable Long placeId) {
 
-    return ResponseEntity.ok(ApiResponse.success(placeService.getPlaceDetail(id)));
+    return ResponseEntity.ok(ApiResponse.success(placeService.getPlaceDetail(placeId)));
   }
 }

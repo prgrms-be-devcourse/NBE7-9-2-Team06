@@ -28,7 +28,7 @@ public interface PlaceSpecification {
           - 현재 정렬은 거리순 정렬로 고정되어 있습니다.
           """
   )
-  ResponseEntity<ApiResponse<List<PlaceSearchResponse>>> search(
+  ResponseEntity<ApiResponse<List<PlaceSearchResponse>>> searchPlaces(
       @Parameter(in = ParameterIn.QUERY, description = "사용자 위도", required = true, example = "37.5665")
       @NotNull Double lat,
 

@@ -25,7 +25,7 @@ public class PlaceController implements PlaceSpecification {
 
   @Override
   @GetMapping("/search")
-  public ResponseEntity<ApiResponse<List<PlaceSearchResponse>>> search(
+  public ResponseEntity<ApiResponse<List<PlaceSearchResponse>>> searchPlaces(
       @RequestParam @NotNull Double lat, @RequestParam @NotNull Double lon,
       @RequestParam(required = false) Integer radiusKm,
       @RequestParam(required = false) List<Category2Type> category2,

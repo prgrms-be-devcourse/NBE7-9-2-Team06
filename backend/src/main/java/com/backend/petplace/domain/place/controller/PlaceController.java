@@ -3,6 +3,7 @@ package com.backend.petplace.domain.place.controller;
 import com.backend.petplace.domain.place.dto.response.PlaceDetailResponse;
 import com.backend.petplace.domain.place.service.PlaceService;
 import com.backend.petplace.global.response.ApiResponse;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,8 @@ public class PlaceController implements PlaceSpecification{
   private final PlaceService placeService;
 
   @GetMapping("/{placeId}")
-  public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetail(@PathVariable Long placeId) {
+  public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetail(
+      @PathVariable @Positive Long placeId) {
 
     return ResponseEntity.ok(ApiResponse.success(placeService.getPlaceDetail(placeId)));
   }

@@ -31,14 +31,12 @@ public class PointTransaction {
   @Schema(description = "적립 설명", example = "사진 리뷰 작성")
   private String description;
 
-  public static PointTransaction from(Point point) {
-    PointTransaction transaction = new PointTransaction();
-    transaction.pointId = point.getId();
-    transaction.place = new PlaceInfo(point.getPlace());
-    transaction.hasImage = point.getDescription() == PointDescription.REVIEW_PHOTO;
-    transaction.createdDate = point.getRewardDate();
-    transaction.points = point.getAmount();
-    transaction.description = point.getDescription().getDescription();
-    return transaction;
+  public PointTransaction(Long pointId, Long placeId, String placeName, String placeAddress, PointDescription description, LocalDate rewardDate, Integer amount) {
+    this.pointId = pointId;
+    this.place = new PlaceInfo(placeId, placeName, placeAddress);
+    this.hasImage = description == PointDescription.REVIEW_PHOTO;
+    this.createdDate = rewardDate;
+    this.points = amount;
+    this.description = description.getDescription();
   }
 }

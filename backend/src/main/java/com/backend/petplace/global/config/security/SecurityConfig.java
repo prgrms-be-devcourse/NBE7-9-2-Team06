@@ -5,8 +5,10 @@ import com.backend.petplace.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,19 +23,29 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
     http
         .csrf(csrf -> csrf.disable())
-        .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .cors(Customizer.withDefaults());
+
+    http
+        .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+
+    http
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/h2-console/**").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-            .requestMatchers("/api/v1/signup").permitAll()
-            .requestMatchers("/api/v1/login").permitAll()
+            .requestMatchers("/api/v1/**").permitAll()
             .anyRequest().authenticated()
-        )
-        .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-            UsernamePasswordAuthenticationFilter.class)
-        .httpBasic(httpBasic -> httpBasic.disable());
+        );
+
+    http
+        .addFilterBefore(
+            new JwtAuthenticationFilter(jwtTokenProvider),
+            UsernamePasswordAuthenticationFilter.class
+        );
 
     return http.build();
   }

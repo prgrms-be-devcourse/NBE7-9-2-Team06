@@ -24,19 +24,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String token = resolveToken(request);
 
-    try {
-      jwtTokenProvider.validateToken(token);
+    if (token != null) {
+      try {
+        jwtTokenProvider.validateToken(token);
 
-      Authentication authentication = jwtTokenProvider.getAuthentication(token);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+        Authentication authentication = jwtTokenProvider.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    } catch (BusinessException ex) {
-      // 메서드로 분리할 예정
-      response.setCharacterEncoding("UTF-8");
-      response.setStatus(ex.getErrorCode().getStatus().value());
-      ApiResponse<Void> apiResponse = ApiResponse.error(ex.getErrorCode());
-      response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
-      return;
+      } catch (BusinessException ex) {
+        // 메서드로 분리할 예정
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(ex.getErrorCode().getStatus().value());
+        ApiResponse<Void> apiResponse = ApiResponse.error(ex.getErrorCode());
+        response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
+        return;
+      }
     }
 
     filterChain.doFilter(request, response);

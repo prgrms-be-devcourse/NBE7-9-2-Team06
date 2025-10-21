@@ -25,6 +25,22 @@ spring:
   http:
     codecs:
       max-in-memory-size: 16MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password: ${app-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connection timeout: 5000
+          timeout: 500
+          write timeout: 5000
+      auth-code-expiration0millis: 300000  # 30 * 60 * 1000(밀리초) == 30분
 
 cloud:
   aws:

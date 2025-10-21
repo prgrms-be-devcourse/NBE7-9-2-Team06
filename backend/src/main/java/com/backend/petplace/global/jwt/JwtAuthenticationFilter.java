@@ -50,18 +50,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     return null;
   }
-
-  /**
-   * JWT 검사 제외 경로 지정
-   */
-  @Override
-  protected boolean shouldNotFilter(HttpServletRequest request) {
-    String path = request.getRequestURI();
-    // H2 콘솔, Swagger, 로그인/회원가입 요청은 필터 제외
-    return path.startsWith("/h2-console") ||
-        path.startsWith("/swagger-ui") ||
-        path.startsWith("/v3/api-docs") ||
-        path.startsWith("/api/v1/login") ||
-        path.startsWith("/api/v1/signup");
-  }
 }

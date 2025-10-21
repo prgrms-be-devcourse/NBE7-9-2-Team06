@@ -23,6 +23,7 @@ public class PlaceController implements PlaceSpecification {
 
   private final PlaceService placeService;
 
+  @Override
   @GetMapping("/search")
   public ResponseEntity<ApiResponse<List<PlaceSearchResponse>>> search(
       @RequestParam @NotNull Double lat, @RequestParam @NotNull Double lon,

@@ -61,6 +61,9 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // email (회원가입 인증)
+    implementation ("org.springframework.boot:spring-boot-starter-mail")
 }
 
 tasks.withType<Test> {

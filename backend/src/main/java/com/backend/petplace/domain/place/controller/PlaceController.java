@@ -18,6 +18,7 @@ public class PlaceController implements PlaceSpecification{
 
   private final PlaceService placeService;
 
+  @Override
   @GetMapping("/{placeId}")
   public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetail(
       @PathVariable @Positive Long placeId) {

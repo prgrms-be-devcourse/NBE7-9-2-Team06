@@ -41,7 +41,6 @@ public class MyReviewResponse {
     this.content = content;
     this.imageUrl = imageUrl;
     this.createdDate = createdDate.toLocalDate();
-    // ✨ Null 처리 추가: 포인트 내역이 없을 수 있으므로
     this.pointsAwarded = (pointsAwarded != null) ? pointsAwarded : 0;
   }
 }

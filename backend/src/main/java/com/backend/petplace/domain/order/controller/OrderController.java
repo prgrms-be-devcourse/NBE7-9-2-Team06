@@ -19,37 +19,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1")
 @RequiredArgsConstructor
-public class OrderController {
+public class OrderController implements OrderSpecification {
 
   private final OrderService orderService;
 
+  @Override
   @PostMapping(value = "/orders")
   public ResponseEntity<ApiResponse<Void>> createOrder(
       @RequestBody OrderCreateRequest request,
-      @CookieValue("userId") Long userId
-  ) {
-    orderService.createOrder(request, userId);
+      @CookieValue("userId") Long userId) {
 
+    orderService.createOrder(request, userId);
     return ResponseEntity.ok(ApiResponse.success());
   }
 
+  @Override
   @GetMapping(value = "/orders")
   public ResponseEntity<ApiResponse<List<OrderReadByIdResponse>>> getOrderById(
       @CookieValue("userId") Long userId) {
 
     List<OrderReadByIdResponse> responses = orderService.getOrdersByUserId(userId);
-
     return ResponseEntity.ok(ApiResponse.success(responses));
   }
 
+  @Override
   @PatchMapping("/orders/{orderid}/cancel")
   public ResponseEntity<ApiResponse<Void>> cancelOrder(
       @PathVariable("orderid") Long orderId,
-      @CookieValue("userId") Long userId
+      @CookieValue("userId") Long userId) {
 
-  ) {
     orderService.cancelOrder(userId, orderId);
-
     return ResponseEntity.ok(ApiResponse.success());
   }
 }

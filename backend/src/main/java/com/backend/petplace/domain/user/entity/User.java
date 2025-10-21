@@ -66,7 +66,7 @@ public class User extends BaseEntity {
     this.address = address;
     this.zipcode = zipcode;
     this.addressDetail = addressDetail;
-    this.totalPoint = 0;
+    this.totalPoint = 10;
   }
 
   //정적 팩토리 메서드를 통한 User 객체 생성
@@ -102,5 +102,12 @@ public class User extends BaseEntity {
     }
     this.totalPoint += amount;
 
+  }
+
+  public void abstractPoints(Integer amount) {
+    if (this.totalPoint == null) {
+      this.totalPoint = 0;
+    }
+    this.totalPoint -= amount;
   }
 }

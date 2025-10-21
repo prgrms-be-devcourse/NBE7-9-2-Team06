@@ -3,8 +3,6 @@ package com.backend.petplace.domain.order.entity;
 import com.backend.petplace.domain.orderproduct.entity.OrderProduct;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.global.entity.BaseEntity;
-import com.backend.petplace.global.exception.BusinessException;
-import com.backend.petplace.global.response.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,7 +39,7 @@ public class Order extends BaseEntity {
 
   @NotNull
   @Min(0)
-  private Long totalPrice;
+  private Integer totalPrice;
 
   @NotNull
   @Enumerated(EnumType.STRING)
@@ -51,14 +49,14 @@ public class Order extends BaseEntity {
   private List<OrderProduct> orderProducts = new ArrayList<>();
 
   @Builder
-  public Order(User user, Long totalPrice, OrderStatus orderStatus) {
+  public Order(User user, Integer totalPrice, OrderStatus orderStatus) {
     this.user = user;
     this.totalPrice = totalPrice;
     this.orderStatus = orderStatus;
   }
 
   //정적 팩토리 메서드를 통한 Order 객체 생성
-  public static Order createOrder(User user, Long totalPrice) {
+  public static Order createOrder(User user, Integer totalPrice) {
     return Order.builder()
         .user(user)
         .totalPrice(totalPrice)

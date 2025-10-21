@@ -24,4 +24,7 @@ public class ReviewCreateRequest {
   @Range(min = 1, max = 5, message = "별점은 1점에서 5점 사이여야 합니다.")
   private int rating;
 
+  @Schema(description = "S3에 업로드된 이미지 파일 경로", example = "reviews/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.jpg")
+  private String s3ImagePath;
+
 }

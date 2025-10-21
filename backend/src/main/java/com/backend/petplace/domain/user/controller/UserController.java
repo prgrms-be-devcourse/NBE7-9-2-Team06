@@ -1,5 +1,6 @@
 package com.backend.petplace.domain.user.controller;
 
+import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.service.UserService;
@@ -27,16 +28,11 @@ public class UserController implements UserSpecification {
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
-  // 테스트를 위해 임시로 넣어놨습니다.
   @PostMapping("/login")
-  public ResponseEntity<Void> login(){
-    return  ResponseEntity.ok().build();
-  }
-  /*@PostMapping("/login")
-  public ResponseEntity<ApiResponse<UserLoginResponse>> login(
+  public ResponseEntity<ApiResponse<String>> login(
       @RequestBody UserLoginRequest request) {
 
-    UserLoginResponse response = userService.login(request);
+    String response = userService.login(request);
     return ResponseEntity.ok(ApiResponse.success(response));
-  }*/
+  }
 }

@@ -36,11 +36,6 @@ public class S3Service {
             .withMethod(HttpMethod.PUT)
             .withExpiration(expiration);
 
-    // 업로드될 파일에 대한 접근 권한 설정
-    generatePresignedUrlRequest.addRequestParameter(
-        Headers.S3_CANNED_ACL,
-        CannedAccessControlList.PublicRead.toString());
-
     URL presignedUrl = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
 
     // 클라이언트에게 URL과 함께, 업로드 후 서버에 알려줄 파일 경로도 전달

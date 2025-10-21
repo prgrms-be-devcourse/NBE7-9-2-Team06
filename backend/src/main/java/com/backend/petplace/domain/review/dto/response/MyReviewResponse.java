@@ -1,7 +1,6 @@
 package com.backend.petplace.domain.review.dto.response;
 
-import com.backend.petplace.domain.review.dto.PlaceInfo;
-import com.backend.petplace.domain.review.entity.Review;
+import com.backend.petplace.domain.point.dto.PlaceInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

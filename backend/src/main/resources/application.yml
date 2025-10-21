@@ -56,3 +56,7 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
     com.rest1: DEBUG
+
+jwt:
+  secret-key: ${jwt.secret-key}
+  access-expiration-ms: "#{1000L * 60 * 15000}" # 개발을 위해 만료시간을 약 10일로 설정

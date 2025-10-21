@@ -1,6 +1,12 @@
 package com.backend.petplace.domain.user.dto.request;
 
-public record UserLoginRequest (
-  String nickname,
-  String password
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class UserLoginRequest {
+
+  String nickName;
+  String password;
+}

@@ -38,12 +38,11 @@ public class ReviewService {
   private static final String REVIEW_IMAGE_DIR = "reviews";
 
   @Transactional
-  public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request,
-      MultipartFile image) {
+  public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request) {
     User user = findUserById(userId);
     Place place = findPlaceById(request.getPlaceId());
 
-    String imageUrl = uploadImageIfPresent(image);
+    String imageUrl = request.getS3ImagePath();
 
     Review review = Review.createNewReview(user, place, request.getContent(), request.getRating(),
         imageUrl);
@@ -98,10 +97,4 @@ public class ReviewService {
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PLACE));
   }
 
-  private String uploadImageIfPresent(MultipartFile image) {
-    if (image != null && !image.isEmpty()) {
-      return s3Uploader.upload(image, REVIEW_IMAGE_DIR);
-    }
-    return null;
-  }
 }

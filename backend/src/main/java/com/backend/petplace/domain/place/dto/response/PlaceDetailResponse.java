@@ -2,6 +2,7 @@ package com.backend.petplace.domain.place.dto.response;
 
 import com.backend.petplace.domain.place.entity.Category1Type;
 import com.backend.petplace.domain.place.entity.Category2Type;
+import com.backend.petplace.domain.place.entity.Place;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "PlaceDetailResponse", description = "장소 상세 응답 DTO")
@@ -27,4 +28,25 @@ public record PlaceDetailResponse(
     String rawDescription
 ) {
 
+  public static PlaceDetailResponse from(Place place) {
+    return new PlaceDetailResponse(
+        place.getId(),
+        place.getName(),
+        place.getCategory1(),
+        place.getCategory2(),
+        place.getOpeningHours(),
+        place.getClosedDays(),
+        place.getParking(),
+        place.getPetAllowed(),
+        place.getPetRestriction(),
+        place.getTel(),
+        place.getUrl(),
+        place.getPostalCode(),
+        place.getAddress(),
+        place.getLatitude(),
+        place.getLongitude(),
+        place.getAverageRating(),
+        place.getTotalReviewCount(),
+        place.getRawDescription());
+  }
 }

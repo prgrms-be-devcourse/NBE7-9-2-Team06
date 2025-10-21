@@ -15,7 +15,6 @@ import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,57 +29,61 @@ public class OrderService {
   @Transactional
   public void createOrder(OrderCreateRequest request, Long userId) {
 
-    User user = createUser(userId);
+    // 기존 유저 읽어서 객체 생성
+    User user = readUser(userId);
 
+    // 포인트 부족 시 예외 처리
+    // 포인트 충분 시 주문 생성
     checkLackOfPoint(user, request.getTotalPrice());
-
     Order order = Order.createOrder(user, request.getTotalPrice());
-    orderRepository.save(order);
 
+    // 연관관계 위해 유저에 주문 추가
     user.addOrder(order);
 
-    List<OrderProduct> orderProducts = putOrderProducts(request, order);
+    // 주문 상품들 생성 및 주문에 추가
+    List<OrderProduct> orderProducts = addNewOrderProducts(request, order);
     order.addOrderProducts(orderProducts);
 
+    // 총 가격만큼 유저 포인트 차감
+    user.abstractPoints(request.getTotalPrice());
+
+    // 저장
     orderRepository.save(order);
   }
 
-  private User createUser(Long userId) {
+  private User readUser(Long userId) {
 
     return userRepository
         .findById(userId)
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
   }
 
-  private void checkLackOfPoint(User user, Long totalPrice) {
+  private void checkLackOfPoint(User user, Integer totalPrice) {
 
     if (user.getTotalPoint() < totalPrice) {
       throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
     }
   }
 
-  private List<OrderProduct> putOrderProducts(
-      OrderCreateRequest request, Order order
-  ) {
+  private List<OrderProduct> addNewOrderProducts(OrderCreateRequest request, Order order) {
 
     return request.getOrderProducts().stream()
-        .map(orderProductRequest -> {
-
-          Product product = productRepository.findById(orderProductRequest.getProductId())
-              .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PRODUCT));
-
-          checkLackOfStock(orderProductRequest, product);
-
-          return OrderProduct.createOrderProduct(
-              order, product, orderProductRequest.getQuantity()
-          );
-        })
-        .collect(Collectors.toList());
+        .map(orderProductRequest -> addNewOrderProduct(orderProductRequest, order))
+        .toList();
   }
 
-  private void checkLackOfStock(
-      OrderProductCreateRequest orderProductRequest, Product product
-  ) {
+  private OrderProduct addNewOrderProduct(OrderProductCreateRequest orderProductRequest, Order order) {
+
+    Product product = productRepository.findById(orderProductRequest.getProductId())
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PRODUCT));
+
+    // 재고가 충분하면 return, 부족하면 예외처리
+    checkLackOfStock(orderProductRequest, product);
+    return OrderProduct.createOrderProduct(order, product, orderProductRequest.getQuantity());
+  }
+
+  private void checkLackOfStock(OrderProductCreateRequest orderProductRequest, Product product) {
+
     if (orderProductRequest.getQuantity() > product.getStock()) {
       throw new BusinessException(ErrorCode.NOT_ENOUGH_STOCK);
     }
@@ -89,21 +92,25 @@ public class OrderService {
   public List<OrderReadByIdResponse> getOrdersByUserId(Long userId) {
     List<Order> orders = orderRepository.findByUserId(userId);
 
+    // Order 객체를 DTO로 변환 후 반환
     return orders.stream()
-        .map(OrderReadByIdResponse::new) // Order -> DTO 변환
+        .map(OrderReadByIdResponse::new)
         .toList();
   }
 
   public void cancelOrder(Long userId, Long orderId) {
+
+    // 주문이 존재하면 조회, 없으면 예외처리
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
 
+    // 요청이 ORDERED 상태가 아니면 예외처리
     if (order.getOrderStatus() != OrderStatus.ORDERED) {
       throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
     }
 
+    // 주문 취소 상태로 저장
     order.cancelOrder();
-
     orderRepository.save(order);
   }
 
@@ -111,7 +118,6 @@ public class OrderService {
   public void updateAllOrderStatus() {
 
     List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.ORDERED);
-
     for (Order order : orders) {
       order.setOrderStatusDelivered();
     }

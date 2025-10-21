@@ -1,5 +1,6 @@
 package com.backend.petplace.domain.place.controller;
 
+import com.backend.petplace.domain.place.dto.response.PlaceDetailResponse;
 import com.backend.petplace.domain.place.service.PlaceService;
 import com.backend.petplace.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;

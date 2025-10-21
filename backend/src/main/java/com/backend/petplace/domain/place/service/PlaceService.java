@@ -61,4 +61,6 @@ public class PlaceService {
     return PlaceDetailResponse.from(place);
   }
 
+  private record BBox(double minLat, double maxLat, double minLon, double maxLon) {}
+
 }

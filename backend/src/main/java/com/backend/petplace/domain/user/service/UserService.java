@@ -1,10 +1,12 @@
 package com.backend.petplace.domain.user.service;
 
+import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
+import com.backend.petplace.global.jwt.JwtTokenProvider;
 import com.backend.petplace.global.response.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final JwtTokenProvider jwtTokenProvider;
 
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
@@ -43,5 +46,17 @@ public class UserService {
     userRepository.save(user);
 
     return new UserSignupResponse(user.getId());
+  }
+
+  @Transactional(readOnly = true)
+  public String login(UserLoginRequest request) {
+    User user = userRepository.findByNickName(request.getNickName())
+        .orElseThrow(() -> new BusinessException(ErrorCode.BAD_CREDENTIAL));
+
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+      throw new BusinessException(ErrorCode.BAD_CREDENTIAL);
+    }
+
+    return jwtTokenProvider.generateAccessToken(user.getId());
   }
 }

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -51,7 +52,7 @@ public class JwtTokenProvider {
         .claims(claims)
         .issuedAt(now)
         .expiration(expiry)
-        .signWith(key)
+        .signWith(key, SignatureAlgorithm.HS256)
         .compact();
   }
 

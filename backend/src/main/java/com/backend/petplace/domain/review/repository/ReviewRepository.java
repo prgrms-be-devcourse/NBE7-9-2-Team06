@@ -20,7 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     //N+1 문제 해소, 최신순으로 정렬
   List<Review> findByUserWithPlace(@Param("user") User user);
 
-  @Query("SELECT new com.backend.petplace.domain.review.dto.MyReviewResponse(" +
+  @Query("SELECT new com.backend.petplace.domain.review.dto.response.MyReviewResponse(" +
       "r.id, p.id, p.name, p.address, r.rating, r.content, r.imageUrl, r.createdDate, pt.amount) " +
       "FROM Review r " +
       "JOIN r.place p " + // Place 정보 JOIN

@@ -2,7 +2,6 @@ package com.backend.petplace.domain.review.service;
 
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
-import com.backend.petplace.domain.point.entity.Point;
 import com.backend.petplace.domain.point.repository.PointRepository;
 import com.backend.petplace.domain.point.service.PointService;
 import com.backend.petplace.domain.point.type.PointAddResult;
@@ -22,7 +21,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -58,19 +56,10 @@ public class ReviewService {
 
   @Transactional(readOnly = true)
   public List<MyReviewResponse> getMyReviews(Long currentUserId) {
+
     User user = findUserById(currentUserId);
 
-    List<Review> reviews = reviewRepository.findByUserOrderByIdDesc(user);
-
-    return reviews.stream()
-        .map(review -> {
-          int points = pointRepository.findByReview(review)
-              .map(Point::getAmount)
-              .orElse(0);
-
-          return MyReviewResponse.from(review, points);
-        })
-        .toList();
+    return reviewRepository.findMyReviews(user);
   }
 
   @Transactional(readOnly = true)
@@ -78,12 +67,7 @@ public class ReviewService {
 
     Place place = findPlaceById(placeId);
 
-    List<Review> reviews = reviewRepository.findByPlaceOrderByIdDesc(place);
-
-    List<ReviewInfo> reviewInfos = reviews.stream()
-        .map(ReviewInfo::from)
-        .toList();
-
+    List<ReviewInfo> reviewInfos = reviewRepository.findReviewInfosByPlace(place);
     return new PlaceReviewsResponse(place, reviewInfos);
   }
 

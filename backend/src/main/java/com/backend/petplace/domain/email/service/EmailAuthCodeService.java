@@ -1,5 +1,8 @@
-package com.backend.petplace.global.email;
+package com.backend.petplace.domain.email.service;
 
+import com.backend.petplace.domain.email.dto.request.CheckAuthCodeRequest;
+import com.backend.petplace.domain.email.entity.EmailAuthCode;
+import com.backend.petplace.domain.email.repository.EmailAuthCodeRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import jakarta.mail.MessagingException;
@@ -16,24 +19,30 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MailService {
+public class EmailAuthCodeService {
 
   private final JavaMailSender javaMailSender;
-  private static final String TITLE = "[PetPlace] Email 인증 코드";
+  private final EmailAuthCodeRepository emailAuthCodeRepository;
 
   @Value("${spring.mail.username}")
   private String senderEmail;
+
+  @Value("${spring.mail.properties.auth-code-expiration-millis}")
+  private long authCodeExpirationTime;
+
+  private static final String TITLE = "[PetPlace] Email 인증 코드";
 
   public String createCode() {
     Random random = new Random();
     StringBuilder key = new StringBuilder();
 
-    for (int i = 0; i < 6; i++) { // 인증 코드 6자리
-      int index = random.nextInt(2); // 0~1까지 랜덤, 랜덤값으로 switch문 실행
+    for (int i = 0; i < 7; i++) { // 인증 코드 6자리
+      int index = random.nextInt(3); // 0: 대문자, 1: 소문자, 2: 숫자, 랜덤값으로 switch문 실행
 
       switch (index) {
-        case 0 -> key.append((char) (random.nextInt(26) + 65)); // 대문자
-        case 1 -> key.append(random.nextInt(10)); // 숫자
+        case 0 -> key.append((char) (random.nextInt(26) + 65)); // A–Z
+        case 1 -> key.append((char) (random.nextInt(26) + 97)); // a–z
+        case 2 -> key.append(random.nextInt(10));               // 0–9
       }
     }
     return key.toString();
@@ -41,8 +50,6 @@ public class MailService {
 
   public MimeMessage createMail(String mail, String authCode) {
     MimeMessage message = javaMailSender.createMimeMessage();
-
-    ValidateEmailFormat(mail);
 
     try {
       message.setFrom(senderEmail);
@@ -59,12 +66,6 @@ public class MailService {
     return message;
   }
 
-  private void ValidateEmailFormat(String email) {
-     if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-       throw new BusinessException(ErrorCode.INVALID_EMAIL_FORMAT);
-     }
-  }
-
   // 메일 발송
   public void sendMail(String sendEmail) {
     String authCode = createCode(); // 랜덤 인증번호 생성
@@ -72,6 +73,7 @@ public class MailService {
 
     try {
       javaMailSender.send(message); // 메일 발송
+      saveEmailAuthCode(sendEmail, authCode);
     } catch (MailAuthenticationException e) {
       throw new BusinessException(ErrorCode.MAIL_AUTH_FAILED);
     } catch (MailSendException e) {
@@ -82,5 +84,22 @@ public class MailService {
     } catch (MailException e) {
       throw new BusinessException(ErrorCode.MAIL_SEND_FAILED);
     }
+  }
+
+  public void saveEmailAuthCode(String email, String authCode) {
+    EmailAuthCode emailAuthCode = EmailAuthCode.create(email, authCode, authCodeExpirationTime);
+    emailAuthCodeRepository.save(emailAuthCode);
+  }
+
+  public void checkAuthCode(CheckAuthCodeRequest request) {
+    EmailAuthCode emailAuthCode = emailAuthCodeRepository.findByEmailAndAuthCode
+            (request.getEmail(), request.getAuthCode())
+        .orElseThrow(() -> new BusinessException(ErrorCode.AUTH_CODE_NOT_FOUND));
+
+    if (emailAuthCode.isExpired()) {
+      throw new BusinessException(ErrorCode.AUTH_CODE_EXPIRED);
+    }
+
+    emailAuthCodeRepository.delete(emailAuthCode); // 인증 성공 시 삭제
   }
 }

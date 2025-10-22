@@ -7,11 +7,13 @@ import com.backend.petplace.domain.review.dto.response.PresignedUrlResponse;
 import com.backend.petplace.domain.review.dto.response.ReviewCreateResponse;
 import com.backend.petplace.domain.review.service.ReviewService;
 import com.backend.petplace.domain.review.service.S3Service;
+import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,12 +45,11 @@ public class ReviewController implements ReviewSpecification {
   @Override
   @PostMapping("/reviews")
   public ResponseEntity<ApiResponse<ReviewCreateResponse>> createReview(
-      @Valid @RequestBody ReviewCreateRequest request) {
+      @Valid @RequestBody ReviewCreateRequest request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-    // TODO: Spring Security 도입 후, 실제 인증된 사용자 정보 넘겨주기
-    Long currentUserId = 1L;
+    Long currentUserId = userDetails.getUserId();
 
-    // ✨ 서비스 호출 시 request 객체만 전달
     ReviewCreateResponse response = reviewService.createReview(currentUserId, request);
     return ResponseEntity.ok(ApiResponse.create(response));
   }
@@ -64,10 +65,10 @@ public class ReviewController implements ReviewSpecification {
 
   @Override
   @GetMapping("/my/reviews")
-  public ResponseEntity<ApiResponse<List<MyReviewResponse>>> getMyReviews() {
+  public ResponseEntity<ApiResponse<List<MyReviewResponse>>> getMyReviews(
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-    // TODO: Spring Security 도입 후, 실제 인증된 사용자 정보 넘겨주기
-    Long currentUserId = 1L;
+    Long currentUserId = userDetails.getUserId();
 
     List<MyReviewResponse> myReviews = reviewService.getMyReviews(currentUserId);
     return ResponseEntity.ok(ApiResponse.success(myReviews));

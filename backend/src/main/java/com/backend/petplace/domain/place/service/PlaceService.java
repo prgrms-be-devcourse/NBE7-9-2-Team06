@@ -21,7 +21,7 @@ public class PlaceService {
 
   private static final int DEFAULT_RADIUS_KM = 10;
   private static final int MAX_RADIUS_KM = 30;
-  private static final int DEFAULT_SIZE = 50;
+  private static final int DEFAULT_SIZE = 100;
 
   @Transactional(readOnly = true)
   public List<PlaceSearchResponse> searchPlaces(

@@ -1,5 +1,6 @@
 package com.backend.petplace.domain.point.repository;
 
+import com.backend.petplace.domain.mypage.dto.MyPageUserPoints;
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.point.dto.PointTransaction;
 import com.backend.petplace.domain.point.entity.Point;
@@ -21,7 +22,11 @@ public interface PointRepository extends JpaRepository<Point, Long> {
 
   Optional<Point> findByReview(Review review);
 
-  List<Point> findByUserOrderByIdDesc(User user);
+  @Query("SELECT new com.backend.petplace.domain.mypage.dto.MyPageUserPoints(" +
+  "p.id, p.description, p.amount, p.createdDate) " +
+  "FROM Point p " +
+  "WHERE p.user = :user")
+  List<MyPageUserPoints> findMyPagePointHistory(@Param("user") User user);
 
   @Query("SELECT new com.backend.petplace.domain.point.dto.PointTransaction(" +
       "p.id, pl.id, pl.name, pl.address, p.description, p.rewardDate, p.amount) " +

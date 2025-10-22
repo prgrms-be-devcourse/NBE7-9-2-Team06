@@ -13,18 +13,19 @@ public class MyPageUserReviews {
   private final String placename;
   private final String address;
   private final String content;
+  private final String imageUrl;
   private final int rating;
   private final LocalDateTime createdDate;
 
-  public static MyPageUserReviews from(Review review){
-    return MyPageUserReviews.builder()
-        .id(review.getId())
-        .placename(review.getPlace().getName()) //fetch join으로 N+1 해결
-        .address(review.getPlace().getAddress()) //fetch join으로 N+1 해결
-        .content(review.getContent())
-        .rating(review.getRating())
-        .createdDate(review.getCreatedDate())
-        .build();
+  public MyPageUserReviews(Long id, String placename, String address, String content, String imageUrl, int rating,
+      LocalDateTime createdDate) {
+    this.id = id;
+    this.placename = placename;
+    this.address = address;
+    this.content = content;
+    this.imageUrl = imageUrl;
+    this.rating = rating;
+    this.createdDate = createdDate;
   }
 
 }

@@ -28,6 +28,9 @@ export default function ProductsPage() {
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/login")
+    } else {
+      fetchUserPoints();
+      fetchOrders();
     }
   }, [router])
   
@@ -99,7 +102,8 @@ export default function ProductsPage() {
           },
         }
       )
-
+      await fetchUserPoints();
+      await fetchOrders();
       // 주문 상태 업데이트
       const newOrder: Order = {
         id: `order-${Date.now()}`,
@@ -190,6 +194,26 @@ export default function ProductsPage() {
       });
     }
   };
+
+  // 유저 포인트를 서버에서 가져오는 함수
+const fetchUserPoints = async () => {
+  try {
+    const response = await axios.get("http://localhost:8080/api/v1/orders/points", {
+      headers: { Authorization: token },
+    });
+
+    const points = response.data.data; // 서버가 totalPoint 값만 반환한다고 가정
+    setUserPoints(points);
+  } catch (err: any) {
+    console.error(err);
+    toast({
+      title: "포인트 조회 실패",
+      description: err.response?.data?.message || "서버 오류가 발생했습니다.",
+      variant: "destructive",
+    });
+  }
+};
+
 
   if (!isAuthenticated()) {
     return null

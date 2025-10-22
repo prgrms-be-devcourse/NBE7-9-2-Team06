@@ -25,4 +25,7 @@ public interface OrderSpecification {
       @Parameter(description = "요청에서 받은 주문 아이디") Long orderId,
       @Parameter(description = "JWT토큰에서 받은 유저 정보") CustomUserDetails userDetails);
 
+  @Operation(summary = "사용자 포인트 조회", description = "특정 사용자의 현재 포인트 잔액을 조회합니다.")
+  ResponseEntity<ApiResponse<Integer>> getUserPoints(
+      @Parameter(description = "JWT토큰에서 받은 유저 정보") CustomUserDetails userDetails);
 }

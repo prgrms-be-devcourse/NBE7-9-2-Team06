@@ -1,6 +1,5 @@
-package com.backend.petplace.domain.review.dto;
+package com.backend.petplace.domain.point.dto;
 
-import com.backend.petplace.domain.place.entity.Place;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

@@ -1,6 +1,7 @@
 package com.backend.petplace.domain.point.entity;
 
 import com.backend.petplace.domain.place.entity.Place;
+import com.backend.petplace.domain.point.type.PointPolicy;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.global.entity.BaseEntity;
@@ -61,7 +62,7 @@ public class Point extends BaseEntity {
   private LocalDate rewardDate;
 
   @Builder
-  public Point(Long id, User user, Place place, Review review, Integer amount,
+  private Point(Long id, User user, Place place, Review review, Integer amount,
       PointDescription description, LocalDate rewardDate) {
     this.id = id;
     this.user = user;
@@ -72,13 +73,10 @@ public class Point extends BaseEntity {
     this.rewardDate = rewardDate;
   }
 
-  private static final int POINTS_FOR_PHOTO_REVIEW = 100;
-  private static final int POINTS_FOR_TEXT_REVIEW = 50;
-
   public static Point createFromReview(Review review) {
     boolean hasImage = (review.getImageUrl() != null && !review.getImageUrl().isBlank());
 
-    int amount = hasImage ? POINTS_FOR_PHOTO_REVIEW : POINTS_FOR_TEXT_REVIEW;
+    int amount = hasImage ? PointPolicy.REVIEW_PHOTO_POINTS.getValue() : PointPolicy.REVIEW_TEXT_POINTS.getValue();
     PointDescription description =
         hasImage ? PointDescription.REVIEW_PHOTO : PointDescription.REVIEW_TEXT;
 

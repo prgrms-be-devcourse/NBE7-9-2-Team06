@@ -38,7 +38,7 @@ spring:
             enable: true
             required: true
           connection timeout: 5000
-          timeout: 500
+          timeout: 5000
           write timeout: 5000
       auth-code-expiration0millis: 300000  # 30 * 60 * 1000(밀리초) == 30분
 

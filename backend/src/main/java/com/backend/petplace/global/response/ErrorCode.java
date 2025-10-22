@@ -37,7 +37,14 @@ public enum ErrorCode {
 
   // 반려동물
   NOT_FOUND_PET("PET001", HttpStatus.NOT_FOUND, "존재하지 않는 반려동물입니다."),
-  ALREADY_DELETED("PET002", HttpStatus.BAD_REQUEST, "이미 삭제된 데이터입니다.");
+  ALREADY_DELETED("PET002", HttpStatus.BAD_REQUEST, "이미 삭제된 데이터입니다."),
+
+  // 이메일
+  MAIL_CREATION_FAILED("E001", HttpStatus.INTERNAL_SERVER_ERROR, "메일 생성에 실패했습니다."),
+  MAIL_SEND_FAILED("E002", HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다."),
+  MAIL_AUTH_FAILED("E003", HttpStatus.UNAUTHORIZED, "메일 인증에 실패했습니다."),
+  INVALID_EMAIL_FORMAT("E004", HttpStatus.BAD_REQUEST, "이메일 형식이 올바르지 않습니다."),
+  SMTP_CONNECTION_FAILED("E005", HttpStatus.GATEWAY_TIMEOUT, "SMTP 서버와의 연결에 실패했습니다.");
 
   private final String code;
   private final HttpStatus status;

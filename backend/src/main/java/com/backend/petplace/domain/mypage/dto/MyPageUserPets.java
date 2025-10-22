@@ -17,14 +17,12 @@ public class MyPageUserPets {
   private final LocalDate birthDate;
   private final String type;
 
-  public static MyPageUserPets from(Pet pet){
-    return MyPageUserPets.builder()
-        .id(pet.getId())
-        .name(pet.getName())
-        .gender(pet.getGender())
-        .birthDate(pet.getBirthDate())
-        .type(pet.getType())
-        .build();
+  public MyPageUserPets(Long id, String name, Gender gender, LocalDate birthDate, String type) {
+    this.id = id;
+    this.name = name;
+    this.gender = gender;
+    this.birthDate = birthDate;
+    this.type = type;
   }
 
 }

@@ -17,14 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PetService {
 
   private final PetRepository petRepository;
   private final UserRepository userRepository;
 
-  private User findUser(String nickname){
-    return userRepository.findByNickName(nickname)
+  private User findUser(Long userid){
+    return userRepository.findById(userid)
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
   }
 
@@ -34,8 +33,9 @@ public class PetService {
     }
   }
 
-  public CreatePetResponse createPet(String nickname, CreatePetRequest request){
-    User user = findUser(nickname);
+  @Transactional
+  public CreatePetResponse createPet(Long userid, CreatePetRequest request){
+    User user = findUser(userid);
     Pet pet = Pet.createPet(user, request);
     pet.assignUser(user);
 
@@ -43,8 +43,9 @@ public class PetService {
     return CreatePetResponse.from(pet);
   }
 
-  public UpdatePetResponse updatePet(String nickname, Long id, UpdatePetRequest request){
-    User user = findUser(nickname);
+  @Transactional
+  public UpdatePetResponse updatePet(Long userid, Long id, UpdatePetRequest request){
+    User user = findUser(userid);
     Pet pet = petRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PET));
     validUser(user.getId(), pet.getUser().getId());
 
@@ -53,8 +54,9 @@ public class PetService {
     return UpdatePetResponse.from(pet);
   }
 
-  public void deletePet(String nickname, Long id){
-    User user = findUser(nickname);
+  @Transactional
+  public void deletePet(Long userid, Long id){
+    User user = findUser(userid);
     Pet pet = petRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PET));
     validUser(user.getId(), pet.getUser().getId());
 

@@ -23,13 +23,12 @@ public class MyPageResponse {
   private final List<MyPageUserPoints> points;
   private final List<MyPageUserPets> pets;
 
-  public static MyPageResponse from(User user, List<Review> review, List<Point> point, List<Pet> pet, int earnablePoints){
-    return MyPageResponse.builder()
-        .userInfo(MyPageUserInfo.from(user, earnablePoints, review.size()))
-        .reviews(review.stream().map(MyPageUserReviews::from).toList())
-        .points(point.stream().map(MyPageUserPoints::from).toList())
-        .pets(pet.stream().map(MyPageUserPets::from).toList())
-        .build();
+  public MyPageResponse(MyPageUserInfo userInfo, List<MyPageUserReviews> reviews,
+      List<MyPageUserPoints> points, List<MyPageUserPets> pets) {
+    this.userInfo = userInfo;
+    this.reviews = reviews;
+    this.points = points;
+    this.pets = pets;
   }
 
 

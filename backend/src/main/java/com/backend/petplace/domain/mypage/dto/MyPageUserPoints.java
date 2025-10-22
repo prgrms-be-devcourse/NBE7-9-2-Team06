@@ -15,12 +15,11 @@ public class MyPageUserPoints {
   private final int amount;
   private final LocalDateTime createdDate;
 
-  public static MyPageUserPoints from(Point point){
-    return MyPageUserPoints.builder()
-        .id(point.getId())
-        .description(point.getDescription())
-        .amount(point.getAmount())
-        .createdDate(point.getCreatedDate())
-        .build();
+  public MyPageUserPoints(Long id, PointDescription description, int amount,
+      LocalDateTime createdDate) {
+    this.id = id;
+    this.description = description;
+    this.amount = amount;
+    this.createdDate = createdDate;
   }
 }

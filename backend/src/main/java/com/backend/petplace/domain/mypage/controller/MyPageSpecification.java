@@ -1,6 +1,7 @@
 package com.backend.petplace.domain.mypage.controller;
 
 import com.backend.petplace.domain.mypage.dto.response.MyPageResponse;
+import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,5 +11,5 @@ import org.springframework.http.ResponseEntity;
 public interface MyPageSpecification {
 
   @Operation(summary = "마이페이지 불러오기", description = "마이페이지 정보를 불러옵니다.")
-  public ResponseEntity<ApiResponse<MyPageResponse>> myPage();
+  public ResponseEntity<ApiResponse<MyPageResponse>> myPage(CustomUserDetails user);
 }

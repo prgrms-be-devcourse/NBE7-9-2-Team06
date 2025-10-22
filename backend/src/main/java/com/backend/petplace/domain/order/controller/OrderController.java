@@ -3,15 +3,12 @@ package com.backend.petplace.domain.order.controller;
 import com.backend.petplace.domain.order.dto.request.OrderCreateRequest;
 import com.backend.petplace.domain.order.dto.response.OrderReadByIdResponse;
 import com.backend.petplace.domain.order.service.OrderService;
-import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
-import com.backend.petplace.global.response.ErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,35 +27,32 @@ public class OrderController implements OrderSpecification {
   @Override
   @PostMapping()
   public ResponseEntity<ApiResponse<Void>> createOrder(
-      @RequestBody OrderCreateRequest request) {
+      @RequestBody OrderCreateRequest request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-    orderService.createOrder(request, getUserIdFromJWTToken());
+    Long userId = userDetails.getUserId();
+    orderService.createOrder(request, userId);
     return ResponseEntity.ok(ApiResponse.success());
   }
 
   @Override
   @GetMapping()
-  public ResponseEntity<ApiResponse<List<OrderReadByIdResponse>>> getOrderById() {
+  public ResponseEntity<ApiResponse<List<OrderReadByIdResponse>>> getOrderById(
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-    List<OrderReadByIdResponse> responses = orderService.getOrdersByUserId(getUserIdFromJWTToken());
+    Long userId = userDetails.getUserId();
+    List<OrderReadByIdResponse> responses = orderService.getOrdersByUserId(userId);
     return ResponseEntity.ok(ApiResponse.success(responses));
   }
 
   @Override
   @PatchMapping("/{orderid}/cancel")
-  public ResponseEntity<ApiResponse<Void>> cancelOrder(@PathVariable("orderid") Long orderId) {
+  public ResponseEntity<ApiResponse<Void>> cancelOrder(
+      @PathVariable("orderid") Long orderId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-    orderService.cancelOrder(getUserIdFromJWTToken(), orderId);
+    Long userId = userDetails.getUserId();
+    orderService.cancelOrder(userId, orderId);
     return ResponseEntity.ok(ApiResponse.success());
-  }
-
-  private Long getUserIdFromJWTToken() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null ||
-        !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-      throw new BusinessException(ErrorCode.NOT_FOUND_MEMBER);
-    }
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    return userDetails.getUserId();
   }
 }

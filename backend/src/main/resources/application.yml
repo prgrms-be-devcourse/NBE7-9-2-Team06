@@ -28,8 +28,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${my-email}
-    password: ${app-password}
+    username: ${MY_EMAIL}
+    password: ${APP_PASSWORD}
     properties:
       mail:
         smtp:
@@ -40,7 +40,7 @@ spring:
           connection timeout: 5000
           timeout: 5000
           write timeout: 5000
-      auth-code-expiration-millis: 180000  # 3 * 60 * 1000(밀리초) == 3분
+      auth-code-expiration-minutes: 3  # 3분
 
 cloud:
   aws:

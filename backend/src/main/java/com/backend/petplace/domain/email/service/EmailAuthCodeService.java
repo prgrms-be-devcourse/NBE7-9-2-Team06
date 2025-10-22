@@ -27,7 +27,7 @@ public class EmailAuthCodeService {
   @Value("${spring.mail.username}")
   private String senderEmail;
 
-  @Value("${spring.mail.properties.auth-code-expiration-millis}")
+  @Value("${spring.mail.properties.auth-code-expiration-minutes}")
   private long authCodeExpirationTime;
 
   private static final String TITLE = "[PetPlace] Email 인증 코드";

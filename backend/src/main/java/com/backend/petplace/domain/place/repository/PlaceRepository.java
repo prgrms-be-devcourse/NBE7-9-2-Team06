@@ -26,19 +26,11 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
       p.address         AS address
     FROM place p
     WHERE
-      -- 1) BBox(바운딩 박스)로 1차 압축
       p.latitude  BETWEEN :minLat AND :maxLat
       AND p.longitude BETWEEN :minLon AND :maxLon
-
-      -- 2) 정확한 원형(반경) 필터
       AND ST_Distance_Sphere(POINT(:lon, :lat), POINT(p.longitude, p.latitude)) <= :radiusMeters
-
-      -- 3) 카테고리2 (다중 선택)
       AND (:category2Count = 0 OR p.category2 IN (:category2List))
-
-      -- 4) 키워드 (선택 사항)
       AND (:keyword IS NULL OR p.name LIKE CONCAT('%', :keyword, '%'))
-
     ORDER BY distanceMeters ASC
     LIMIT :limit OFFSET :offset
   """, nativeQuery = true)

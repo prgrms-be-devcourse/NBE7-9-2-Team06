@@ -169,7 +169,6 @@ export default function MyPage() {
                  {pets.length === 0 ? (<p className="col-span-full text-center text-sm text-muted-foreground">등록된 반려동물이 없습니다.</p>) : (
                     pets.map((pet) => (
                       <Card key={pet.id}>
-                        {/* ✨ Pet details 내용 복구 ✨ */}
                         <CardContent className="p-4">
                           <div className="mb-3 flex items-start justify-between">
                             <div>
@@ -186,7 +185,6 @@ export default function MyPage() {
                             {pet.birthDate && (<div className="flex justify-between"><span>생년월일</span><span>{pet.birthDate}</span></div>)}
                           </div>
                         </CardContent>
-                         {/* ✨ 복구 완료 ✨ */}
                       </Card>
                     ))
                  )}

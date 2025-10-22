@@ -37,7 +37,7 @@ class JwtTokenProviderTest {
     jwtTokenProvider.init();
   }
 
-  @DisplayName("JwtTokenProvider 단위 테스트: 암호화된 토큰 생성 & 파싱 확인")
+  @DisplayName("JwtTokenProvider 통합 테스트: 암호화된 토큰 생성 & 파싱 확인")
   @Test
   void token_shouldBeGeneratedAndParsedCorrectly() {
     // 토큰 생성

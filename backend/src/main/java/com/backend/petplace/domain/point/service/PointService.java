@@ -5,6 +5,7 @@ import com.backend.petplace.domain.point.dto.response.PointHistoryResponse;
 import com.backend.petplace.domain.point.entity.Point;
 import com.backend.petplace.domain.point.repository.PointRepository;
 import com.backend.petplace.domain.point.type.PointAddResult;
+import com.backend.petplace.domain.point.type.PointPolicy;
 import com.backend.petplace.domain.review.entity.Review;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
@@ -23,8 +24,6 @@ public class PointService {
   private final PointRepository pointRepository;
   private final UserRepository userRepository;
 
-  private static final int DAILY_POINT_LIMIT = 1000;
-
   @Transactional
   public PointAddResult addPointsForReview(User user, Review review) {
     LocalDate today = LocalDate.now();
@@ -34,7 +33,8 @@ public class PointService {
     }
 
     Integer todaysPoints = pointRepository.findTodaysPointsSumByUser(user, today);
-    if (todaysPoints >= DAILY_POINT_LIMIT) {
+
+    if (todaysPoints >= PointPolicy.DAILY_LIMIT.getValue()) {
       return PointAddResult.DAILY_LIMIT_EXCEEDED;
     }
 

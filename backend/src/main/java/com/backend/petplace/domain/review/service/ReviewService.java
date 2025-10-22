@@ -2,7 +2,6 @@ package com.backend.petplace.domain.review.service;
 
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.place.repository.PlaceRepository;
-import com.backend.petplace.domain.point.repository.PointRepository;
 import com.backend.petplace.domain.point.service.PointService;
 import com.backend.petplace.domain.point.type.PointAddResult;
 import com.backend.petplace.domain.review.dto.ReviewInfo;
@@ -16,7 +15,6 @@ import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
-import com.backend.petplace.global.s3.S3Uploader;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,13 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
   private final PointService pointService;
-  private final PointRepository pointRepository;
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
-  private final S3Uploader s3Uploader;
-
-  private static final String REVIEW_IMAGE_DIR = "reviews";
 
   @Transactional
   public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request) {

@@ -114,6 +114,12 @@ public class OrderService {
     orderRepository.save(order);
   }
 
+  public Integer getUserPoints(Long userId) {
+    return userRepository.findById(userId)
+        .map(User::getTotalPoint)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
+  }
+
   @Transactional
   public void updateAllOrderStatus() {
 

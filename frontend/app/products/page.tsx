@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { mockProducts, type Product, type Order } from "@/lib/mock-data"
 import { ShoppingCart, Package, Plus, Minus, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import axios from "axios"
 
 interface CartItem {
   product: Product
@@ -17,6 +18,7 @@ interface CartItem {
 }
 
 export default function ProductsPage() {
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2MTAwMDEyOSwiZXhwIjoxNzYxOTAwMTI5fQ.SHRhJEUOkNkuqU5azkFs7sQ7lC2RG5raJBroYBkZPLk"
   const router = useRouter()
   const { toast } = useToast()
   const [cart, setCart] = useState<CartItem[]>([])
@@ -28,7 +30,7 @@ export default function ProductsPage() {
       router.push("/login")
     }
   }, [router])
-
+  
   const addToCart = (product: Product) => {
     const existingItem = cart.find((item) => item.product.id === product.id)
 
@@ -66,7 +68,7 @@ export default function ProductsPage() {
     return cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
   }
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     const totalPrice = getTotalPrice()
 
     if (totalPrice > userPoints) {
@@ -77,54 +79,117 @@ export default function ProductsPage() {
       })
       return
     }
-
-    const newOrder: Order = {
-      id: `order-${Date.now()}`,
-      userId: "currentUser",
-      items: cart.map((item) => ({
-        productId: item.product.id,
-        quantity: item.quantity,
-        name: item.product.name,
-        price: item.product.price,
-      })),
+    
+    //서버로 보낼 주문 데이터 생성
+    const orderData = {
       totalPrice,
-      status: "ORDERED",
-      date: new Date().toISOString().split("T")[0],
+      orderProducts: cart.map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity
+      })),
     }
 
-    setOrders([newOrder, ...orders])
-    setUserPoints(userPoints - totalPrice)
-    setCart([])
+    try {
+      //서버에 주문 데이터 전송
+      await axios.post("http://localhost:8080/api/v1/orders",
+        orderData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      )
+
+      // 주문 상태 업데이트
+      const newOrder: Order = {
+        id: `order-${Date.now()}`,
+        userId: "currentUser",
+        items: cart.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          name: item.product.name,
+          price: item.product.price,
+        })), // ← 여기 중괄호와 괄호 모두 닫음
+        totalPrice,
+        status: "ORDERED",
+        date: new Date().toISOString().split("T")[0],
+      }
+
+      setOrders([newOrder, ...orders])
+      setUserPoints(userPoints - totalPrice)
+      setCart([])
 
     toast({
       title: "결제 완료",
       description: `${totalPrice}P가 차감되었습니다.`,
     })
-  }
-
-  const cancelOrder = (orderId: string) => {
-    const order = orders.find((o) => o.id === orderId)
-
-    if (!order) return
-
-    if (order.status !== "ORDERED") {
-      toast({
-        title: "취소 불가",
-        description: "이미 배송되었거나 취소된 주문입니다.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    setOrders(orders.map((o) => (o.id === orderId ? { ...o, status: "CANCELED" as const } : o)))
-
-    setUserPoints(userPoints + order.totalPrice)
-
+  } catch (err: any) {
+    console.error(err)
     toast({
-      title: "주문 취소",
-      description: `${order.totalPrice}P가 환불되었습니다.`,
+      title: "결제 실패",
+      description: err.response?.data?.message || "서버 오류가 발생했습니다.",
+      variant: "destructive",
     })
   }
+}
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/v1/orders", {
+        headers: { Authorization: token },
+      })
+  
+      const apiResponse = response.data // ApiResponse 구조
+      const orderList = apiResponse.data // 실제 List<OrderReadByIdResponse>
+  
+      // 서버 DTO를 프론트의 Order 구조로 변환
+      const formattedOrders: Order[] = orderList.map((o: any) => ({
+        id: String(o.orderId),
+        userId: "currentUser",
+        items: o.orderProducts.map((p: any) => ({
+          productId: p.productName, // 서버에서 productId가 아닌 productName만 옴
+          name: p.productName,
+          quantity: p.quantity,
+          price: 0, // 서버에서 가격 정보가 없으므로 일단 0으로 표시
+        })),
+        totalPrice: o.totalPrice,
+        status: o.orderStatus,
+        date: o.updatedAt?.split("T")[0] || "",
+      }))
+  
+      setOrders(formattedOrders)
+    } catch (err: any) {
+      console.error(err)
+      toast({
+        title: "주문 내역 조회 실패",
+        description: err.response?.data?.message || "서버 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const cancelOrderOnServer = async (orderId: string) => {
+    try {
+      await axios.patch(`http://localhost:8080/api/v1/orders/${orderId}/cancel`, null, {
+        headers: { Authorization: token },
+      });
+  
+      toast({
+        title: "주문 취소 완료",
+        description: "주문이 정상적으로 취소되었습니다.",
+      });
+  
+      // 취소 후 서버에서 최신 주문 내역 가져오기
+      fetchOrders();
+    } catch (err: any) {
+      console.error(err);
+      toast({
+        title: "주문 취소 실패",
+        description: err.response?.data?.message || "서버 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!isAuthenticated()) {
     return null
@@ -201,7 +266,7 @@ export default function ProductsPage() {
               </SheetContent>
             </Sheet>
 
-            <Sheet>
+            <Sheet onOpenChange={(open) => { if (open) fetchOrders() }}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Package className="h-5 w-5" />
@@ -249,13 +314,13 @@ export default function ProductsPage() {
                           </div>
                           {order.status === "ORDERED" && (
                             <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => cancelOrder(order.id)}
-                              className="mt-3 w-full"
-                            >
-                              주문 취소
-                            </Button>
+                            variant="outline"
+                            size="sm"
+                            onClick={() => cancelOrderOnServer(order.id)}
+                            className="mt-3 w-full"
+                          >
+                            주문 취소
+                          </Button>
                           )}
                         </CardContent>
                       </Card>

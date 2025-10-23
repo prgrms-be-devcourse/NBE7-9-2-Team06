@@ -1,14 +1,9 @@
 package com.backend.petplace.global.initdata;
 
-import com.backend.petplace.domain.order.entity.Order;
 import com.backend.petplace.domain.order.repository.OrderRepository;
-import com.backend.petplace.domain.orderproduct.entity.OrderProduct;
 import com.backend.petplace.domain.product.entity.Product;
 import com.backend.petplace.domain.product.repository.ProductRepository;
-import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -59,28 +54,11 @@ public class BaseInitData implements CommandLineRunner {
     productRepository.save(p4);
 
     // 스케줄러 테스트용 주문 생성
-    // 유저 생성
-    User user = userRepository.findById(1L).orElseGet(() -> {
-      User newUser = User.createUser("John1234", "John1234@@", "John1234@naver.com",
-          "서울 송파구 뮁뮁로 10", "zipcode", "301동 1004호");
-      return userRepository.save(newUser);
-    });
 
     // 상품 생성
     Product product = productRepository.findById(1L).orElseGet(() -> {
       Product newProduct = Product.createProduct("상품1", 1L, 10000L, "상품1.");
       return productRepository.save(newProduct);
     });
-
-    // 10개의 주문 생성
-    for (int numberOfOrder = 0; numberOfOrder < 2; numberOfOrder++) {
-      Order order = Order.createOrder(user, 1);
-      OrderProduct orderProduct = OrderProduct.createOrderProduct(order, product, 1L);
-      List<OrderProduct> orderProducts = new ArrayList<>();
-      orderProducts.add(orderProduct);
-      order.addOrderProducts(orderProducts);
-      orderRepository.save(order);
-      orderRepository.flush();
-    }
   }
 }

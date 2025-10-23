@@ -27,16 +27,16 @@ public class UserController implements UserSpecification {
 
   @GetMapping("/signup-username")
   public ResponseEntity<ApiResponse<BoolResultResponse>> checkNickName(
-      @RequestParam @NotBlank String nickName
-  ) {
+      @RequestParam @NotBlank String nickName) {
+
     BoolResultResponse response = userService.validateDuplicateNickName(nickName);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
   @GetMapping("/signup-email")
   public ResponseEntity<ApiResponse<BoolResultResponse>> checkEmail(
-      @RequestParam @NotBlank @Email String email
-  ) {
+      @RequestParam @NotBlank @Email String email) {
+
     BoolResultResponse response = userService.validateDuplicateEmail(email);
     return ResponseEntity.ok(ApiResponse.success(response));
   }

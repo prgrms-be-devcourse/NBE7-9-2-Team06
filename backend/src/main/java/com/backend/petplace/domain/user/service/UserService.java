@@ -5,6 +5,7 @@ import com.backend.petplace.domain.email.repository.EmailAuthCodeRepository;
 import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
+import com.backend.petplace.domain.user.dto.response.UserLoginResponse;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
@@ -70,7 +71,7 @@ public class UserService {
   }
 
   @Transactional(readOnly = true)
-  public String login(UserLoginRequest request) {
+  public UserLoginResponse login(UserLoginRequest request) {
     User user = userRepository.findByNickName(request.getNickName())
         .orElseThrow(() -> new BusinessException(ErrorCode.BAD_CREDENTIAL));
 
@@ -78,6 +79,6 @@ public class UserService {
       throw new BusinessException(ErrorCode.BAD_CREDENTIAL);
     }
 
-    return jwtTokenProvider.generateAccessToken(user.getId());
+    return new UserLoginResponse(jwtTokenProvider.generateAccessToken(user.getId()));
   }
 }

@@ -3,6 +3,7 @@ package com.backend.petplace.domain.user.controller;
 import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
+import com.backend.petplace.domain.user.dto.response.UserLoginResponse;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.service.UserService;
 import com.backend.petplace.global.response.ApiResponse;
@@ -50,10 +51,10 @@ public class UserController implements UserSpecification {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<String>> login(
+  public ResponseEntity<ApiResponse<UserLoginResponse>> login(
       @RequestBody UserLoginRequest request) {
 
-    String response = userService.login(request);
+    UserLoginResponse response = userService.login(request);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 }

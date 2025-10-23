@@ -38,6 +38,7 @@ public class SecurityConfig {
             .requestMatchers("/h2-console/**").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .requestMatchers("/api/v1/signup", "/api/v1/login").permitAll() // 회원가입, 로그인
+            .requestMatchers("/api/v1/signup-username", "/api/v1/signup-email").permitAll()
             .requestMatchers("/api/v1/places/{placeId}/reviews").permitAll() // 장소별 리뷰 조회
             .requestMatchers("/api/v1/**").permitAll()
             .anyRequest().authenticated()

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/api/v1/email/auth")
 @RequiredArgsConstructor
-public class UserEmailVerificationController {
+public class UserEmailVerificationController implements UserEmailVerificationSpecification{
 
   private final EmailAuthCodeService EMailAuthCodeService;
 

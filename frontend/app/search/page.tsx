@@ -16,7 +16,6 @@ import { searchPlaces, getPlaceDetail, type PlaceDto } from "./placeService"
 // 지도는 브라우저 전용
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false })
 
-// ✅ 백엔드 Enum(category2)과 정확히 일치하는 매핑
 const CATEGORY_MAP: Record<string, string> = {
   "동물약국": "VET_PHARMACY",
   "박물관": "MUSEUM",
@@ -88,7 +87,7 @@ export default function SearchPage() {
       lon: userCenter[1],
       radiusKm: radius[0],
       keyword: overrides?.keyword ?? (keyword.trim() || undefined),
-      category2, // ✅ 백엔드 Enum 이름 그대로 전달
+      category2,
     }
 
     try {
@@ -145,13 +144,13 @@ export default function SearchPage() {
               </Button>
             </div>
 
-            {/* 📏 반경 슬라이더 */}
+            {/* 반경 슬라이더 */}
             <div className="space-y-2">
               <label className="text-sm font-medium">반경: {radius[0]}km</label>
               <Slider value={radius} onValueChange={handleRadiusChange} min={1} max={30} step={1} />
             </div>
 
-            {/* 🏷️ 카테고리 선택 버튼 */}
+            {/* 카테고리 선택 버튼 */}
             <div className="flex flex-wrap gap-2">
               {categories.map((label) => (
                 <Button
@@ -164,7 +163,7 @@ export default function SearchPage() {
               ))}
             </div>
 
-            {/* 🗺️ 지도 + 결과 목록 */}
+            {/* 지도 + 결과 목록 */}
             <div className="space-y-4">
               <div className="rounded-lg border border-border bg-muted/30 p-8">
                 <MapView center={userCenter} places={places} onSelectPlace={handlePlaceClick} />

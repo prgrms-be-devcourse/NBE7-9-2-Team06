@@ -8,16 +8,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function HomePage() {
   const router = useRouter()
-  const [mounted, setMounted] = useState(false)        // ★ 추가
+  const [mounted, setMounted] = useState(false)       
 
   useEffect(() => {
-    setMounted(true)                                   // ★ 추가
+    setMounted(true)                                   
     if (!isAuthenticated()) {
       router.push("/login")
     }
   }, [router])
 
-  if (!mounted) return null                            // ★ 추가: 클라이언트 마운트 전엔 아무것도 렌더하지 않음
+  if (!mounted) return null                            
 
   const articles = [
     {

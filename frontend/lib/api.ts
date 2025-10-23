@@ -26,7 +26,7 @@ export async function api<T>(
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    credentials: 'include', // 쿠키 인증 쓰면 유지
+    credentials: 'include',
   });
 
   if (!res.ok) {

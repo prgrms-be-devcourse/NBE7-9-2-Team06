@@ -3,7 +3,7 @@ import { api } from '@/lib/api';
 export type PlaceDto = {
   id: number;
   name: string;
-  category2: string;      // 백엔드 필드명 그대로
+  category2: string;      
   latitude: number;
   longitude: number;
   distanceMeters: number;
@@ -17,13 +17,12 @@ export type ApiResponse<T> = {
   data: T;
 };
 
-/** 백엔드가 기대하는 쿼리 키는 category2 입니다! */
 export async function searchPlaces(params: {
   lat: number;
   lon: number;
-  radiusKm: number;        // km (필수)
-  keyword?: string;        // 선택
-  category2?: string;      // ✅ 선택 (예: 'MUSEUM', 'HOSPITAL', ...)
+  radiusKm: number;        
+  keyword?: string;        
+  category2?: string;      
 }) {
   return api<ApiResponse<PlaceDto[]>>('/api/v1/places/search', { query: params });
 }

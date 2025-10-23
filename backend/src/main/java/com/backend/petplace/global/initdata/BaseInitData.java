@@ -73,7 +73,7 @@ public class BaseInitData implements CommandLineRunner {
     });
 
     // 10개의 주문 생성
-    for (int numberOfOrder = 0; numberOfOrder < 10; numberOfOrder++) {
+    for (int numberOfOrder = 0; numberOfOrder < 2; numberOfOrder++) {
       Order order = Order.createOrder(user, 1);
       OrderProduct orderProduct = OrderProduct.createOrderProduct(order, product, 1L);
       List<OrderProduct> orderProducts = new ArrayList<>();

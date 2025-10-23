@@ -27,7 +27,7 @@ public class OrderService {
   private final ProductRepository productRepository;
 
   @Transactional
-  public void createOrder(OrderCreateRequest request, Long userId) {
+  public long createOrder(OrderCreateRequest request, Long userId) {
 
     // 기존 유저 읽어서 객체 생성
     User user = readUser(userId);
@@ -49,6 +49,8 @@ public class OrderService {
 
     // 저장
     orderRepository.save(order);
+
+    return order.getOrderId();
   }
 
   private User readUser(Long userId) {

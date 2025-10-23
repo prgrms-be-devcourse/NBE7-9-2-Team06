@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 public interface OrderSpecification {
 
   @Operation(summary = "주문 생성", description = "새로운 주문을 생성합니다.")
-  ResponseEntity<ApiResponse<Void>> createOrder(
+  ResponseEntity<ApiResponse<Long>> createOrder(
       @Parameter(description = "가격 총액, 주문객체 리스트") OrderCreateRequest request,
       @Parameter(description = "JWT토큰에서 받은 유저 정보") CustomUserDetails userDetails);
 

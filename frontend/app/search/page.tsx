@@ -1,101 +1,110 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { isAuthenticated } from "@/lib/auth"
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
-import { mockPlaces, mockReviews, type Place } from "@/lib/mock-data"
+import { mockReviews } from "@/lib/mock-data"
 import { PlaceSidebar } from "@/components/place-sidebar"
 import { useToast } from "@/hooks/use-toast"
+import dynamic from "next/dynamic"
+import { searchPlaces, getPlaceDetail, type PlaceDto } from "./placeService"
+
+// ★ 반드시 SSR 끈 동적 import 사용
+const MapView = dynamic(() => import("@/components/MapView"), { ssr: false })
 
 export default function SearchPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const [keyword, setKeyword] = useState("")
-  const [radius, setRadius] = useState([5])
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [filteredPlaces, setFilteredPlaces] = useState<Place[]>(mockPlaces)
-  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const [mounted, setMounted] = useState(false)                // ★ 추가
+  useEffect(() => { setMounted(true) }, [])                    // ★ 추가
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/login")
-    } else {
-      // Initial load: show all places within 5km
-      filterPlaces()
     }
   }, [router])
 
-  const categories = ["병원", "약국", "식당"]
+  const [keyword, setKeyword] = useState("")
+  const [radius, setRadius] = useState([10])
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
-  const filterPlaces = (searchKeyword?: string, category?: string | null) => {
-    let filtered = mockPlaces.filter((place) => place.distance <= radius[0])
+  const [userCenter, setUserCenter] = useState<[number, number] | null>(null)
+  const [places, setPlaces] = useState<PlaceDto[]>([])
+  const [selectedPlace, setSelectedPlace] = useState<PlaceDto | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-    if (searchKeyword) {
-      filtered = filtered.filter(
-        (place) => place.name.includes(searchKeyword) || place.description.includes(searchKeyword),
+  // 브라우저에서만 위치 권한 시도
+  useEffect(() => {
+    if (!mounted) return
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserCenter([pos.coords.latitude, pos.coords.longitude]),
+        () => setUserCenter(null),
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       )
+    } else {
+      setUserCenter(null)
     }
+  }, [mounted])
 
-    if (category) {
-      filtered = filtered.filter((place) => place.category === category)
-    }
+  const categories = useMemo(() => ["병원", "약국", "식당"], [])
 
-    setFilteredPlaces(filtered)
-  }
-
-  const handleSearch = () => {
-    if (!keyword.trim()) {
-      toast({
-        title: "검색 오류",
-        description: "키워드를 넣어주세요",
-        variant: "destructive",
-      })
+  const runSearch = async (overrides?: { keyword?: string; category?: string | null }) => {
+    if (!userCenter) {
+      toast({ title: "위치 확인 필요", description: "내 위치를 확인한 후 검색해 주세요.", variant: "destructive" })
       return
     }
-    setSelectedCategory(null)
-    filterPlaces(keyword, null)
+    const q = {
+      lat: userCenter[0],
+      lon: userCenter[1],
+      radiusKm: radius[0],
+      keyword: overrides?.keyword ?? (keyword.trim() || undefined),
+      category: overrides?.category ?? selectedCategory ?? undefined,
+    }
+    try {
+      setLoading(true)
+      const res = await searchPlaces(q)
+      setPlaces(res.data)
+    } catch (e: any) {
+      toast({ title: "검색 실패", description: e?.message || "잠시 후 다시 시도해 주세요.", variant: "destructive" })
+    } finally {
+      setLoading(false)
+    }
   }
 
+  const handleSearch = () => runSearch()
   const handleCategoryClick = (category: string) => {
-    setKeyword("")
-    setSelectedCategory(category)
-    filterPlaces("", category)
+    const next = category === selectedCategory ? null : category
+    setSelectedCategory(next)
+    runSearch({ category: next })
   }
+  const handleRadiusChange = (value: number[]) => setRadius(value)
 
-  const handleRadiusChange = (value: number[]) => {
-    setRadius(value)
-    filterPlaces(keyword || undefined, selectedCategory)
-  }
-
-  const handlePlaceClick = (place: Place) => {
+  const handlePlaceClick = async (place: PlaceDto) => {
     setSelectedPlace(place)
     setSidebarOpen(true)
+    // 상세 API 붙일 곳:
+    // const detail = await getPlaceDetail(place.id)
   }
 
-  if (!isAuthenticated()) {
-    return null
-  }
+  if (!mounted) return null                                  // ★ 추가: 페이지도 마운트 전 렌더 안 함
+  if (!isAuthenticated()) return null
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-
       <main className="container mx-auto px-4 py-6">
         <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
           <div className="space-y-4">
             <div className="flex gap-2">
-              <Input
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder="장소를 검색하세요"
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <Button onClick={handleSearch}>검색</Button>
+              <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="장소를 검색하세요 (선택)"
+                     onKeyDown={(e) => e.key === "Enter" && handleSearch()} />
+              <Button onClick={handleSearch} disabled={loading}>{loading ? "검색 중..." : "검색"}</Button>
             </div>
 
             <div className="space-y-2">
@@ -105,11 +114,9 @@ export default function SearchPage() {
 
             <div className="flex gap-2">
               {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  onClick={() => handleCategoryClick(category)}
-                >
+                <Button key={category}
+                        variant={selectedCategory === category ? "default" : "outline"}
+                        onClick={() => handleCategoryClick(category)}>
                   {category}
                 </Button>
               ))}
@@ -117,26 +124,17 @@ export default function SearchPage() {
 
             <div className="space-y-4">
               <div className="rounded-lg border border-border bg-muted/30 p-8">
-                <div className="flex h-[400px] items-center justify-center text-sm text-muted-foreground">
-                  지도 영역 (JavaScript Map API 통합 예정)
-                </div>
+                <MapView center={userCenter} places={places} onSelectPlace={handlePlaceClick} />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                {filteredPlaces.map((place) => (
-                  <button
-                    key={place.id}
-                    onClick={() => handlePlaceClick(place)}
-                    className="rounded-lg border border-border bg-card p-3 text-left transition-shadow hover:shadow-md"
-                  >
-                    <img
-                      src={place.image || "/placeholder.svg"}
-                      alt={place.name}
-                      className="mb-2 h-32 w-full rounded object-cover"
-                    />
+                {places.map((place) => (
+                  <button key={place.id} onClick={() => handlePlaceClick(place)}
+                          className="rounded-lg border border-border bg-card p-3 text-left transition-shadow hover:shadow-md">
+                    <img src={"/placeholder.svg"} alt={place.name} className="mb-2 h-32 w-full rounded object-cover" />
                     <h3 className="font-semibold text-card-foreground">{place.name}</h3>
-                    <p className="text-xs text-muted-foreground">{place.category}</p>
-                    <p className="text-xs text-muted-foreground">{place.distance}km</p>
+                    <p className="text-xs text-muted-foreground">{place.category2}</p>
+                    <p className="text-xs text-muted-foreground">{Math.round(place.distanceMeters / 100) / 10}km</p>
                   </button>
                 ))}
               </div>
@@ -144,8 +142,8 @@ export default function SearchPage() {
           </div>
 
           <PlaceSidebar
-            place={selectedPlace}
-            reviews={mockReviews.filter((r) => r.placeId === selectedPlace?.id)}
+            place={selectedPlace as any}
+            reviews={mockReviews.filter((r) => r.placeId === (selectedPlace as any)?.id)}
             open={sidebarOpen}
             onOpenChange={setSidebarOpen}
           />

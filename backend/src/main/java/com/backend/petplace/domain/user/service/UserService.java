@@ -2,6 +2,7 @@ package com.backend.petplace.domain.user.service;
 
 import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
+import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
@@ -23,15 +24,6 @@ public class UserService {
 
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
-
-    if (userRepository.existsByNickName(request.getNickName())) {
-      throw new BusinessException(ErrorCode.DUPLICATE_NICKNAME);
-    }
-
-    if (userRepository.existsByEmail(request.getEmail())) {
-      throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
-    }
-
     User user = User.builder()
         .nickName(request.getNickName())
         .password(passwordEncoder.encode(request.getPassword()))
@@ -44,6 +36,22 @@ public class UserService {
     userRepository.save(user);
 
     return new UserSignupResponse(user.getId());
+  }
+
+  @Transactional(readOnly = true)
+  public BoolResultResponse validateDuplicateNickName(String nickName) {
+    if (userRepository.existsByNickName(nickName)) {
+      throw new BusinessException(ErrorCode.DUPLICATE_NICKNAME);
+    }
+    return new BoolResultResponse(true);
+  }
+
+  @Transactional(readOnly = true)
+  public BoolResultResponse validateDuplicateEmail(String email) {
+    if (userRepository.existsByEmail(email)) {
+      throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
+    }
+    return new BoolResultResponse(true);
   }
 
   @Transactional(readOnly = true)

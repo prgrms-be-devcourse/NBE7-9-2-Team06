@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { isAuthenticated } from "@/lib/auth"
 import { Navigation } from "@/components/navigation"
@@ -8,12 +8,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function HomePage() {
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)       
 
   useEffect(() => {
+    setMounted(true)                                   
     if (!isAuthenticated()) {
       router.push("/login")
     }
   }, [router])
+
+  if (!mounted) return null                            
 
   const articles = [
     {
@@ -47,7 +51,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="mb-4 text-4xl font-bold text-balance text-foreground">반려동물과 함께하는 행복한 일상</h1>

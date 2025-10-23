@@ -62,7 +62,6 @@ public class OrderController implements OrderSpecification {
   public ResponseEntity<ApiResponse<Integer>> getUserPoints(@AuthenticationPrincipal CustomUserDetails userDetails) {
     Long userId = userDetails.getUserId();
     Integer points = orderService.getUserPoints(userId);
-    System.out.println("controller: user points = " + points);
     return ResponseEntity.ok(ApiResponse.success(points));
   }
 }

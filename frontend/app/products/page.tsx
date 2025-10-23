@@ -28,12 +28,29 @@ export default function ProductsPage() {
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/login")
-    } else {
-      fetchUserPoints();
-      fetchOrders();
-    }
+    } 
+    readUserPoints();
   }, [router])
   
+  // 함수: 서버에서 포인트 받아오기
+  const readUserPoints = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/v1/orders/points", {
+        headers: { Authorization: token },
+      });
+      setUserPoints(response.data.data);
+    }
+    catch (err: any) {
+      console.error(err);
+      toast({
+        title: "포인트 조회 실패",
+        description: err.response?.data?.message || "서버 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // 함수: 장바구니에 아이템 추가
   const addToCart = (product: Product) => {
     const existingItem = cart.find((item) => item.product.id === product.id)
 
@@ -42,13 +59,10 @@ export default function ProductsPage() {
     } else {
       setCart([...cart, { product, quantity: 1 }])
     }
-
-    toast({
-      title: "장바구니에 추가되었습니다",
-      description: product.name,
-    })
+    toast({title: "장바구니에 추가되었습니다", description: product.name,})
   }
 
+  // 함수: 장바구니 속 아이템 숫자 변경
   const updateQuantity = (productId: string, delta: number) => {
     setCart(
       cart
@@ -63,26 +77,25 @@ export default function ProductsPage() {
     )
   }
 
+  // 함수: 장바구니 속 아이템 숫자 변경 시, 0되면 장바구니에서 삭제
   const removeFromCart = (productId: string) => {
     setCart(cart.filter((item) => item.product.id !== productId))
   }
 
+  // 함수: 장바구니 속 값 총합
   const getTotalPrice = () => {
     return cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
   }
 
+  // 함수: 장바구니에서 구매 누르면 처리
   const handleCheckout = async () => {
     const totalPrice = getTotalPrice()
 
     if (totalPrice > userPoints) {
-      toast({
-        title: "결제 실패",
-        description: "포인트가 부족합니다.",
-        variant: "destructive",
-      })
+      toast({title: "결제 실패", description: "포인트가 부족합니다.", variant: "destructive",})
       return
     }
-    
+
     //서버로 보낼 주문 데이터 생성
     const orderData = {
       totalPrice,
@@ -94,126 +107,122 @@ export default function ProductsPage() {
 
     try {
       //서버에 주문 데이터 전송
-      await axios.post("http://localhost:8080/api/v1/orders",
+      const response = await axios.post("http://localhost:8080/api/v1/orders",
         orderData,
         {
           headers: {
             Authorization: token,
           },
-        }
+        } 
       )
-      await fetchUserPoints();
-      await fetchOrders();
-      // 주문 상태 업데이트
+
+      // 프론트에 표시할 새 주문 내역 생성
       const newOrder: Order = {
-        id: `order-${Date.now()}`,
+        id: response.data.data,
         userId: "currentUser",
         items: cart.map((item) => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-          name: item.product.name,
-          price: item.product.price,
-        })), // ← 여기 중괄호와 괄호 모두 닫음
-        totalPrice,
-        status: "ORDERED",
+          productId: item.product.id, quantity: item.quantity,
+          name: item.product.name, price: item.product.price,})),
+        totalPrice, status: "ORDERED",
         date: new Date().toISOString().split("T")[0],
       }
-
-      setOrders([newOrder, ...orders])
+      
+      // 장바구니 속 아이템들을 하나의 주문으로 묶어 주문 내역으로 보내기
+      //setOrders([newOrder, ...orders])
+      await readOrders()
+      // 유저의 포인트를 갱신해서 출력
       setUserPoints(userPoints - totalPrice)
+      // 장바구니 비우기
       setCart([])
 
-    toast({
-      title: "결제 완료",
-      description: `${totalPrice}P가 차감되었습니다.`,
-    })
-  } catch (err: any) {
+      toast({
+        title: "결제 완료",
+        description: `${totalPrice}P가 차감되었습니다.`,
+      })
+    } catch (err : any) {
     console.error(err)
-    toast({
-      title: "결제 실패",
-      description: err.response?.data?.message || "서버 오류가 발생했습니다.",
-      variant: "destructive",
-    })
+      toast({
+        title: "결제 실패",
+        description: err.response?.data?.message || "서버 오류가 발생했습니다.",
+        variant: "destructive",})
+    }
   }
-}
 
-  const fetchOrders = async () => {
+  // 함수: 주문 내역에 표시할 함수 표시
+  const readOrders = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/v1/orders", {
-        headers: { Authorization: token },
+        headers: {Authorization: token},
       })
-  
-      const apiResponse = response.data // ApiResponse 구조
-      const orderList = apiResponse.data // 실제 List<OrderReadByIdResponse>
-  
-      // 서버 DTO를 프론트의 Order 구조로 변환
-      const formattedOrders: Order[] = orderList.map((o: any) => ({
+
+      const apiResponse = response.data //ApiResponse 구조 용도
+      const orderlist = apiResponse.data// 그 안에 있는 실제 List<OrderReadByIdResponse>
+      
+      // OrderReadByIdResponse DTO를 프론트의 Order 구조로 변환
+      const orders: Order[] = orderlist.map((o : any) => ({
         id: String(o.orderId),
-        userId: "currentUser",
-        items: o.orderProducts.map((p: any) => ({
-          productId: p.productName, // 서버에서 productId가 아닌 productName만 옴
+        userId: "currentuser",
+        items: o.orderProducts.map((p : any) => ({
+          productId: p.productName, //서버에서 product Id는 안 보냄
           name: p.productName,
           quantity: p.quantity,
-          price: 0, // 서버에서 가격 정보가 없으므로 일단 0으로 표시
+          price: 0, //서버에 가격 정보 안 보내서 0으로 표시
         })),
         totalPrice: o.totalPrice,
         status: o.orderStatus,
         date: o.updatedAt?.split("T")[0] || "",
       }))
-  
-      setOrders(formattedOrders)
+
+      // 후처리한 orders를 주문 내역 화면에 표시
+      setOrders(orders)
     } catch (err: any) {
       console.error(err)
       toast({
-        title: "주문 내역 조회 실패",
-        description: err.response?.data?.message || "서버 오류가 발생했습니다.",
-        variant: "destructive",
-      })
+        title: "주문 내역 조회 실패", variant: "destructive",
+        description: err.response?.data?.message || "서버 오류가 발생했습니다."})
     }
   }
 
-  const cancelOrderOnServer = async (orderId: string) => {
+  // 함수: 주문 내역에서 주문 취소 시
+  const cancelOrder = async (orderId: string) => {
+
+    // 특정 오더 타게팅
+    const order = orders.find((o) => o.id === orderId)
+    if (!order) return
+    // 특정 오더가 ORDERED 상태 아니면 예외처리
+    if (order.status !== "ORDERED") {
+      toast({title: "취소 불가", description: "이미 배송되었거나 취소된 주문입니다.", variant: "destructive",})
+      return
+    }
+
+    // 주문 취소 요청
     try {
-      await axios.patch(`http://localhost:8080/api/v1/orders/${orderId}/cancel`, null, {
+      const response = await axios.patch(`http://localhost:8080/api/v1/orders/${orderId}/cancel`, null, {
         headers: { Authorization: token },
       });
-  
+
+      await readOrders();
+    } catch (err : any) {
+      console.error("주문 취소 실패: ", err);
       toast({
-        title: "주문 취소 완료",
-        description: "주문이 정상적으로 취소되었습니다.",
-      });
-  
-      // 취소 후 서버에서 최신 주문 내역 가져오기
-      fetchOrders();
-    } catch (err: any) {
-      console.error(err);
-      toast({
-        title: "주문 취소 실패",
+        title: "주문 취소 실패", variant: "destructive",
         description: err.response?.data?.message || "서버 오류가 발생했습니다.",
-        variant: "destructive",
-      });
+      })
     }
-  };
 
-  // 유저 포인트를 서버에서 가져오는 함수
-const fetchUserPoints = async () => {
-  try {
-    const response = await axios.get("http://localhost:8080/api/v1/orders/points", {
-      headers: { Authorization: token },
-    });
 
-    const points = response.data.data; // 서버가 totalPoint 값만 반환한다고 가정
-    setUserPoints(points);
-  } catch (err: any) {
-    console.error(err);
+
+    // 장바구니 속 아이템들을 하나의 주문으로 묶어 주문 내역으로 보내기
+    //setOrders(orders.map((o) => (o.id === orderId ? { ...o, status: "CANCELED" as const } : o)))
+    // 여기에 주문 취소 요청 로직 출력해야.
+    // 유저 포인트를 갱신해서 출력 -> 위의 주문 취소 요청이 성공한 경우에만.
+    setUserPoints(userPoints + order.totalPrice)
+
     toast({
-      title: "포인트 조회 실패",
-      description: err.response?.data?.message || "서버 오류가 발생했습니다.",
-      variant: "destructive",
-    });
+      title: "주문 취소",
+      description: `${order.totalPrice}P가 환불되었습니다.`,
+    })
   }
-};
-
 
   if (!isAuthenticated()) {
     return null
@@ -290,7 +299,7 @@ const fetchUserPoints = async () => {
               </SheetContent>
             </Sheet>
 
-            <Sheet onOpenChange={(open) => { if (open) fetchOrders() }}>
+            <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Package className="h-5 w-5" />
@@ -338,13 +347,13 @@ const fetchUserPoints = async () => {
                           </div>
                           {order.status === "ORDERED" && (
                             <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => cancelOrderOnServer(order.id)}
-                            className="mt-3 w-full"
-                          >
-                            주문 취소
-                          </Button>
+                              variant="outline"
+                              size="sm"
+                              onClick={() => cancelOrder(order.id)}
+                              className="mt-3 w-full"
+                            >
+                              주문 취소
+                            </Button>
                           )}
                         </CardContent>
                       </Card>

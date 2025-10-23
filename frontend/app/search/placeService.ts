@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 export type PlaceDto = {
   id: number;
   name: string;
-  category2: string;        // 서버에서 enum name으로 옴 (e.g., VET_PHARMACY)
+  category2: string;        // 서버 enum name (e.g., VET_PHARMACY)
   latitude: number;
   longitude: number;
   distanceMeters: number;
@@ -69,10 +69,26 @@ export const CATEGORY2_LABELS: Record<string, string> = {
   ETC: '기타',
 };
 
+/** UI에서 쓸 카테고리 옵션(ETC 제외) */
+export const CATEGORY2_OPTIONS: { value: keyof typeof CATEGORY2_LABELS; label: string }[] = [
+  { value: 'VET_PHARMACY', label: CATEGORY2_LABELS.VET_PHARMACY },
+  { value: 'MUSEUM', label: CATEGORY2_LABELS.MUSEUM },
+  { value: 'CAFE', label: CATEGORY2_LABELS.CAFE },
+  { value: 'VET_HOSPITAL', label: CATEGORY2_LABELS.VET_HOSPITAL },
+  { value: 'PET_SUPPLIES', label: CATEGORY2_LABELS.PET_SUPPLIES },
+  { value: 'GROOMING', label: CATEGORY2_LABELS.GROOMING },
+  { value: 'ART_CENTER', label: CATEGORY2_LABELS.ART_CENTER },
+  { value: 'PENSION', label: CATEGORY2_LABELS.PENSION },
+  { value: 'RESTAURANT', label: CATEGORY2_LABELS.RESTAURANT },
+  { value: 'DESTINATION', label: CATEGORY2_LABELS.DESTINATION },
+  { value: 'DAYCARE', label: CATEGORY2_LABELS.DAYCARE },
+  { value: 'ART_MUSEUM', label: CATEGORY2_LABELS.ART_MUSEUM },
+];
+
 /** 안전한 라벨 변환 함수 */
 export function getCategory1Label(v?: string | null) {
   if (!v) return '-';
-  return CATEGORY1_LABELS[v] ?? v; // 매핑 없으면 원본 표시(방어)
+  return CATEGORY1_LABELS[v] ?? v;
 }
 
 export function getCategory2Label(v?: string | null) {
@@ -87,7 +103,7 @@ export async function searchPlaces(params: {
   lon: number;
   radiusKm: number;     // km
   keyword?: string;     // 선택
-  category?: string;    // 선택 (백엔드 파라미터 키와 일치: category2)
+  category2?: string;   // 선택 (백엔드 파라미터와 동일한 키)
 }) {
   return api<ApiResponse<PlaceDto[]>>('/api/v1/places/search', { query: params });
 }

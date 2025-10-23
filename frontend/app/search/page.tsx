@@ -17,6 +17,7 @@ import {
   type PlaceDto,
   type PlaceDetailResponse,
   getCategory2Label,
+  CATEGORY2_OPTIONS,
 } from "./placeService"
 
 // 지도는 SSR 끔
@@ -35,8 +36,8 @@ export default function SearchPage() {
   }, [router])
 
   const [keyword, setKeyword] = useState("")
-  const [radius, setRadius] = useState([10])
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [radius, setRadius] = useState([10])                  // 1~30km 슬라이더
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null) // enum name 저장
 
   const [userCenter, setUserCenter] = useState<[number, number] | null>(null)
   const [places, setPlaces] = useState<PlaceDto[]>([])
@@ -62,10 +63,10 @@ export default function SearchPage() {
     }
   }, [mounted])
 
-  // (필요시) 카테고리 버튼은 별도로 유지/수정
-  const categories = useMemo(() => ["동물병원", "동물약국", "식당", "카페"], [])
+  // 카테고리 옵션 (ETC 제외, placeService에서 공급)
+  const categories = useMemo(() => CATEGORY2_OPTIONS, [])
 
-  const runSearch = async (overrides?: { keyword?: string; category?: string | null }) => {
+  const runSearch = async (overrides?: { keyword?: string; category2?: string | null }) => {
     if (!userCenter) {
       toast({ title: "위치 확인 필요", description: "내 위치를 확인한 후 검색해 주세요.", variant: "destructive" })
       return
@@ -75,8 +76,8 @@ export default function SearchPage() {
       lon: userCenter[1],
       radiusKm: radius[0],
       keyword: overrides?.keyword ?? (keyword.trim() || undefined),
-      // 서버는 category2(enum name)로 받으므로, 여기 버튼에서 enum을 넘기는 경우에만 값 세팅.
-      category: overrides?.category ?? selectedCategory ?? undefined,
+      // ★ 서버 파라미터 키는 category2
+      category2: overrides?.category2 ?? selectedCategory ?? undefined,
     }
     try {
       setLoading(true)
@@ -90,11 +91,13 @@ export default function SearchPage() {
   }
 
   const handleSearch = () => runSearch()
-  const handleCategoryClick = (category: string) => {
-    const next = category === selectedCategory ? null : category
+
+  const handleCategoryClick = (enumValue: string) => {
+    const next = enumValue === selectedCategory ? null : enumValue
     setSelectedCategory(next)
-    runSearch({ category: next })
+    runSearch({ category2: next })
   }
+
   const handleRadiusChange = (value: number[]) => setRadius(value)
 
   const handlePlaceClick = async (place: PlaceDto) => {
@@ -105,8 +108,8 @@ export default function SearchPage() {
     try {
       const res = await getPlaceDetail(place.id)
       setDetail(res.data)
-    } catch (e) {
-      // 상세 실패해도 사이드바는 열어둠 (목록 정보로 최소 표시)
+    } catch {
+      // 상세 실패해도 사이드바는 열어둠
     } finally {
       setDetailLoading(false)
     }
@@ -140,15 +143,16 @@ export default function SearchPage() {
               <Slider value={radius} onValueChange={handleRadiusChange} min={1} max={30} step={1} className="w-full" />
             </div>
 
-            {/* (선택) 카테고리 버튼 – 현재는 표시/테스트용 */}
-            <div className="flex gap-2">
-              {categories.map((category) => (
+            {/* 카테고리(ETC 제외 전부) */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map(({ value, label }) => (
                 <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  onClick={() => handleCategoryClick(category)}
+                  key={value}
+                  variant={selectedCategory === value ? "default" : "outline"}
+                  onClick={() => handleCategoryClick(value)}
+                  className="px-3 py-1 text-sm"
                 >
-                  {category}
+                  {label}
                 </Button>
               ))}
             </div>
@@ -186,7 +190,7 @@ export default function SearchPage() {
             </div>
           </div>
 
-          {/* 사이드바 – 상세 koLabel 적용됨 */}
+          {/* 사이드바 – detail 전달 */}
           <PlaceSidebar
             place={selectedPlace as any}
             reviews={mockReviews.filter((r) => r.placeId === (selectedPlace as any)?.id)}

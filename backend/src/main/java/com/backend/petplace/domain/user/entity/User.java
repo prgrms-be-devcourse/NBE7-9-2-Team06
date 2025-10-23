@@ -81,22 +81,6 @@ public class User extends BaseEntity {
         .build();
   }
 
-  //정적 팩토리 메서드를 통한 User 객체 생성
-  public static User createUser(
-      String nickName, String password,
-      String email, String address,
-      String zipcode, String addressDetail) {
-
-    return User.builder()
-        .nickName(nickName)
-        .password(password)
-        .email(email)
-        .address(address)
-        .zipcode(zipcode)
-        .addressDetail(addressDetail)
-        .build();
-  }
-
   public void addOrders(List<Order> orders) {
     for (Order order : orders) {
       addOrder(order);

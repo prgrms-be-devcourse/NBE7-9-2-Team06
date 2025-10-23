@@ -55,4 +55,12 @@ public class OrderController implements OrderSpecification {
     orderService.cancelOrder(userId, orderId);
     return ResponseEntity.ok(ApiResponse.success());
   }
+
+  @Override
+  @GetMapping("/points")
+  public ResponseEntity<ApiResponse<Integer>> getUserPoints(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    Long userId = userDetails.getUserId();
+    Integer points = orderService.getUserPoints(userId);
+    return ResponseEntity.ok(ApiResponse.success(points));
+  }
 }

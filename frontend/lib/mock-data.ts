@@ -274,7 +274,7 @@ export const mockProducts: Product[] = [
   {
     id: "1",
     name: "프리미엄 강아지 사료",
-    price: 150,
+    price: 1,
     description: "영양가 높은 천연 재료로 만든 프리미엄 사료입니다.",
     image: "/premium-dog-food.png",
   },

@@ -112,6 +112,17 @@ public class OrderService {
     // 주문 취소 상태로 저장
     order.cancelOrder();
     orderRepository.save(order);
+
+    // 주문 금액만큼 유저 포인트 복구
+    User user = order.getUser();
+    user.addPoints(order.getTotalPrice());
+    userRepository.save(user);
+  }
+
+  public Integer getUserPoints(Long userId) {
+    return userRepository.findById(userId)
+        .map(User::getTotalPoint)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
   }
 
   @Transactional

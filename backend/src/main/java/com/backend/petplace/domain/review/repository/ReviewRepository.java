@@ -1,5 +1,6 @@
 package com.backend.petplace.domain.review.repository;
 
+import com.backend.petplace.domain.mypage.dto.MyPageUserReviews;
 import com.backend.petplace.domain.place.entity.Place;
 import com.backend.petplace.domain.review.dto.ReviewInfo;
 import com.backend.petplace.domain.review.dto.response.MyReviewResponse;
@@ -15,10 +16,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   List<Review> findByUserOrderByIdDesc(User user);
 
   List<Review> findByPlaceOrderByIdDesc(Place place);
-
-  @Query("select r from Review r join fetch r.place p where r.user = :user order by r.createdDate desc")
-    //N+1 문제 해소, 최신순으로 정렬
-  List<Review> findByUserWithPlace(@Param("user") User user);
 
   @Query("SELECT new com.backend.petplace.domain.review.dto.response.MyReviewResponse(" +
       "r.id, p.id, p.name, p.address, r.rating, r.content, r.imageUrl, r.createdDate, pt.amount) " +
@@ -37,4 +34,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
       "WHERE r.place = :place ORDER BY r.id DESC")
   List<ReviewInfo> findReviewInfosByPlace(@Param("place") Place place);
 
+  @Query("SELECT new com.backend.petplace.domain.mypage.dto.MyPageUserReviews("+
+  "r.id, p.name, p.address, r.content, r.imageUrl, r.rating, r.createdDate) " +
+  "FROM Review r " +
+  "JOIN r.place p " +
+  "WHERE r.user = :user ORDER BY r.id DESC")
+  List<MyPageUserReviews> findByUserWithPlace(@Param("user") User user);
 }

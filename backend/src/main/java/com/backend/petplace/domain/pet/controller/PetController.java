@@ -5,11 +5,14 @@ import com.backend.petplace.domain.pet.dto.request.UpdatePetRequest;
 import com.backend.petplace.domain.pet.dto.response.CreatePetResponse;
 import com.backend.petplace.domain.pet.dto.response.UpdatePetResponse;
 import com.backend.petplace.domain.pet.service.PetService;
+import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,26 +29,27 @@ public class PetController implements PetSpecification{
 
   private final PetService petService;
 
+  @Override
   @PostMapping("/create-pet")
-  public ResponseEntity<ApiResponse<CreatePetResponse>> createPet(@RequestBody @Valid CreatePetRequest request) {
-    //String userName = SecurityContextHolder.getContext().getAuthentication().getName(); - 로그인 유저 정보
-    //로그인 구현되면 입력값 변경 예정
-    String nickname = "test"; //로컬에서 만든 db 사용 (임시)
-    CreatePetResponse response = petService.createPet(nickname, request);
+  public ResponseEntity<ApiResponse<CreatePetResponse>> createPet(@RequestBody @Valid CreatePetRequest request, @AuthenticationPrincipal CustomUserDetails user) {
+    Long userid = user.getUserId();
+    CreatePetResponse response = petService.createPet(userid, request);
     return ResponseEntity.ok(ApiResponse.create(response));
   }
 
+  @Override
   @PatchMapping("/update-pet/{id}")
-  public ResponseEntity<ApiResponse<UpdatePetResponse>> updatePet(@PathVariable("id") Long id, @RequestBody @Valid UpdatePetRequest request){
-    String nickname = "test"; //로컬에서 만든 db 사용 (임시)
-    UpdatePetResponse response = petService.updatePet(nickname, id, request);
+  public ResponseEntity<ApiResponse<UpdatePetResponse>> updatePet(@PathVariable("id") Long id, @RequestBody @Valid UpdatePetRequest request, @AuthenticationPrincipal CustomUserDetails user){
+    Long userid = user.getUserId();
+    UpdatePetResponse response = petService.updatePet(userid, id, request);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
+  @Override
   @DeleteMapping("/delete-pet/{id}")
-  public ResponseEntity<ApiResponse<Void>> deletePet(@PathVariable("id") Long id) {
-    String nickname = "test"; //로컬에서 만든 db 사용 (임시)
-    petService.deletePet(nickname, id);
+  public ResponseEntity<ApiResponse<Void>> deletePet(@PathVariable("id") Long id, @AuthenticationPrincipal CustomUserDetails user) {
+    Long userid = user.getUserId();
+    petService.deletePet(userid, id);
     return ResponseEntity.ok(ApiResponse.success());
   }
 }

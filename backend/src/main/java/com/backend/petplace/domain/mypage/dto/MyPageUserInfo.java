@@ -18,7 +18,7 @@ public class MyPageUserInfo {
   private final int earnablePoints;
   private final int totalReviews;
 
-  public static MyPageUserInfo from(User user, int earnablePoints, int totalReviews){
+  public static MyPageUserInfo from(User user, int earnablePoints, int totalReviews){ //dto 내부 조립이 필요하면 from을 씁시다
     return MyPageUserInfo.builder()
         .id(user.getId())
         .nickname(user.getNickName())

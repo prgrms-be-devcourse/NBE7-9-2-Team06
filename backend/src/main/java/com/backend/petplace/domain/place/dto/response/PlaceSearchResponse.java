@@ -19,7 +19,7 @@ public record PlaceSearchResponse(
     return new PlaceSearchResponse(
         row.getId(),
         row.getName(),
-        Category2Type.valueOf(row.getCategory2()), // 문자열 → Enum 변환
+        Category2Type.valueOf(row.getCategory2()),
         row.getLatitude(),
         row.getLongitude(),
         row.getDistanceMeters(),

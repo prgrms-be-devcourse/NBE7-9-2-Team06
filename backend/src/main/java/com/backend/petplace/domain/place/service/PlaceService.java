@@ -28,7 +28,7 @@ public class PlaceService {
       double lat, double lon,
       Integer radiusKm,
       List<Category2Type> category2List,
-      String keyword // ← 이름 맞춤
+      String keyword
   ) {
     int rk = (radiusKm == null ? DEFAULT_RADIUS_KM : Math.min(radiusKm, MAX_RADIUS_KM));
     int radiusMeters = rk * 1_000;

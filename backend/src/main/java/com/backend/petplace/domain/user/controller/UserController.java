@@ -10,6 +10,8 @@ import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +30,11 @@ public class UserController implements UserSpecification {
 
   @GetMapping("/signup-username")
   public ResponseEntity<ApiResponse<BoolResultResponse>> checkNickName(
-      @RequestParam @NotBlank String nickName) {
+      @RequestParam
+      @NotBlank
+      @Size(min = 2, max = 12)
+      @Pattern(regexp = "^[a-zA-Z0-9가-힣]+$")
+      String nickName) {
 
     BoolResultResponse response = userService.validateDuplicateNickName(nickName);
     return ResponseEntity.ok(ApiResponse.success(response));

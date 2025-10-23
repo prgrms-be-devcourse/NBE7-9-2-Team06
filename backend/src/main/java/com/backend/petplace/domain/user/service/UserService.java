@@ -1,7 +1,10 @@
 package com.backend.petplace.domain.user.service;
 
+import com.backend.petplace.domain.email.entity.EmailAuthCode;
+import com.backend.petplace.domain.email.repository.EmailAuthCodeRepository;
 import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
+import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
@@ -20,32 +23,50 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
+  private final EmailAuthCodeRepository emailAuthCodeRepository;
 
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
+     validateDuplicateNickName(request.getNickName());
 
-    if (userRepository.existsByNickName(request.getNickName())) {
-      throw new BusinessException(ErrorCode.DUPLICATE_NICKNAME);
-    }
+     validateDuplicateEmail(request.getEmail());
 
-    // TODO:이메일 인증 기능 추가
+    // 이메일 인증 체크
+    checkAuthCode(request);
 
-    if (userRepository.existsByEmail(request.getEmail())) {
-      throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
-    }
-
-    User user = User.builder()
-        .nickName(request.getNickName())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .email(request.getEmail())
-        .address(request.getAddress())
-        .zipcode(request.getZipcode())
-        .addressDetail(request.getAddressDetail())
-        .build();
-
+    User user = User.create(request, passwordEncoder.encode(request.getPassword()));
     userRepository.save(user);
 
     return new UserSignupResponse(user.getId());
+  }
+
+  @Transactional
+  protected void checkAuthCode(UserSignupRequest request) {
+    EmailAuthCode emailAuthCode = emailAuthCodeRepository.findByEmailAndAuthCode
+            (request.getEmail(), request.getAuthCode())
+        .orElseThrow(() -> new BusinessException(ErrorCode.AUTH_CODE_NOT_FOUND));
+
+    if (emailAuthCode.isVerified()) {
+      emailAuthCodeRepository.delete(emailAuthCode);
+      return;
+    }
+    throw new BusinessException(ErrorCode.AUTH_CODE_NOT_VERIFIED);
+  }
+
+  @Transactional(readOnly = true)
+  public BoolResultResponse validateDuplicateNickName(String nickName) {
+    if (userRepository.existsByNickName(nickName)) {
+      throw new BusinessException(ErrorCode.DUPLICATE_NICKNAME);
+    }
+    return new BoolResultResponse(true);
+  }
+
+  @Transactional(readOnly = true)
+  public BoolResultResponse validateDuplicateEmail(String email) {
+    if (userRepository.existsByEmail(email)) {
+      throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
+    }
+    return new BoolResultResponse(true);
   }
 
   @Transactional(readOnly = true)

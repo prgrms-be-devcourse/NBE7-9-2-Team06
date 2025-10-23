@@ -2,6 +2,7 @@ package com.backend.petplace.domain.user.entity;
 
 import com.backend.petplace.domain.order.entity.Order;
 import com.backend.petplace.domain.pet.entity.Pet;
+import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -67,6 +68,17 @@ public class User extends BaseEntity {
     this.zipcode = zipcode;
     this.addressDetail = addressDetail;
     this.totalPoint = 10;
+  }
+
+  public static User create(UserSignupRequest request, String password) {
+    return User.builder()
+        .nickName(request.getNickName())
+        .password(password)
+        .email(request.getEmail())
+        .address(request.getAddress())
+        .zipcode(request.getZipcode())
+        .addressDetail(request.getAddressDetail())
+        .build();
   }
 
   //정적 팩토리 메서드를 통한 User 객체 생성

@@ -24,15 +24,8 @@ public class UserService {
 
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
-    User user = User.builder()
-        .nickName(request.getNickName())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .email(request.getEmail())
-        .address(request.getAddress())
-        .zipcode(request.getZipcode())
-        .addressDetail(request.getAddressDetail())
-        .build();
 
+    User user = User.create(request, passwordEncoder.encode(request.getPassword()));
     userRepository.save(user);
 
     return new UserSignupResponse(user.getId());

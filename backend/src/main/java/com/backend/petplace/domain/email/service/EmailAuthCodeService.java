@@ -3,6 +3,7 @@ package com.backend.petplace.domain.email.service;
 import com.backend.petplace.domain.email.dto.request.CheckAuthCodeRequest;
 import com.backend.petplace.domain.email.entity.EmailAuthCode;
 import com.backend.petplace.domain.email.repository.EmailAuthCodeRepository;
+import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import jakarta.mail.MessagingException;
@@ -16,6 +17,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +69,8 @@ public class EmailAuthCodeService {
   }
 
   // 메일 발송
-  public void sendMail(String sendEmail) {
+  @Transactional
+  public BoolResultResponse sendMail(String sendEmail) {
     String authCode = createCode(); // 랜덤 인증번호 생성
     MimeMessage message = createMail(sendEmail, authCode); // 메일 생성
 
@@ -84,14 +87,17 @@ public class EmailAuthCodeService {
     } catch (MailException e) {
       throw new BusinessException(ErrorCode.MAIL_SEND_FAILED);
     }
+    return  new BoolResultResponse(true);
   }
 
-  public void saveEmailAuthCode(String email, String authCode) {
+  @Transactional
+  protected void saveEmailAuthCode(String email, String authCode) {
     EmailAuthCode emailAuthCode = EmailAuthCode.create(email, authCode, authCodeExpirationTime);
     emailAuthCodeRepository.save(emailAuthCode);
   }
 
-  public void checkAuthCode(CheckAuthCodeRequest request) {
+  @Transactional
+  public BoolResultResponse checkAuthCode(CheckAuthCodeRequest request) {
     EmailAuthCode emailAuthCode = emailAuthCodeRepository.findByEmailAndAuthCode
             (request.getEmail(), request.getAuthCode())
         .orElseThrow(() -> new BusinessException(ErrorCode.AUTH_CODE_NOT_FOUND));
@@ -101,5 +107,6 @@ public class EmailAuthCodeService {
     }
 
     emailAuthCodeRepository.delete(emailAuthCode); // 인증 성공 시 삭제
+    return new BoolResultResponse(true);
   }
 }

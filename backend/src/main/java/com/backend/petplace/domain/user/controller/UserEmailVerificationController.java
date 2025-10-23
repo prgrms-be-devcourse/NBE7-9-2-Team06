@@ -2,6 +2,7 @@ package com.backend.petplace.domain.user.controller;
 
 import com.backend.petplace.domain.email.dto.request.CheckAuthCodeRequest;
 import com.backend.petplace.domain.email.service.EmailAuthCodeService;
+import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -23,18 +24,18 @@ public class UserEmailVerificationController {
   private final EmailAuthCodeService EMailAuthCodeService;
 
   @GetMapping
-  public ResponseEntity<ApiResponse<Void>> sendAuthCodeToEmail
+  public ResponseEntity<ApiResponse<BoolResultResponse>> sendAuthCodeToEmail
       (@RequestParam @NotBlank @Email String email) {
 
-    EMailAuthCodeService.sendMail(email);
-    return ResponseEntity.ok(ApiResponse.success());
+    BoolResultResponse response = EMailAuthCodeService.sendMail(email);
+    return ResponseEntity.ok(ApiResponse.success(response));
   }
 
   @PatchMapping
-  public ResponseEntity<ApiResponse<Void>> checkAuthCode
+  public ResponseEntity<ApiResponse<BoolResultResponse>> checkAuthCode
       (@RequestBody @Valid CheckAuthCodeRequest request) {
 
-    EMailAuthCodeService.checkAuthCode(request);
-    return ResponseEntity.ok(ApiResponse.success());
+    BoolResultResponse response = EMailAuthCodeService.checkAuthCode(request);
+    return ResponseEntity.ok(ApiResponse.success(response));
   }
 }

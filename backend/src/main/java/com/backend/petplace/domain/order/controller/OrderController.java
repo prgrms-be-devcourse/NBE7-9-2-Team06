@@ -2,6 +2,7 @@ package com.backend.petplace.domain.order.controller;
 
 import com.backend.petplace.domain.order.dto.request.OrderCreateRequest;
 import com.backend.petplace.domain.order.dto.response.OrderReadByIdResponse;
+import com.backend.petplace.domain.order.entity.Order;
 import com.backend.petplace.domain.order.service.OrderService;
 import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
@@ -26,13 +27,13 @@ public class OrderController implements OrderSpecification {
 
   @Override
   @PostMapping()
-  public ResponseEntity<ApiResponse<Void>> createOrder(
+  public ResponseEntity<ApiResponse<Long>> createOrder(
       @RequestBody OrderCreateRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     Long userId = userDetails.getUserId();
-    orderService.createOrder(request, userId);
-    return ResponseEntity.ok(ApiResponse.success());
+    Long orderId = orderService.createOrder(request, userId);
+    return ResponseEntity.ok(ApiResponse.success(orderId));
   }
 
   @Override
@@ -61,6 +62,7 @@ public class OrderController implements OrderSpecification {
   public ResponseEntity<ApiResponse<Integer>> getUserPoints(@AuthenticationPrincipal CustomUserDetails userDetails) {
     Long userId = userDetails.getUserId();
     Integer points = orderService.getUserPoints(userId);
+    System.out.println("controller: user points = " + points);
     return ResponseEntity.ok(ApiResponse.success(points));
   }
 }

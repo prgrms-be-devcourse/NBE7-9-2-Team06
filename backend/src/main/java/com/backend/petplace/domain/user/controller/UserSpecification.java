@@ -46,7 +46,8 @@ public interface UserSpecification {
       String email
   );
 
-  @ApiErrorCodeExamples({DUPLICATE_NICKNAME, DUPLICATE_EMAIL, AUTH_CODE_NOT_FOUND, AUTH_CODE_NOT_VERIFIED})
+  @ApiErrorCodeExamples({DUPLICATE_NICKNAME, DUPLICATE_EMAIL, AUTH_CODE_NOT_FOUND,
+      AUTH_CODE_NOT_VERIFIED})
   @Operation(summary = "회원가입", description = "이용자가 회원가입을 제출합니다. 이름, 비밀번호, 이메일, 인증번호, 주소, 우편번호는 필수이며 상세주소는 선택입니다.")
   ResponseEntity<ApiResponse<UserSignupResponse>> signup(
       @Parameter(description = "이름, 비밀번호, 이메일, 인증번호, 주소, 우편번호, 상세주소(선택)", required = true) @Valid UserSignupRequest request
@@ -57,5 +58,4 @@ public interface UserSpecification {
   ResponseEntity<ApiResponse<UserLoginResponse>> login(
       @Parameter(description = "이름, 비밀번호", required = true) @Valid UserLoginRequest request
   );
-
 }

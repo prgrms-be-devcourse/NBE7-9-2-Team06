@@ -106,7 +106,10 @@ public class EmailAuthCodeService {
       throw new BusinessException(ErrorCode.AUTH_CODE_EXPIRED);
     }
 
-    emailAuthCodeRepository.delete(emailAuthCode); // 인증 성공 시 삭제
+    // 성공하면 인증번호 값을 true로 변경
+    if (!emailAuthCode.isVerified()) {
+      emailAuthCode.markVerifiedTrue();
+    }
     return new BoolResultResponse(true);
   }
 }

@@ -13,7 +13,7 @@ public interface UserSpecification {
 
   @Operation(summary = "회원가입", description = "이용자가 회원가입을 제출합니다. 이름, 비밀번호, 이메일, 주소, 우편번호는 필수이며 상세주소는 선택입니다.")
   ResponseEntity<ApiResponse<UserSignupResponse>> signup(
-      @Parameter(description = "이름, 비밀번호, 이메일, 주소, 우편번호, 상세주소(선택)", required = true) UserSignupRequest request
+      @Parameter(description = "이름, 비밀번호, 주소, 우편번호, 상세주소(선택)", required = true) UserSignupRequest request
   );
 
   /*@Operation(summary = "로그인", description = "이용자가 로그인을 합니다. 이름, 비밀번호 필수입니다.")

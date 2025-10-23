@@ -28,11 +28,15 @@ public class EmailAuthCode {
   @Column(nullable = false)
   private LocalDateTime expiredAt;
 
+  @Column(nullable = false)
+  private boolean verified;
+
   @Builder
-  public EmailAuthCode(String authCode, String email, LocalDateTime expiredAt) {
+  public EmailAuthCode(String authCode, String email, LocalDateTime expiredAt,  boolean verified) {
     this.authCode = authCode;
     this.email = email;
     this.expiredAt = expiredAt;
+    this.verified = verified;
   }
 
   public static EmailAuthCode create(String email, String authCode, long authCodeExpirationTime) {
@@ -40,10 +44,15 @@ public class EmailAuthCode {
         .email(email)
         .authCode(authCode)
         .expiredAt(LocalDateTime.now().plusMinutes(authCodeExpirationTime))
+        .verified(false)
         .build();
   }
 
   public boolean isExpired() {
     return LocalDateTime.now().isAfter(expiredAt);
+  }
+
+  public void markVerifiedTrue() {
+    this.verified = true;
   }
 }

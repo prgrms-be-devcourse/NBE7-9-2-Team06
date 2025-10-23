@@ -9,10 +9,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CheckAuthCodeRequest {
 
-  @NotBlank
+  @NotBlank(message = "이메일은 필수입니다.")
   @Email
   private String email;
 
-  @NotBlank
+  @NotBlank(message = "인증번호는 필수입니다.")
   private String authCode;
 }

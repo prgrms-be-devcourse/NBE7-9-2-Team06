@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface EmailAuthCodeRepository extends JpaRepository<EmailAuthCode, String> {
 
   Optional<EmailAuthCode> findByEmailAndAuthCode(String email, String authCode);
+
+  Optional<EmailAuthCode> findByEmail(String email);
 }

@@ -47,7 +47,8 @@ public enum ErrorCode {
 
   // 인증 번호(Auth Code)
   AUTH_CODE_NOT_FOUND("AC001", HttpStatus.UNAUTHORIZED, "인증 번호가 존재하지 않습니다."),
-  AUTH_CODE_EXPIRED("AC002", HttpStatus.UNAUTHORIZED, "인증 번호가 만료되었습니다.");
+  AUTH_CODE_EXPIRED("AC002", HttpStatus.UNAUTHORIZED, "인증 번호가 만료되었습니다."),
+  AUTH_CODE_NOT_VERIFIED("AC003", HttpStatus.UNAUTHORIZED , "인증번호가 인증이 되지 않았습니다");
 
   private final String code;
   private final HttpStatus status;

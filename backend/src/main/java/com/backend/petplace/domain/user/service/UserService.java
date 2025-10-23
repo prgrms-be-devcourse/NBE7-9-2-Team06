@@ -1,5 +1,7 @@
 package com.backend.petplace.domain.user.service;
 
+import com.backend.petplace.domain.email.entity.EmailAuthCode;
+import com.backend.petplace.domain.email.repository.EmailAuthCodeRepository;
 import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
@@ -21,14 +23,34 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
+  private final EmailAuthCodeRepository emailAuthCodeRepository;
 
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
+     validateDuplicateNickName(request.getNickName());
+
+     validateDuplicateEmail(request.getEmail());
+
+    // 이메일 인증 체크
+    checkAuthCode(request);
 
     User user = User.create(request, passwordEncoder.encode(request.getPassword()));
     userRepository.save(user);
 
     return new UserSignupResponse(user.getId());
+  }
+
+  @Transactional
+  protected void checkAuthCode(UserSignupRequest request) {
+    EmailAuthCode emailAuthCode = emailAuthCodeRepository.findByEmailAndAuthCode
+            (request.getEmail(), request.getAuthCode())
+        .orElseThrow(() -> new BusinessException(ErrorCode.AUTH_CODE_NOT_FOUND));
+
+    if (emailAuthCode.isVerified()) {
+      emailAuthCodeRepository.delete(emailAuthCode);
+      return;
+    }
+    throw new BusinessException(ErrorCode.AUTH_CODE_NOT_VERIFIED);
   }
 
   @Transactional(readOnly = true)

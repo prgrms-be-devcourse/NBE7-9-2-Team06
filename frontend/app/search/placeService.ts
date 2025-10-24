@@ -1,6 +1,5 @@
 import { api } from '@/lib/api';
 
-/** ====== 공용 타입 ====== */
 
 export type PlaceDto = {
   id: number;
@@ -19,7 +18,7 @@ export type ApiResponse<T> = {
   data: T;
 };
 
-/** ====== 상세 응답 타입 (백엔드 DTO와 동일) ====== */
+
 export type PlaceDetailResponse = {
   id: number;
   name: string;
@@ -41,7 +40,6 @@ export type PlaceDetailResponse = {
   rawDescription: string | null;
 };
 
-/** ====== 카테고리 한글 라벨 매핑 ====== */
 
 /** 대분류 */
 export const CATEGORY1_LABELS: Record<string, string> = {
@@ -69,7 +67,7 @@ export const CATEGORY2_LABELS: Record<string, string> = {
   ETC: '기타',
 };
 
-/** UI에서 쓸 카테고리 옵션(ETC 제외) */
+
 export const CATEGORY2_OPTIONS: { value: keyof typeof CATEGORY2_LABELS; label: string }[] = [
   { value: 'VET_PHARMACY', label: CATEGORY2_LABELS.VET_PHARMACY },
   { value: 'MUSEUM', label: CATEGORY2_LABELS.MUSEUM },
@@ -85,7 +83,7 @@ export const CATEGORY2_OPTIONS: { value: keyof typeof CATEGORY2_LABELS; label: s
   { value: 'ART_MUSEUM', label: CATEGORY2_LABELS.ART_MUSEUM },
 ];
 
-/** 안전한 라벨 변환 함수 */
+
 export function getCategory1Label(v?: string | null) {
   if (!v) return '-';
   return CATEGORY1_LABELS[v] ?? v;
@@ -96,7 +94,6 @@ export function getCategory2Label(v?: string | null) {
   return CATEGORY2_LABELS[v] ?? v;
 }
 
-/** ====== API ====== */
 
 export async function searchPlaces(params: {
   lat: number;

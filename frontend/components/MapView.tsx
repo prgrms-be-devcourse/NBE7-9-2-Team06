@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import type { PlaceDto } from '@/app/search/placeService';
 import type { LatLngExpression } from 'leaflet';
 import L from 'leaflet';
-// app/globals.css에서 이미 'leaflet/dist/leaflet.css'를 import하므로 여기서는 생략
+
 
 type Props = {
   center: [number, number] | null; // 내 위치
@@ -13,7 +13,7 @@ type Props = {
   onSelectPlace?: (p: PlaceDto) => void;
 };
 
-/** center가 바뀔 때 지도만 이동 (MapContainer는 재마운트하지 않음) */
+
 function RecenterOnChange({ center }: { center: LatLngExpression }) {
   const map = useMap();
   useEffect(() => {
@@ -22,12 +22,12 @@ function RecenterOnChange({ center }: { center: LatLngExpression }) {
   return null;
 }
 
-/** SVG → data URL 유틸 */
+
 function svgToDataUrl(svg: string) {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-/** 사용자 위치용 아이콘 (파란 핀) */
+
 const USER_SVG = `
 <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -42,7 +42,7 @@ const USER_SVG = `
 </svg>
 `;
 
-/** 장소 결과용 아이콘 (레드 핀) */
+
 const PLACE_SVG = `
 <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>

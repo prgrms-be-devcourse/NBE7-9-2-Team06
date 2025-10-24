@@ -20,7 +20,7 @@ import {
   CATEGORY2_OPTIONS,
 } from "./placeService"
 
-// 지도는 SSR 끔
+
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false })
 
 export default function SearchPage() {
@@ -63,7 +63,6 @@ export default function SearchPage() {
     }
   }, [mounted])
 
-  // 카테고리 옵션 (ETC 제외, placeService에서 공급)
   const categories = useMemo(() => CATEGORY2_OPTIONS, [])
 
   const runSearch = async (overrides?: { keyword?: string; category2?: string | null }) => {
@@ -76,7 +75,6 @@ export default function SearchPage() {
       lon: userCenter[1],
       radiusKm: radius[0],
       keyword: overrides?.keyword ?? (keyword.trim() || undefined),
-      // ★ 서버 파라미터 키는 category2
       category2: overrides?.category2 ?? selectedCategory ?? undefined,
     }
     try {
@@ -109,7 +107,6 @@ export default function SearchPage() {
       const res = await getPlaceDetail(place.id)
       setDetail(res.data)
     } catch {
-      // 상세 실패해도 사이드바는 열어둠
     } finally {
       setDetailLoading(false)
     }
@@ -137,13 +134,13 @@ export default function SearchPage() {
               </Button>
             </div>
 
-            {/* 반경 */}
+            
             <div className="space-y-2">
               <label className="text-sm font-medium">반경: {radius[0]}km</label>
               <Slider value={radius} onValueChange={handleRadiusChange} min={1} max={30} step={1} className="w-full" />
             </div>
 
-            {/* 카테고리(ETC 제외 전부) */}
+            
             <div className="flex flex-wrap gap-2">
               {categories.map(({ value, label }) => (
                 <Button
@@ -157,7 +154,7 @@ export default function SearchPage() {
               ))}
             </div>
 
-            {/* 지도 + 결과 카드 */}
+            
             <div className="space-y-4">
               <div className="rounded-lg border border-border bg-muted/30 p-8">
                 <MapView center={userCenter} places={places} onSelectPlace={handlePlaceClick} />
@@ -176,7 +173,6 @@ export default function SearchPage() {
                       className="mb-2 h-32 w-full rounded object-cover"
                     />
                     <h3 className="font-semibold text-card-foreground">{place.name}</h3>
-                    {/* 🔽 중분류 한글 라벨로 표시 */}
                     <p className="text-xs text-muted-foreground">
                       {getCategory2Label(place.category2)}
                     </p>
@@ -190,7 +186,6 @@ export default function SearchPage() {
             </div>
           </div>
 
-          {/* 사이드바 – detail 전달 */}
           <PlaceSidebar
             place={selectedPlace as any}
             reviews={mockReviews.filter((r) => r.placeId === (selectedPlace as any)?.id)}

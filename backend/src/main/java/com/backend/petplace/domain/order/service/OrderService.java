@@ -16,7 +16,11 @@ import com.backend.petplace.global.response.ErrorCode;
 import com.backend.petplace.global.scheduler.executiontimer.ExecutionTimer;
 import com.backend.petplace.global.scheduler.managementfactory.MemoryMonitor;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -131,20 +135,66 @@ public class OrderService {
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
   }
 
+
+  // 한 배치 크기 (예: 500개)
+  private static final int BATCH_SIZE = 500;
+  // 동시에 처리할 스레드 수
+  private static final int THREAD_COUNT = 4;
+
   // AOP Timer을 통한 메서드 실행 시간 측정용 어노테이션
   @ExecutionTimer
   // 여러가지 사용량 측정용 어노테이션
   @MemoryMonitor
   @Transactional
   public void updateAllOrderStatus() {
-    log.info("DB에서 orders 받아오기 \n");
+    log.info("DB에서 orders 받아오기...");
     List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.ORDERED);
-    log.info("DB에서 orders 받아오기 완료 \n\n");
+    log.info("조회 완료: {}개 주문", orders.size());
 
-    log.info("주문 상태 변경 시작 \n");
-    for (Order order : orders) {
+    // 배치 단위로 쪼개기
+    List<List<Order>> batches = partition(orders, BATCH_SIZE);
+
+    // 스레드 풀 생성
+    ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
+    List<Future<?>> futures = new ArrayList<>();
+
+    log.info("멀티스레드로 주문 상태 변경 시작 ({} batches, {} threads)", batches.size(), THREAD_COUNT);
+
+    for (List<Order> batch : batches) {
+      futures.add(executor.submit(() -> processBatch(batch)));
+    }
+
+    // 모든 작업 완료 대기
+    for (Future<?> future : futures) {
+      try {
+        future.get(); // 예외 발생 시 throw
+      } catch (Exception e) {
+        log.error("배치 처리 중 오류 발생", e);
+      }
+    }
+
+    executor.shutdown();
+    log.info("모든 주문 상태 변경 완료");
+  }
+
+  // 각 배치를 별도 트랜잭션으로 처리
+  @Transactional
+  public void processBatch(List<Order> batch) {
+    for (Order order : batch) {
       order.setOrderStatusDelivered();
     }
-    log.info("주문 상태 변경 끝 \n");
+
+    // 영속성 컨텍스트 flush + clear로 메모리 절약
+    orderRepository.flush();
+    orderRepository.clear(); // JpaRepository에 직접 clear()가 없으면 EntityManager로
+    log.info("배치 {}건 처리 완료", batch.size());
+  }
+
+  private List<List<Order>> partition(List<Order> list, int size) {
+    List<List<Order>> parts = new ArrayList<>();
+    for (int i = 0; i < list.size(); i += size) {
+      parts.add(list.subList(i, Math.min(list.size(), i + size)));
+    }
+    return parts;
   }
 }

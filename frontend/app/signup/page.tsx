@@ -29,6 +29,7 @@ export default function SignupPage() {
   const [emailDomain, setEmailDomain] = useState("gmail.com")
   const [customDomain, setCustomDomain] = useState("")
   const [address, setAddress] = useState("")
+  const [zipcode, setZipcode] = useState("")
   const [detailAddress, setDetailAddress] = useState("")
   const [verificationCode, setVerificationCode] = useState("")
 
@@ -228,6 +229,7 @@ export default function SignupPage() {
       oncomplete: (data: any) => {
         const fullAddress = data.roadAddress || data.jibunAddress
         setAddress(fullAddress)
+        setZipcode(data.zonecode)
       },
     }).open()
   }
@@ -283,7 +285,7 @@ export default function SignupPage() {
         password: password,
         email: fullEmail,
         address: address,
-        zipcode: "12345", // 필요 시 우편번호 입력 필드와 연결
+        zipcode: zipcode,
         addressDetail: detailAddress,
         authCode: verificationCode,
       }
@@ -535,6 +537,18 @@ export default function SignupPage() {
                         className="flex-1"
                         required
                     />
+                    <Label htmlFor="zipcode"></Label>
+                    <div className="flex gap-2">
+                      <Input
+                          id="zipcode"
+                          type="text"
+                          value={zipcode}
+                          readOnly
+                          placeholder="우편번호"
+                          className="flex-1"
+                          style={{ width: '80px' }}
+                      />
+                    </div>
                     <Button type="button" variant="outline" onClick={openAddressSearch}>
                       주소 검색
                     </Button>

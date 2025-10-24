@@ -2,7 +2,6 @@ package com.backend.petplace.domain.order.controller;
 
 import com.backend.petplace.domain.order.dto.request.OrderCreateRequest;
 import com.backend.petplace.domain.order.dto.response.OrderReadByIdResponse;
-import com.backend.petplace.domain.order.entity.Order;
 import com.backend.petplace.domain.order.service.OrderService;
 import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;

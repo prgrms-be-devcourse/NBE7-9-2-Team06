@@ -13,11 +13,15 @@ import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
+import com.backend.petplace.global.scheduler.executiontimer.ExecutionTimer;
+import com.backend.petplace.global.scheduler.managementfactory.MemoryMonitor;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -127,12 +131,20 @@ public class OrderService {
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
   }
 
+  // AOP Timer을 통한 메서드 실행 시간 측정용 어노테이션
+  @ExecutionTimer
+  // 여러가지 사용량 측정용 어노테이션
+  @MemoryMonitor
   @Transactional
   public void updateAllOrderStatus() {
-
+    log.info("DB에서 orders 받아오기 \n");
     List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.ORDERED);
+    log.info("DB에서 orders 받아오기 완료 \n\n");
+
+    log.info("주문 상태 변경 시작 \n");
     for (Order order : orders) {
       order.setOrderStatusDelivered();
     }
+    log.info("주문 상태 변경 끝 \n");
   }
 }

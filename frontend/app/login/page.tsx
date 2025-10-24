@@ -43,7 +43,12 @@ export default function LoginPage() {
 
       if (response.ok && data.code === "200") {
         const token = data.data.token
+
+        // 1️⃣ 세션 스토리지에 토큰 저장
+        sessionStorage.setItem("authToken", token)
+
         setAuthToken(token)
+
         toast({
           title: "로그인 성공",
           description: "환영합니다!",

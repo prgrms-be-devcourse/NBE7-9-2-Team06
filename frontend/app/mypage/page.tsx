@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { getAuthToken } from "@/lib/auth"
 import { Star, Plus, Pencil, Trash2, MapPin, Loader2, List } from "lucide-react" // Loader2, List 아이콘 추가
 
 // --- 포인트 관련 타입 ---
@@ -23,7 +24,7 @@ interface Review { id: number; placename: string; address: string; content: stri
 interface MyPageData { userInfo: UserInfo; reviews: Review[]; pets: Pet[] }
 
 const API_BASE_URL = "http://localhost:8080/api/v1"
-const TEMP_JWT = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjUsImlhdCI6MTc2MTExNjQ0MywiZXhwIjoxNzYyMDE2NDQzfQ.-UevYP_wJKRNyiBW2tksJWoFRox6yMngAD8lgaNB3VA"
+const JWT = `Bearer ${getAuthToken()}` || "";
 
 export default function MyPage() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function MyPage() {
   const fetchMyPageData = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/my-page`, {
-        headers: { Authorization: TEMP_JWT },
+        headers: { Authorization: JWT },
       })
       const data: { code: string; message: string; data: MyPageData } = await res.json()
       if (res.ok) {
@@ -71,7 +72,7 @@ export default function MyPage() {
     setIsLoadingPoints(true)
     try {
       const response = await fetch(`${API_BASE_URL}/my/points`, {
-        headers: { Authorization: TEMP_JWT }
+        headers: { Authorization: JWT }
       })
       if (!response.ok) throw new Error(`포인트 내역 로딩 실패 (${response.status})`)
       const result: { code: string; message: string; data: PointHistoryResponse } = await response.json()
@@ -100,7 +101,7 @@ export default function MyPage() {
   }
 
   useEffect(() => {
-    if (!TEMP_JWT) router.push("/login")
+    if (!JWT) router.push("/login")
     fetchMyPageData()
     fetchPointHistory() // 포인트 내역 호출
   }, [])
@@ -138,7 +139,7 @@ export default function MyPage() {
         method: editingPet ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: TEMP_JWT,
+          Authorization: JWT,
         },
         body: JSON.stringify(petForm),
       })
@@ -170,7 +171,7 @@ export default function MyPage() {
     try {
       const res = await fetch(`${API_BASE_URL}/delete-pet/${deletingPet.id}`, {
         method: "DELETE",
-        headers: { Authorization: TEMP_JWT },
+        headers: { Authorization: JWT },
       })
       const data = await res.json()
       if (!res.ok) {

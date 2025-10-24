@@ -24,6 +24,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String token = resolveToken(request);
 
+    // 성능 측정용 Actuator만 토큰 검사 패스하는 코드
+    if(request.getServletPath().startsWith("/actuator")){
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     if (token != null) {
       try {
         jwtTokenProvider.validateToken(token);

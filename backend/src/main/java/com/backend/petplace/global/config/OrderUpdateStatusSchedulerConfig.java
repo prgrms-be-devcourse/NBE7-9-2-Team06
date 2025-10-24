@@ -1,10 +1,10 @@
-package com.backend.petplace.global.scheduler;
+package com.backend.petplace.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableScheduling
-public class SchedulerConfig {
+public class OrderUpdateStatusSchedulerConfig {
 
 }

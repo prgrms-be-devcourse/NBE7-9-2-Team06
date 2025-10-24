@@ -41,6 +41,9 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/signup-username", "/api/v1/signup-email").permitAll()
             .requestMatchers("/api/v1/places/{placeId}/reviews").permitAll() // 장소별 리뷰 조회
             .requestMatchers("/api/v1/**").permitAll()
+
+            // Spring Actuator API 허용
+            .requestMatchers("/actuator/**").permitAll()
             .anyRequest().authenticated()
         );
 

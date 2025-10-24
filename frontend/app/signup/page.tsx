@@ -37,6 +37,10 @@ export default function SignupPage() {
   const [usernameAvailable, setUsernameAvailable] = useState(false)
   const [checkingUsername, setCheckingUsername] = useState(false)
 
+  const [emailChecked, setEmailChecked] = useState(false)
+  const [emailAvailable, setEmailAvailable] = useState(false)
+  const [checkingEmail, setCheckingEmail] = useState(false)
+
   const [emailVerified, setEmailVerified] = useState(false)
   const [codeSent, setCodeSent] = useState(false)
   const [sendingCode, setSendingCode] = useState(false)
@@ -52,6 +56,50 @@ export default function SignupPage() {
     hasSpecial: false,
   })
 
+// 이메일 중복 확인 함수
+  const checkEmailDuplicate = async () => {
+    const fullEmail = `${emailLocal}@${emailDomain === "custom" ? customDomain : emailDomain}`
+
+    if (!emailLocal || (emailDomain === "custom" && !customDomain)) {
+      toast({
+        title: "입력 오류",
+        description: "이메일을 입력해주세요.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setCheckingEmail(true)
+    try {
+      const response = await fetch(
+          `http://localhost:8080/api/v1/signup-email?email=${encodeURIComponent(fullEmail)}`,
+          { method: "GET", headers: { "Content-Type": "application/json" } }
+      )
+      const data = await response.json()
+
+      if (response.ok && data.code === "200" && data.data?.result === true) {
+        setEmailChecked(true)
+        setEmailAvailable(true)
+        toast({ title: "사용 가능", description: "사용 가능한 이메일입니다." })
+      } else {
+        setEmailChecked(true)
+        setEmailAvailable(false)
+        toast({
+          title: "중복된 이메일",
+          description: data.message || "이미 사용 중인 이메일입니다.",
+          variant: "destructive",
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: "네트워크 오류",
+        description: error.message || "이메일 확인 중 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+    } finally {
+      setCheckingEmail(false)
+    }
+  }
   const validatePassword = (pwd: string) => {
     setPasswordValidation({ //🚨 영어, 숫자, 특수문자, 길이 체크함
       length: pwd.length >= 8 && pwd.length <= 12,
@@ -476,6 +524,18 @@ export default function SignupPage() {
                           placeholder="도메인 입력"
                           required
                       />
+                  )}
+                  {/* ✅ 이메일 중복 확인 버튼 추가 */}
+                  {!emailVerified && (
+                      <Button
+                          type="button"
+                          variant="outline"
+                          onClick={checkEmailDuplicate}
+                          disabled={checkingEmail || !emailLocal || (emailDomain === "custom" && !customDomain)}
+                          className="w-full"
+                      >
+                        {checkingEmail ? "확인 중..." : "이메일 중복 확인"}
+                      </Button>
                   )}
                   {!emailVerified && (
                       <div className="space-y-2">

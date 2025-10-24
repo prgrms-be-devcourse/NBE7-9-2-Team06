@@ -15,7 +15,8 @@ import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import com.backend.petplace.global.scheduler.executiontimer.ExecutionTimer;
 import com.backend.petplace.global.scheduler.managementfactory.MemoryMonitor;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,34 @@ import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+// 스케줄러 상태
+// 주문 수 1만.
+// DB에서 꺼내와서 상태 변경. (저장은 영속성 컨텍스트가 자동으로 해줌)
+//
+// 스케줄러 도전 0 (대조군)
+//   전체 실행 시간: 17.4초
+//   최대 힙 사용량: 126MB
+//   평균 힙 사용량: 100MB
+//   GC 횟수: 7회
+//   GC 시간: 53ms
+//   평균 CPU Load: 16.43%
+//   활성 스레드: 32
+//   DB 커넥션 풀 (총 10): active 1, idle 9
+//
+// 스케줄러 도전 1 (배치 사이즈 500, 스레드 4)
+//   전체 실행 시간: 17.4초 (+ 0%)
+//   최대 힙 사용량: 168MB (+ 33%) -> 병렬 스레드 생성 시 일시적 증가 추정
+//   평균 힙 사용량: 120MB (+ 20%) -> 멀티 스레드 메모리 overhead 추정
+//   GC 횟수: 5회 (- 30%) -> 7과 5라는 숫자가 소규모라 유의미한 지 모르겠음
+//   GC 총 시간: 54ms (+ 0%)
+//   평균 CPU Load: 17% (+ 0.8%)
+//   DB 커넥션 풀 (총 10): active 1, idle 9
+// 결론: 배치와 스레드는 의미가 없어 보인다.
+//
+// 스케줄러 도전 2 (배치 사이즈 1000, 스레드 8)
+
+
 
 @Slf4j
 @Service
@@ -140,12 +169,12 @@ public class OrderService {
   private static final int BATCH_SIZE = 500;
   // 동시에 처리할 스레드 수
   private static final int THREAD_COUNT = 4;
+  private final OrderBatchService orderBatchService;
 
   // AOP Timer을 통한 메서드 실행 시간 측정용 어노테이션
   @ExecutionTimer
   // 여러가지 사용량 측정용 어노테이션
   @MemoryMonitor
-  @Transactional
   public void updateAllOrderStatus() {
     log.info("DB에서 orders 받아오기...");
     List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.ORDERED);
@@ -161,8 +190,14 @@ public class OrderService {
     log.info("멀티스레드로 주문 상태 변경 시작 ({} batches, {} threads)", batches.size(), THREAD_COUNT);
 
     for (List<Order> batch : batches) {
-      futures.add(executor.submit(() -> processBatch(batch)));
+      orderBatchService.processBatch(batch); //싱글스레드로 해도 ORDERED 상태가 안바뀐다. 코드 문제같다.
+      //futures.add(executor.submit(() -> orderBatchService.processBatch(batch)));
     }
+
+    /*
+    for (List<Order> batch : batches) {
+      futures.add(executor.submit(() -> processBatch(batch)));
+    }*/
 
     // 모든 작업 완료 대기
     for (Future<?> future : futures) {
@@ -177,8 +212,9 @@ public class OrderService {
     log.info("모든 주문 상태 변경 완료");
   }
 
+  /*
   // 각 배치를 별도 트랜잭션으로 처리
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void processBatch(List<Order> batch) {
     for (Order order : batch) {
       order.setOrderStatusDelivered();
@@ -188,7 +224,7 @@ public class OrderService {
     orderRepository.flush();
     orderRepository.clear(); // JpaRepository에 직접 clear()가 없으면 EntityManager로
     log.info("배치 {}건 처리 완료", batch.size());
-  }
+  }*/
 
   private List<List<Order>> partition(List<Order> list, int size) {
     List<List<Order>> parts = new ArrayList<>();

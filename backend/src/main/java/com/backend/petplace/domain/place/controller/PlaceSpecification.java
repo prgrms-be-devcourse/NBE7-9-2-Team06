@@ -1,8 +1,11 @@
 package com.backend.petplace.domain.place.controller;
 
+import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_PLACE;
+
 import com.backend.petplace.domain.place.dto.response.PlaceDetailResponse;
 import com.backend.petplace.domain.place.dto.response.PlaceSearchResponse;
 import com.backend.petplace.domain.place.entity.Category2Type;
+import com.backend.petplace.global.config.swagger.ApiErrorCodeExamples;
 import com.backend.petplace.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,6 +52,7 @@ public interface PlaceSpecification {
       String keyword
   );
 
+  @ApiErrorCodeExamples({NOT_FOUND_PLACE})
   @Operation(summary = "장소 상세 조회", description = "장소 ID로 상세 정보를 조회합니다.")
   ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetail(
       @Parameter(in = ParameterIn.PATH, description = "장소 ID", required = true)

@@ -64,6 +64,10 @@ dependencies {
 
     // email (회원가입 인증)
     implementation ("org.springframework.boot:spring-boot-starter-mail")
+
+	// 측정 관련
+	//// Spring Boot Actuator
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 tasks.withType<Test> {

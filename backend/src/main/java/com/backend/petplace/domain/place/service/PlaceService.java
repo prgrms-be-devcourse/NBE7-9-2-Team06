@@ -21,14 +21,14 @@ public class PlaceService {
 
   private static final int DEFAULT_RADIUS_KM = 10;
   private static final int MAX_RADIUS_KM = 30;
-  private static final int DEFAULT_SIZE = 100;
+  private static final int DEFAULT_SIZE = 300;
 
   @Transactional(readOnly = true)
   public List<PlaceSearchResponse> searchPlaces(
       double lat, double lon,
       Integer radiusKm,
       List<Category2Type> category2List,
-      String keyword // ← 이름 맞춤
+      String keyword
   ) {
     int rk = (radiusKm == null ? DEFAULT_RADIUS_KM : Math.min(radiusKm, MAX_RADIUS_KM));
     int radiusMeters = rk * 1_000;

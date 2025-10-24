@@ -3,12 +3,15 @@ package com.backend.petplace.domain.user.controller;
 import com.backend.petplace.domain.user.dto.request.UserLoginRequest;
 import com.backend.petplace.domain.user.dto.request.UserSignupRequest;
 import com.backend.petplace.domain.user.dto.response.BoolResultResponse;
+import com.backend.petplace.domain.user.dto.response.UserLoginResponse;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.service.UserService;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +30,11 @@ public class UserController implements UserSpecification {
 
   @GetMapping("/signup-username")
   public ResponseEntity<ApiResponse<BoolResultResponse>> checkNickName(
-      @RequestParam @NotBlank String nickName) {
+      @RequestParam
+      @NotBlank
+      @Size(min = 2, max = 12)
+      @Pattern(regexp = "^[a-zA-Z0-9가-힣]+$")
+      String nickName) {
 
     BoolResultResponse response = userService.validateDuplicateNickName(nickName);
     return ResponseEntity.ok(ApiResponse.success(response));
@@ -50,10 +57,10 @@ public class UserController implements UserSpecification {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<String>> login(
-      @RequestBody UserLoginRequest request) {
+  public ResponseEntity<ApiResponse<UserLoginResponse>> login(
+      @Valid @RequestBody UserLoginRequest request) {
 
-    String response = userService.login(request);
+    UserLoginResponse response = userService.login(request);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 }

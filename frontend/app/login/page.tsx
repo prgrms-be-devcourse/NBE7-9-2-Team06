@@ -44,9 +44,6 @@ export default function LoginPage() {
       if (response.ok && data.code === "200") {
         const token = data.data.token
 
-        // 1️⃣ 세션 스토리지에 토큰 저장
-        sessionStorage.setItem("authToken", token)
-
         setAuthToken(token)
 
         toast({

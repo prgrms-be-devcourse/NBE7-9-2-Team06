@@ -7,7 +7,6 @@ import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
-import { mockReviews } from "@/lib/mock-data"
 import { PlaceSidebar } from "@/components/place-sidebar"
 import { useToast } from "@/hooks/use-toast"
 import dynamic from "next/dynamic"
@@ -18,6 +17,8 @@ import {
   type PlaceDetailResponse,
   getCategory2Label,
   CATEGORY2_OPTIONS,
+  getReviewsByPlace,
+  type ReviewDetail,
 } from "./placeService"
 
 
@@ -36,8 +37,8 @@ export default function SearchPage() {
   }, [router])
 
   const [keyword, setKeyword] = useState("")
-  const [radius, setRadius] = useState([10])                  // 1~30km 슬라이더
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null) // enum name 저장
+  const [radius, setRadius] = useState([10])
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const [userCenter, setUserCenter] = useState<[number, number] | null>(null)
   const [places, setPlaces] = useState<PlaceDto[]>([])
@@ -48,6 +49,8 @@ export default function SearchPage() {
   // 상세 조회 상태
   const [detail, setDetail] = useState<PlaceDetailResponse | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [placeReviews, setPlaceReviews] = useState<ReviewDetail[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
 
   // 위치 권한
   useEffect(() => {
@@ -98,18 +101,43 @@ export default function SearchPage() {
 
   const handleRadiusChange = (value: number[]) => setRadius(value)
 
-  const handlePlaceClick = async (place: PlaceDto) => {
-    setSelectedPlace(place)
-    setSidebarOpen(true)
-    setDetail(null)
-    setDetailLoading(true)
+  // (수정) 리뷰 목록 조회 로직
+  const loadReviewsForPlace = async (placeId: number) => {
+    setReviewsLoading(true)
     try {
-      const res = await getPlaceDetail(place.id)
+      const res = await getReviewsByPlace(placeId)
+      setPlaceReviews(res.data.reviews ?? [])
+    } catch (e) {
+      console.error("리뷰 조회 실패:", e)
+      setPlaceReviews([])
+    } finally {
+      setReviewsLoading(false)
+    }
+  }
+
+  // (추가) 장소 상세 정보 조회 로직
+  const loadPlaceDetail = async (placeId: number) => {
+    setDetailLoading(true)
+    // (수정) 상세정보가 바뀔 수 있으므로 기존 상세 정보 초기화
+    setDetail(null)
+    try {
+      const res = await getPlaceDetail(placeId)
       setDetail(res.data)
-    } catch {
+    } catch (e) {
+      console.error("상세 정보 조회 실패:", e)
     } finally {
       setDetailLoading(false)
     }
+  }
+
+  const handlePlaceClick = async (place: PlaceDto) => {
+    setSelectedPlace(place)
+    setSidebarOpen(true)
+    setPlaceReviews([]) // 리뷰 목록 초기화
+
+    // (수정) 분리된 두 함수를 각각 호출
+    loadPlaceDetail(place.id)
+    loadReviewsForPlace(place.id)
   }
 
   if (!mounted) return null
@@ -134,13 +162,13 @@ export default function SearchPage() {
               </Button>
             </div>
 
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">반경: {radius[0]}km</label>
               <Slider value={radius} onValueChange={handleRadiusChange} min={1} max={30} step={1} className="w-full" />
             </div>
 
-            
+
             <div className="flex flex-wrap gap-2">
               {categories.map(({ value, label }) => (
                 <Button
@@ -154,7 +182,7 @@ export default function SearchPage() {
               ))}
             </div>
 
-            
+
             <div className="space-y-4">
               <div className="rounded-lg border border-border bg-muted/30 p-8">
                 <MapView center={userCenter} places={places} onSelectPlace={handlePlaceClick} />
@@ -187,8 +215,16 @@ export default function SearchPage() {
           </div>
 
           <PlaceSidebar
-            place={selectedPlace as any}
-            reviews={mockReviews.filter((r) => r.placeId === (selectedPlace as any)?.id)}
+            place={selectedPlace}
+            reviews={placeReviews}
+            reviewsLoading={reviewsLoading}
+            // (수정) 리뷰 생성 시, 장소 상세 정보와 리뷰 목록을 모두 새로고침
+            onReviewCreated={() => {
+              if (selectedPlace) {
+                loadPlaceDetail(selectedPlace.id) // (추가)
+                loadReviewsForPlace(selectedPlace.id)
+              }
+            }}
             open={sidebarOpen}
             onOpenChange={setSidebarOpen}
             detail={detail}

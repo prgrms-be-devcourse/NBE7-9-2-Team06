@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
@@ -22,18 +22,19 @@ import {
   Hash,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import type { Place, Review } from "@/lib/mock-data"
-import type { PlaceDetailResponse } from "@/app/search/placeService"
-import { getCategory1Label, getCategory2Label } from "@/app/search/placeService"
+import type { PlaceDetailResponse, PlaceDto, ReviewDetail, ReviewCreateRequest } from "@/app/search/placeService"
+import { getCategory1Label, getCategory2Label, getPresignedUrl, createReview } from "@/app/search/placeService"
+import { getAuthToken } from "@/lib/auth"
 
 interface PlaceSidebarProps {
-  place: Place | null
-  reviews: Review[]
+  place: PlaceDto | null
+  reviews: ReviewDetail[]
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** 상세 조회 결과를 부모에서 내려줌 */
   detail?: PlaceDetailResponse | null
   detailLoading?: boolean
+  reviewsLoading?: boolean
+  onReviewCreated: () => void
 }
 
 function InfoRow({
@@ -71,20 +72,18 @@ export function PlaceSidebar({
   onOpenChange,
   detail,
   detailLoading,
+  reviewsLoading,
+  onReviewCreated,
 }: PlaceSidebarProps) {
   const [showReviewDialog, setShowReviewDialog] = useState(false)
   const [reviewContent, setReviewContent] = useState("")
   const [reviewRating, setReviewRating] = useState(0)
   const [reviewImage, setReviewImage] = useState<File | null>(null)
   const [bookmarked, setBookmarked] = useState(false)
-  const [localReviews, setLocalReviews] = useState<Review[]>(reviews)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
-  // 로컬 포인트(모의)
-  const [dailyPoints, setDailyPoints] = useState(0)
-  const [reviewedPlacesToday, setReviewedPlacesToday] = useState<Set<string>>(new Set())
-
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = async () => {
     if (reviewRating === 0) {
       toast({ title: "별점 등록은 필수입니다", variant: "destructive" })
       return
@@ -93,6 +92,18 @@ export function PlaceSidebar({
       toast({ title: "본문은 30자 이상 작성 필수입니다", variant: "destructive" })
       return
     }
+    const currentPlaceId = detail?.id ?? place?.id
+    if (!currentPlaceId) {
+      toast({ title: "장소 정보가 없습니다", variant: "destructive" })
+      return
+    }
+
+    const token = getAuthToken()
+    if (!token) {
+      toast({ title: "로그인이 필요합니다", variant: "destructive" })
+      return
+    }
+
     if (reviewImage) {
       const validTypes = ["image/jpeg", "image/jpg", "image/png"]
       if (!validTypes.includes(reviewImage.type)) {
@@ -100,53 +111,74 @@ export function PlaceSidebar({
         return
       }
     }
-    if (place && reviewedPlacesToday.has(place.id)) {
-      toast({ title: "일일 한 장소의 리뷰 포인트 적립은 한번입니다.", variant: "destructive" })
-      addReview()
-      return
-    }
-    const pointsToAdd = reviewImage ? 100 : 50
-    if (dailyPoints + pointsToAdd > 1000) {
-      toast({ title: "일일 한도 1000p 적립으로 포인트는 제공 되지 않습니다.", variant: "destructive" })
-      addReview()
-      return
-    }
-    setDailyPoints((prev) => prev + pointsToAdd)
-    if (place) setReviewedPlacesToday((prev) => new Set(prev).add(place.id))
-    toast({ title: "리뷰 등록 완료", description: `${pointsToAdd}포인트가 적립되었습니다!` })
-    addReview()
-  }
 
-  const addReview = () => {
-    if (!place) return
-    const newReview: Review = {
-      id: `new-${Date.now()}`,
-      placeId: place.id,
-      userId: "currentUser",
-      userName: "나",
-      content: reviewContent,
-      rating: reviewRating,
-      image: reviewImage ? URL.createObjectURL(reviewImage) : undefined,
-      date: new Date().toISOString().split("T")[0],
-    }
-    setLocalReviews([newReview, ...localReviews])
-    setShowReviewDialog(false)
-    setReviewContent("")
-    setReviewRating(0)
-    setReviewImage(null)
-  }
+    setIsSubmitting(true)
+    try {
+      let S3ImageUrl: string | null = null
 
+      if (reviewImage) {
+        const presignedRes = await getPresignedUrl(reviewImage.name)
+        const { presignedUrl, imageUrl } = presignedRes.data
+
+        const uploadRes = await fetch(presignedUrl, {
+          method: "PUT",
+          body: reviewImage,
+          headers: {
+            "Content-Type": reviewImage.type,
+          },
+        })
+
+        if (!uploadRes.ok) {
+          throw new Error("S3 이미지 업로드에 실패했습니다.")
+        }
+        S3ImageUrl = imageUrl
+      }
+
+      const reviewRequest: ReviewCreateRequest = {
+        placeId: currentPlaceId,
+        content: reviewContent,
+        rating: reviewRating,
+        imageUrl: S3ImageUrl,
+      }
+
+      const reviewRes = await createReview(reviewRequest, token)
+      
+      // (수정) 백엔드 DTO 필드명과 일치시킴: pointResultMessage
+      const pointMessage = reviewRes.data?.pointResultMessage 
+
+      onReviewCreated() // 부모 컴포넌트에 새로고침 알림
+
+      setShowReviewDialog(false)
+      setReviewContent("")
+      setReviewRating(0)
+      setReviewImage(null)
+      
+      toast({
+        title: "리뷰 등록 완료",
+        description: pointMessage || "리뷰가 성공적으로 등록되었습니다.", // pointMessage가 있으면 표시, 없으면 기본 메시지
+        variant: "default",
+      })
+
+    } catch (error: any) {
+      toast({
+        title: "리뷰 등록 실패",
+        description: error?.message || "잠시 후 다시 시도해 주세요.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
   if (!place && !detail) return null
 
   // 제목, 카테고리, 주소, 평점/리뷰수 구성
   const title = detail?.name ?? place?.name ?? ""
   const categoryLabel = detail
     ? `${getCategory1Label(detail.category1)} / ${getCategory2Label(detail.category2)}`
-    : (place?.category ?? "")
+    : (place?.category2 ? getCategory2Label(place.category2) : "")
   const address = detail?.address ?? place?.address ?? ""
-  const rating = (detail?.averageRating ?? place?.rating ?? 0) as number
+  const rating = (detail?.averageRating ?? place?.averageRating ?? 0) as number
   const reviewCount = detail?.totalReviewCount
-
   const dash = (s?: string | null) => (s && s.trim() ? s : "-")
 
   return (
@@ -191,18 +223,6 @@ export function PlaceSidebar({
 
         {/* 콘텐츠 */}
         <CardContent className="space-y-6 py-6">
-          {/* 이미지/설명(모크 유지) */}
-          {place?.image && (
-            <img
-              src={place.image || "/placeholder.svg"}
-              alt={title}
-              className="h-44 w-full rounded-xl object-cover"
-            />
-          )}
-          {place?.description && (
-            <p className="text-sm leading-relaxed text-pretty">{place.description}</p>
-          )}
-
           {/* 상세 정보 */}
           <section className="space-y-3">
             <h3 className="text-sm font-semibold">상세 정보</h3>
@@ -281,16 +301,21 @@ export function PlaceSidebar({
           {/* 리뷰 리스트 */}
           <section className="space-y-3">
             <h3 className="text-sm font-semibold">리뷰</h3>
-            {localReviews.length === 0 ? (
+            {reviewsLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                리뷰를 불러오는 중…
+              </div>
+            ) : reviews.length === 0 ? (
               <p className="text-sm text-muted-foreground">아직 리뷰가 없습니다.</p>
             ) : (
               <div className="space-y-3">
-                {localReviews.map((review) => (
+                {reviews.map((review) => (
                   <Card key={review.id} className="rounded-xl">
                     <CardContent className="space-y-2 p-4">
-                      {review.image && (
+                      {review.imageUrl && (
                         <img
-                          src={review.image || "/placeholder.svg"}
+                          src={review.imageUrl}
                           alt="리뷰 이미지"
                           className="h-32 w-full rounded-lg object-cover"
                         />
@@ -315,12 +340,14 @@ export function PlaceSidebar({
           </section>
         </CardContent>
       </Card>
-
       {/* 리뷰 작성 다이얼로그 */}
       <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>리뷰 작성</DialogTitle>
+            <DialogDescription className="sr-only">
+              이 장소에 대한 리뷰를 작성합니다. 별점, 내용, 이미지를 등록할 수 있습니다.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-5">
             <div className="space-y-2">
@@ -363,8 +390,8 @@ export function PlaceSidebar({
               >
                 취소
               </Button>
-              <Button onClick={handleReviewSubmit} className="flex-1">
-                등록
+              <Button onClick={handleReviewSubmit} className="flex-1" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "등록"}
               </Button>
             </div>
           </div>

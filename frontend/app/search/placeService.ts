@@ -1,6 +1,5 @@
 import { api } from '@/lib/api';
 
-
 export type PlaceDto = {
   id: number;
   name: string;
@@ -17,7 +16,6 @@ export type ApiResponse<T> = {
   message: string;
   data: T;
 };
-
 
 export type PlaceDetailResponse = {
   id: number;
@@ -40,6 +38,37 @@ export type PlaceDetailResponse = {
   rawDescription: string | null;
 };
 
+// 백엔드 API 응답과 일치시킬 리뷰 상세 타입
+export type ReviewDetail = {
+  id: number;
+  placeId: number;
+  userId: number;
+  userName: string;
+  content: string;
+  rating: number;
+  imageUrl: string | null;
+  date: string;
+};
+
+// Presigned URL 응답 타입
+export type PresignedUrlResponse = {
+  presignedUrl: string; // S3 업로드용 URL
+  imageUrl: string; // DB 저장용 최종 URL
+};
+
+// 리뷰 생성 요청 타입
+export type ReviewCreateRequest = {
+  placeId: number;
+  content: string;
+  rating: number;
+  imageUrl: string | null;
+};
+
+// (추가) 백엔드에서 실제 반환하는 리뷰 생성 응답 타입
+export type ReviewCreateResponse = {
+  id: number; // 생성된 리뷰 ID
+  pointResultMessage: string; // 포인트 적립 결과 메시지
+};
 
 /** 대분류 */
 export const CATEGORY1_LABELS: Record<string, string> = {
@@ -67,7 +96,6 @@ export const CATEGORY2_LABELS: Record<string, string> = {
   ETC: '기타',
 };
 
-
 export const CATEGORY2_OPTIONS: { value: keyof typeof CATEGORY2_LABELS; label: string }[] = [
   { value: 'VET_PHARMACY', label: CATEGORY2_LABELS.VET_PHARMACY },
   { value: 'MUSEUM', label: CATEGORY2_LABELS.MUSEUM },
@@ -83,7 +111,6 @@ export const CATEGORY2_OPTIONS: { value: keyof typeof CATEGORY2_LABELS; label: s
   { value: 'ART_MUSEUM', label: CATEGORY2_LABELS.ART_MUSEUM },
 ];
 
-
 export function getCategory1Label(v?: string | null) {
   if (!v) return '-';
   return CATEGORY1_LABELS[v] ?? v;
@@ -93,7 +120,6 @@ export function getCategory2Label(v?: string | null) {
   if (!v) return '-';
   return CATEGORY2_LABELS[v] ?? v;
 }
-
 
 export async function searchPlaces(params: {
   lat: number;
@@ -107,4 +133,30 @@ export async function searchPlaces(params: {
 
 export async function getPlaceDetail(placeId: number) {
   return api<ApiResponse<PlaceDetailResponse>>(`/api/v1/places/${placeId}`);
+}
+
+// 장소 ID로 리뷰 목록 조회
+export async function getReviewsByPlace(placeId: number) {
+  // GET /api/v1/places/{placeId}/reviews
+  return api<ApiResponse<{ reviews: ReviewDetail[] }>>(`/api/v1/places/${placeId}/reviews`);
+}
+
+// S3 Presigned URL 요청
+export async function getPresignedUrl(filename: string) {
+  // POST /api/v1/presigned-url
+  return api<ApiResponse<PresignedUrlResponse>>('/api/v1/presigned-url', {
+    method: 'POST',
+    query: { filename },
+  });
+}
+
+// 새 리뷰 생성
+export async function createReview(request: ReviewCreateRequest, token: string) {
+  // POST /api/v1/reviews
+  // (수정) 반환 타입을 백엔드 스펙인 ReviewCreateResponse로 변경
+  return api<ApiResponse<ReviewCreateResponse>>('/api/v1/reviews', {
+    method: 'POST',
+    body: request,
+    token: token,
+  });
 }

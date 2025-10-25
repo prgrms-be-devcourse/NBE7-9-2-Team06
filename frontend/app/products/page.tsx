@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { mockProducts, type Product, type Order } from "@/lib/mock-data"
 import { ShoppingCart, Package, Plus, Minus, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { getAuthToken } from "@/lib/auth"
 import axios from "axios"
 
 interface CartItem {
@@ -17,20 +18,23 @@ interface CartItem {
   quantity: number
 }
 
+const token = `Bearer ${getAuthToken()}` || "";
+
 export default function ProductsPage() {
-  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2MTAwMDEyOSwiZXhwIjoxNzYxOTAwMTI5fQ.SHRhJEUOkNkuqU5azkFs7sQ7lC2RG5raJBroYBkZPLk"
+  // const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2MTAwMDEyOSwiZXhwIjoxNzYxOTAwMTI5fQ.SHRhJEUOkNkuqU5azkFs7sQ7lC2RG5raJBroYBkZPLk"
+  
   const router = useRouter()
   const { toast } = useToast()
   const [cart, setCart] = useState<CartItem[]>([])
   const [orders, setOrders] = useState<Order[]>([])
-  const [userPoints, setUserPoints] = useState(1000)
+  const [userPoints, setUserPoints] = useState(0);
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/login")
     } 
     readUserPoints();
-  }, [router])
+  }, [])
   
   // 함수: 서버에서 포인트 받아오기
   const readUserPoints = async () => {
@@ -238,7 +242,7 @@ export default function ProductsPage() {
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="text-sm text-muted-foreground">보유 포인트</p>
-              <p className="text-2xl font-bold text-primary">{userPoints}P</p>
+              <p className="text-2xl font-bold text-primary">{userPoints !== null ? `${userPoints}P` : "-"}</p>
             </div>
             <Sheet>
               <SheetTrigger asChild>

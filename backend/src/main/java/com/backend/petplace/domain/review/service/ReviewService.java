@@ -16,6 +16,7 @@ import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,18 +29,17 @@ public class ReviewService {
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
+  private final S3Service s3Service;
 
   @Transactional
   public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request) {
     User user = findUserById(userId);
     Place place = findPlaceById(request.getPlaceId());
-
     String imageUrl = request.getS3ImagePath();
 
     Review review = Review.createNewReview(user, place, request.getContent(), request.getRating(),
         imageUrl);
     Review savedReview = reviewRepository.save(review);
-
     place.updateReviewStats(savedReview.getRating());
 
     PointAddResult result = pointService.addPointsForReview(user, savedReview);
@@ -61,7 +61,20 @@ public class ReviewService {
 
     Place place = findPlaceById(placeId);
 
-    List<ReviewInfo> reviewInfos = reviewRepository.findReviewInfosByPlace(place);
+    List<Review> reviews = reviewRepository.findAllByPlace(place);
+
+    //List<ReviewInfo> reviewInfos = reviewRepository.findReviewInfosByPlace(place);
+    List<ReviewInfo> reviewInfos = reviews.stream()
+        .map(review -> new ReviewInfo(
+            review.getId(), // (확인) Review 엔티티의 ID 필드
+            review.getUser().getNickName(), // (가정) User 엔티티의 닉네임 필드
+            review.getContent(),
+            review.getRating(),
+            s3Service.getPublicUrl(review.getImageUrl()), // (중요) S3Service로 전체 URL 변환
+            review.getCreatedDate() // (가정) Review 엔티티의 생성 날짜 필드
+        ))
+        .collect(Collectors.toList());
+
     return new PlaceReviewsResponse(place, reviewInfos);
   }
 

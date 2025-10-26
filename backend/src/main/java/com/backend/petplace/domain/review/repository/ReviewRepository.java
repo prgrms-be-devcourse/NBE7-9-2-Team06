@@ -40,4 +40,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   "JOIN r.place p " +
   "WHERE r.user = :user ORDER BY r.id DESC")
   List<MyPageUserReviews> findByUserWithPlace(@Param("user") User user);
+
+  List<Review> findAllByPlace(Place place);
 }

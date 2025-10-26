@@ -37,10 +37,11 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/h2-console/**").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-            .requestMatchers("/api/v1/signup", "/api/v1/login").permitAll() // 회원가입, 로그인
-            .requestMatchers("/api/v1/signup-username", "/api/v1/signup-email").permitAll()
-            .requestMatchers("/api/v1/places/{placeId}/reviews").permitAll() // 장소별 리뷰 조회
-            .requestMatchers("/api/v1/**").permitAll()
+            .requestMatchers("/api/v1/signup", "/api/v1/login").permitAll()
+            .requestMatchers("/api/v1/signup-username", "/api/v1/signup-email", "/api/v1/email/auth").permitAll()
+            .requestMatchers("/api/v1/places/{placeId}/reviews", "/api/v1/places/search").permitAll()
+            .requestMatchers("/api/v1/presigned-url").permitAll()
+            .requestMatchers("/api/v1/reviews").permitAll() // 프론트 jwt 연결 오류로 임시 허용 (백엔드 이상없음)
 
             // Spring Actuator API 허용
             .requestMatchers("/actuator/**").permitAll()

@@ -16,7 +16,6 @@ import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ErrorCode;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +52,14 @@ public class ReviewService {
 
     User user = findUserById(currentUserId);
 
-    return reviewRepository.findMyReviews(user);
+    List<MyReviewResponse> dtosWithS3Path = reviewRepository.findMyReviewsWithProjection(user);
+
+    return dtosWithS3Path.stream()
+        .map(dto -> MyReviewResponse.withFullImageUrl(
+            dto,
+            s3Service.getPublicUrl(dto.getImageUrl())
+        ))
+        .toList();
   }
 
   @Transactional(readOnly = true)
@@ -61,21 +67,16 @@ public class ReviewService {
 
     Place place = findPlaceById(placeId);
 
-    List<Review> reviews = reviewRepository.findAllByPlace(place);
+    List<ReviewInfo> dtosWithS3Path = reviewRepository.findReviewInfosByPlaceWithProjection(place);
 
-    //List<ReviewInfo> reviewInfos = reviewRepository.findReviewInfosByPlace(place);
-    List<ReviewInfo> reviewInfos = reviews.stream()
-        .map(review -> new ReviewInfo(
-            review.getId(), // (확인) Review 엔티티의 ID 필드
-            review.getUser().getNickName(), // (가정) User 엔티티의 닉네임 필드
-            review.getContent(),
-            review.getRating(),
-            s3Service.getPublicUrl(review.getImageUrl()), // (중요) S3Service로 전체 URL 변환
-            review.getCreatedDate() // (가정) Review 엔티티의 생성 날짜 필드
+    List<ReviewInfo> dtosWithFullUrl = dtosWithS3Path.stream()
+        .map(dto -> ReviewInfo.withFullImageUrl(
+            dto,
+            s3Service.getPublicUrl(dto.getImageUrl())
         ))
-        .collect(Collectors.toList());
+        .toList();
 
-    return new PlaceReviewsResponse(place, reviewInfos);
+    return new PlaceReviewsResponse(place, dtosWithFullUrl);
   }
 
   private User findUserById(Long userId) {

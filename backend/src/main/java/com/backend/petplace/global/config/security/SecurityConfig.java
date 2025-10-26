@@ -39,7 +39,7 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .requestMatchers("/api/v1/signup", "/api/v1/login").permitAll()
             .requestMatchers("/api/v1/signup-username", "/api/v1/signup-email", "/api/v1/email/auth").permitAll()
-            .requestMatchers("/api/v1/places/{placeId}/reviews", "/api/v1/places/search").permitAll()
+            .requestMatchers("/api/v1/places/{placeId}/reviews", "/api/v1/places/search", "api/v1/places/{placeId}").permitAll()
             .requestMatchers("/api/v1/presigned-url").permitAll()
             .requestMatchers("/api/v1/reviews").permitAll() // 프론트 jwt 연결 오류로 임시 허용 (백엔드 이상없음)
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -20,8 +20,23 @@ interface PointHistoryResponse { totalPoints: number; history: PointTransaction[
 
 interface Pet { id: number | string; name: string; gender?: string; birthDate?: string; type?: string }
 interface UserInfo { id: number; nickname: string; userEmail: string; createdDate: string; address: string; point: number; earnablePoints: number; totalReviews: number }
-interface Review { id: number; placename: string; address: string; content: string; imageUrl?: string | null; rating: number; createdDate: string }
-interface MyPageData { userInfo: UserInfo; reviews: Review[]; pets: Pet[] }
+
+interface MyReviewPlaceInfo {
+  placeId: number;
+  placeName: string;
+  fullAddress: string;
+}
+interface MyReviewResponse {
+  reviewId: number;
+  place: MyReviewPlaceInfo;
+  rating: number;
+  content: string;
+  imageUrl: string | null; 
+  createdDate: string;
+  pointsAwarded: number;
+}
+
+interface MyPageData { userInfo: UserInfo; pets: Pet[] }
 
 const API_BASE_URL = "http://localhost:8080/api/v1"
 const JWT = `Bearer ${getAuthToken()}` || "";
@@ -32,7 +47,8 @@ export default function MyPage() {
 
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [pets, setPets] = useState<Pet[]>([])
-  const [reviews, setReviews] = useState<Review[]>([])
+  const [reviews, setReviews] = useState<MyReviewResponse[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [pointHistory, setPointHistory] = useState<PointHistoryResponse | null>(null)
   const [dailyPointsEarned, setDailyPointsEarned] = useState(0)
   const [animatedPoints, setAnimatedPoints] = useState(0)
@@ -56,7 +72,6 @@ export default function MyPage() {
       if (res.ok) {
         setUserInfo(data.data.userInfo)
         setPets(data.data.pets)
-        setReviews(data.data.reviews)
         setDailyPointsEarned(data.data.userInfo.earnablePoints)
         setAnimatedPoints(data.data.userInfo.point)
       } else {
@@ -64,6 +79,28 @@ export default function MyPage() {
       }
     } catch (err) {
       toast({ title: "마이페이지 정보를 불러오는 중 오류가 발생했습니다.", variant: "destructive" })
+    }
+  }
+
+  /** '내가 남긴 리뷰' API 호출 함수 (fetch 사용) */
+  const fetchMyReviews = async () => {
+    setReviewsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/my/reviews`, { // (수정) 직접 API 호출
+        headers: { Authorization: JWT },
+      });
+      // (수정) 직접 API 응답 처리 (ApiResponse 형태 가정)
+      const result: { code: string; message: string; data: MyReviewResponse[] } = await res.json();
+      if (res.ok) {
+        setReviews(result.data || []);
+      } else {
+        throw new Error(result.message || `리뷰 내역 로딩 실패 (${res.status})`);
+      }
+    } catch (e: any) {
+      toast({ title: "리뷰 내역 로딩 실패", description: e.message, variant: "destructive" });
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
     }
   }
 
@@ -103,6 +140,7 @@ export default function MyPage() {
   useEffect(() => {
     if (!JWT) router.push("/login")
     fetchMyPageData()
+    fetchMyReviews()
     fetchPointHistory() // 포인트 내역 호출
   }, [])
 
@@ -327,26 +365,35 @@ export default function MyPage() {
         <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>내가 남긴 리뷰</DialogTitle>
+            <DialogDescription className="sr-only">내가 남긴 리뷰 목록입니다.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            {reviews.map((review) => (
-              <Card key={review.id}>
-                <CardContent className="p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    <span className="font-semibold text-primary">{review.placename}</span>
-                  </div>
-                  {review.imageUrl && <img src={review.imageUrl} alt="리뷰 이미지" className="mb-2 h-32 w-full rounded object-cover" />}
-                  <p className="text-sm text-pretty">{review.content}</p>
-                  <div className="mt-2 flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-secondary text-secondary" : "text-muted"}`} />
-                    ))}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">{new Date(review.createdDate).toLocaleDateString()}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {reviewsLoading ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : reviews.length === 0 ? (
+              <p className="text-center text-muted-foreground py-4">작성한 리뷰가 없습니다.</p>
+            ) : (
+              reviews.map((review) => (
+                <Card key={review.reviewId}>
+                  <CardContent className="p-4">
+                    <div className="mb-2 flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      <span className="font-semibold text-primary">{review.place.placeName}</span>
+                    </div>
+                    {review.imageUrl && <img src={review.imageUrl} alt="리뷰 이미지" className="mb-2 h-32 w-full rounded object-cover" />}
+                    <p className="text-sm text-pretty">{review.content}</p>
+                    <div className="mt-2 flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-secondary text-secondary" : "text-muted"}`} />
+                      ))}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{review.createdDate}</p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </DialogContent>
       </Dialog>

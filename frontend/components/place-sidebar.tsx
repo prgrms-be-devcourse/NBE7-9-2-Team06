@@ -37,6 +37,7 @@ interface PlaceSidebarProps {
   onReviewCreated: () => void
 }
 
+// ... (InfoRow, BoolBadge 함수 동일) ...
 function InfoRow({
   icon,
   label,
@@ -65,6 +66,7 @@ function BoolBadge({ on }: { on: boolean | null | undefined }) {
   return <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">-</span>
 }
 
+
 export function PlaceSidebar({
   place,
   reviews,
@@ -84,6 +86,7 @@ export function PlaceSidebar({
   const { toast } = useToast()
 
   const handleReviewSubmit = async () => {
+    // ... (유효성 검사 동일) ...
     if (reviewRating === 0) {
       toast({ title: "별점 등록은 필수입니다", variant: "destructive" })
       return
@@ -114,11 +117,12 @@ export function PlaceSidebar({
 
     setIsSubmitting(true)
     try {
-      let S3ImageUrl: string | null = null
+      let finalS3Path: string | null = null // (수정) 변수명 변경
 
       if (reviewImage) {
         const presignedRes = await getPresignedUrl(reviewImage.name)
-        const { presignedUrl, imageUrl } = presignedRes.data
+        // (수정) 백엔드 DTO에 맞게 s3FilePath로 변경
+        const { presignedUrl, s3FilePath } = presignedRes.data
 
         const uploadRes = await fetch(presignedUrl, {
           method: "PUT",
@@ -129,21 +133,21 @@ export function PlaceSidebar({
         })
 
         if (!uploadRes.ok) {
-          throw new Error("S3 이미지 업로드에 실패했습니다.")
+          throw new Error("S3 이미지 업로드에 실패했습니다. (CORS 확인 필요)")
         }
-        S3ImageUrl = imageUrl
+        finalS3Path = s3FilePath // (수정)
       }
 
+      // (수정) 백엔드 DTO에 맞게 s3ImagePath로 변경
       const reviewRequest: ReviewCreateRequest = {
         placeId: currentPlaceId,
         content: reviewContent,
         rating: reviewRating,
-        imageUrl: S3ImageUrl,
+        s3ImagePath: finalS3Path, // (수정)
       }
 
       const reviewRes = await createReview(reviewRequest, token)
       
-      // (수정) 백엔드 DTO 필드명과 일치시킴: pointResultMessage
       const pointMessage = reviewRes.data?.pointResultMessage 
 
       onReviewCreated() // 부모 컴포넌트에 새로고침 알림
@@ -155,7 +159,7 @@ export function PlaceSidebar({
       
       toast({
         title: "리뷰 등록 완료",
-        description: pointMessage || "리뷰가 성공적으로 등록되었습니다.", // pointMessage가 있으면 표시, 없으면 기본 메시지
+        description: pointMessage || "리뷰가 성공적으로 등록되었습니다.",
         variant: "default",
       })
 
@@ -171,7 +175,7 @@ export function PlaceSidebar({
   }
   if (!place && !detail) return null
 
-  // 제목, 카테고리, 주소, 평점/리뷰수 구성
+  // ... (렌더링 변수 선언 동일) ...
   const title = detail?.name ?? place?.name ?? ""
   const categoryLabel = detail
     ? `${getCategory1Label(detail.category1)} / ${getCategory2Label(detail.category2)}`
@@ -180,6 +184,7 @@ export function PlaceSidebar({
   const rating = (detail?.averageRating ?? place?.averageRating ?? 0) as number
   const reviewCount = detail?.totalReviewCount
   const dash = (s?: string | null) => (s && s.trim() ? s : "-")
+
 
   return (
     <>
@@ -311,11 +316,12 @@ export function PlaceSidebar({
             ) : (
               <div className="space-y-3">
                 {reviews.map((review) => (
-                  <Card key={review.id} className="rounded-xl">
+                  // (수정) key prop을 DTO 필드명인 'reviewId'로 변경
+                  <Card key={review.reviewId} className="rounded-xl">
                     <CardContent className="space-y-2 p-4">
                       {review.imageUrl && (
                         <img
-                          src={review.imageUrl}
+                          src={review.imageUrl} // (중요) 이제 이곳에 S3 전체 URL이 들어옴
                           alt="리뷰 이미지"
                           className="h-32 w-full rounded-lg object-cover"
                         />
@@ -330,7 +336,8 @@ export function PlaceSidebar({
                         ))}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {review.userName} · {review.date}
+                        {/* (수정) DTO 필드명인 'createdDate'로 변경 */}
+                        {review.userName} · {review.createdDate}
                       </p>
                     </CardContent>
                   </Card>

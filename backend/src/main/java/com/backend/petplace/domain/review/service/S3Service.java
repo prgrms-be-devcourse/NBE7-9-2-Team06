@@ -42,6 +42,13 @@ public class S3Service {
     return new PresignedUrlResponse(presignedUrl.toString(), uniqueFileName);
   }
 
+  public String getPublicUrl(String s3Path) {
+    if (s3Path == null || s3Path.isEmpty()) {
+      return null;
+    }
+    return amazonS3Client.getUrl(bucket, s3Path).toString();
+  }
+
   private String createUniqueFileName(String originalFilename, String dirName) {
     String extension = "";
     if (originalFilename != null && originalFilename.contains(".")) {

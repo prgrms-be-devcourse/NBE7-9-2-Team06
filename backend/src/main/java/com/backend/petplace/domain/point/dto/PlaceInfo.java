@@ -1,5 +1,6 @@
 package com.backend.petplace.domain.point.dto;
 
+import com.backend.petplace.domain.place.entity.Place;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -16,9 +17,21 @@ public class PlaceInfo {
   @Schema(description = "장소 전체 주소 -  우편번호 제외", example = "서울 강남구 테헤란로 123")
   private String fullAddress;
 
-  public PlaceInfo(Long placeId, String placeName, String address) {
+  PlaceInfo(Long placeId, String placeName, String address) {
     this.placeId = placeId;
     this.placeName = placeName;
     this.fullAddress = address;
+  }
+
+  public static PlaceInfo fromProjection(Long placeId, String placeName, String address) {
+    return new PlaceInfo(placeId, placeName, address);
+  }
+
+  public static PlaceInfo from(Place place) {
+    return new PlaceInfo(
+        place.getId(),
+        place.getName(),
+        place.getAddress()
+    );
   }
 }

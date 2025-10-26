@@ -33,13 +33,30 @@ public class MyReviewResponse {
   @Schema(description = "해당 리뷰로 적립된 포인트", example = "100")
   private int pointsAwarded;
 
-  public MyReviewResponse(Long reviewId, Long placeId, String placeName, String placeAddress, int rating, String content, String imageUrl, LocalDateTime createdDate, Integer pointsAwarded) {
+  public MyReviewResponse(Long reviewId, Long placeId, String placeName, String placeAddress,
+      int rating, String content, String imageUrl, LocalDateTime createdDate,
+      Integer pointsAwarded) {
     this.reviewId = reviewId;
-    this.place = new PlaceInfo(placeId, placeName, placeAddress);
+    this.place = PlaceInfo.fromProjection(placeId, placeName, placeAddress);
     this.rating = rating;
     this.content = content;
     this.imageUrl = imageUrl;
     this.createdDate = createdDate.toLocalDate();
     this.pointsAwarded = (pointsAwarded != null) ? pointsAwarded : 0;
+  }
+
+  // S3 경로를 전체 URL로 교체하는 생성자
+  private MyReviewResponse(MyReviewResponse dto, String fullImageUrl) {
+    this.reviewId = dto.reviewId;
+    this.place = dto.place;
+    this.rating = dto.rating;
+    this.content = dto.content;
+    this.createdDate = dto.createdDate;
+    this.pointsAwarded = dto.pointsAwarded;
+    this.imageUrl = fullImageUrl;
+  }
+
+  public static MyReviewResponse withFullImageUrl(MyReviewResponse dto, String fullImageUrl) {
+    return new MyReviewResponse(dto, fullImageUrl);
   }
 }

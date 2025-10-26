@@ -28,18 +28,17 @@ public class ReviewService {
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
+  private final S3Service s3Service;
 
   @Transactional
   public ReviewCreateResponse createReview(Long userId, ReviewCreateRequest request) {
     User user = findUserById(userId);
     Place place = findPlaceById(request.getPlaceId());
-
     String imageUrl = request.getS3ImagePath();
 
     Review review = Review.createNewReview(user, place, request.getContent(), request.getRating(),
         imageUrl);
     Review savedReview = reviewRepository.save(review);
-
     place.updateReviewStats(savedReview.getRating());
 
     PointAddResult result = pointService.addPointsForReview(user, savedReview);
@@ -53,7 +52,14 @@ public class ReviewService {
 
     User user = findUserById(currentUserId);
 
-    return reviewRepository.findMyReviews(user);
+    List<MyReviewResponse> dtosWithS3Path = reviewRepository.findMyReviewsWithProjection(user);
+
+    return dtosWithS3Path.stream()
+        .map(dto -> MyReviewResponse.withFullImageUrl(
+            dto,
+            s3Service.getPublicUrl(dto.getImageUrl())
+        ))
+        .toList();
   }
 
   @Transactional(readOnly = true)
@@ -61,8 +67,16 @@ public class ReviewService {
 
     Place place = findPlaceById(placeId);
 
-    List<ReviewInfo> reviewInfos = reviewRepository.findReviewInfosByPlace(place);
-    return new PlaceReviewsResponse(place, reviewInfos);
+    List<ReviewInfo> dtosWithS3Path = reviewRepository.findReviewInfosByPlaceWithProjection(place);
+
+    List<ReviewInfo> dtosWithFullUrl = dtosWithS3Path.stream()
+        .map(dto -> ReviewInfo.withFullImageUrl(
+            dto,
+            s3Service.getPublicUrl(dto.getImageUrl())
+        ))
+        .toList();
+
+    return new PlaceReviewsResponse(place, dtosWithFullUrl);
   }
 
   private User findUserById(Long userId) {

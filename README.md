@@ -14,7 +14,7 @@
 
 | 최지혁 | 유호준 | 윤예지 | 이창중 | 주정윤 |
 |:--:|:--:|:--:|:--:|:--:|
-| [![](https://github.com/hodakrer.png?size=100)](https://github.com/hodakrer)<br>**최지혁**<br>팀장<br>개발 1 | [![](https://github.com/dbghwns123.png?size=100)](https://github.com/dbghwns123)<br>**유호준**<br>팀원<br>개발 2 | [![](https://github.com/dpwl0974.png?size=100)](https://github.com/dpwl0974)<br>**윤예지**<br>팀원<br>개발 3 | [![](https://github.com/DEV-Cheeze.png?size=100)](https://github.com/DEV-Cheeze)<br>**이창중**<br>팀원<br>개발 4 | [![](https://github.com/zoooooz2.png?size=100)](https://github.com/zoooooz2)<br>**주정윤**<br>팀원<br>개발 5 |
+| [![](https://github.com/hodakrer.png?size=100)](https://github.com/hodakrer)<br>**최지혁**<br>팀장<br>상품 주문 | [![](https://github.com/dbghwns123.png?size=100)](https://github.com/dbghwns123)<br>**유호준**<br>팀원<br>지도/검색 | [![](https://github.com/dpwl0974.png?size=100)](https://github.com/dpwl0974)<br>**윤예지**<br>팀원<br>리뷰/포인트 | [![](https://github.com/DEV-Cheeze.png?size=100)](https://github.com/DEV-Cheeze)<br>**이창중**<br>팀원<br>마이페이지 | [![](https://github.com/zoooooz2.png?size=100)](https://github.com/zoooooz2)<br>**주정윤**<br>팀원<br>회원가입/로그인 |
 
 
 ## **⭐** 주요 기능
@@ -30,8 +30,37 @@
     - **1) 키워드 검색:** '애견카페' 등 단어와 **부분 일치**하는 장소 검색
     - **2) 카테고리 검색:** '동물병원' 등 카테고리와 **완전 일치**하는 장소 검색
 - **✨ 핵심 로직 (정확도 향상):**
-    - 카카오 API 검색 결과 중, **반려동물 관련 카테고리가 아닌 장소는 필터링** (e.g., 일반 음식점, 카페 제외)
-    - `카카오 맵 API`에 없는 데이터는 **자체 `CSV` 파일로 보완**하여 검색
+    - [문화 공공 데이터 광장](https://www.culture.go.kr/data/openapi/openapiView.do?id=585) API를 사용하여 **반려동물 관련 카테고리가 아닌 장소는 필터링** (e.g., 일반 음식점, 카페 제외)
+      
+-  **반경 기반 필터링 적용**
+    - 사용자의 위도·경도와 장소의 위도·경도를 활용해 거리 계산(하버사인 기반 거리 공식 등)을 수행
+    - 지정 반경(1 ~ 30 km) 안에 있는 장소만 선별해서 반환
+        
+        → “지금 내 주변에서 실제로 갈 수 있는 곳”만 추천되도록 설계
+        
+- **복합 조건 검색 지원**
+    - 위치(반경) + 키워드 + 카테고리(중분류) 조건을 동시에 걸 수 있음
+    - 예: “5km 안에서 ‘카페’ 키워드이면서 카테고리=애견동반카페”처럼 교차 필터 가능
+        
+        → 노이즈 많은 공공데이터를 사용자 의도에 맞게 정제
+        
+- **공공데이터 표준화/정제**
+    - 공공데이터 API에서 내려오는 원본 응답을 내부 도메인 모델(Place)로 파싱 및 정리
+    - 영업시간, 휴무일, 반려동물 동반 가능 여부, 주차 여부 등 실제로 방문 결정에 필요한 필드만 추출/저장
+    - 잘못된/누락된 주소 정보 등은 가공해 프론트가 바로 표시 가능한 형태로 제공
+- **장소별 평점 정보 캐싱**
+    - `Place` 엔티티에서 평균 평점과 리뷰 수를 유지
+    - 리뷰 생성 시마다 평균/리뷰 수를 갱신해 둠으로써, 상세 조회에서 별도 집계 쿼리 없이 즉시 응답
+        
+        → 상세 화면 진입 속도 향상
+        
+- **장소 상세 조회 정보 패키징**
+    - 상세 조회 시 단순 위치 정보만 주는 게 아니라:
+        - 장소 기본 정보 (이름, 주소, 영업시간, 휴무일, 전화번호 등)
+        - 반려동물 동반 가능 여부 / 제한 조건
+        - 별점 평균 / 리뷰 개수
+        - 원본 설명(rawDescription)까지 한 번에 내려줌
+    - 즉, 프론트는 추가 호출 없이 바로 상세 화면을 그릴 수 있음
 
 ---
 
@@ -107,7 +136,7 @@
 
 # 참고한 레퍼런스
 
-- https://github.com/emperor-juwon/TourWithPet_teamproject?tab=readme-ov-file#spring-boot%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%B0%98%EB%A0%A4%EB%8F%99%EB%AC%BC-%EB%8F%99%EB%B0%98-%EC%97%AC%ED%96%89-%ED%94%8C%EB%9E%AB%ED%8F%BC-%EB%A7%8C%EB%93%A4%EA%B8%B0
+- [참고 레포지토리](https://github.com/emperor-juwon/TourWithPet_teamproject?tab=readme-ov-file#spring-boot%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%B0%98%EB%A0%A4%EB%8F%99%EB%AC%BC-%EB%8F%99%EB%B0%98-%EC%97%AC%ED%96%89-%ED%94%8C%EB%9E%AB%ED%8F%BC-%EB%A7%8C%EB%93%A4%EA%B8%B0)
 
 ---
 
@@ -124,22 +153,53 @@
 ---
 
 ## 🔧기술 스택
+
+### 백엔드
 <div style="text-align: left;">
     <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white" alt="Java">
-    <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Java">
-    <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Java">
+     <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Java">
+    <img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?style=for-the-badge&logo=&logoColor=white">
     <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white" alt="Java">
     <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Java">
     <img src="https://img.shields.io/badge/h2database-09476B?style=for-the-badge&logo=h2database&logoColor=white" alt="Java">
-    <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Java">
-    <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white" alt="Java">
-    <img src="https://img.shields.io/badge/nextdotjs-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Java">
+    <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white">
+    <img src="https://img.shields.io/badge/jquery-0769AD?style=for-the-badge&logo=jquery&logoColor=white">
 </div>
+
+### 프론트
+<div style="text-align: left;">
+    <img src="https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Java">  
+    <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
+    <img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/>
+</div>
+
+### 인증
+<div style="text-align: left;">
+    <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Java">
+    <img src="https://img.shields.io/badge/JWT-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Java">
+</div>
+
+### 이미지 업로드
+<div style="text-align: left;">
+        <img src="https://img.shields.io/badge/aws s3-232F3E?style=for-the-badge&logo=aws&logoColor=white">
+</div>
+
+### 협업 도구
+<div style="text-align: left;">
+        <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Java">
+    <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white" alt="Java">
+    <img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white">
+    <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
+    <img src="https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white">
+    <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">
+</div>
+
 
 ---
 
 ## **🔗 ERD (Entity Relationship Diagram)**
-<img width="837" height="521" alt="image" src="https://github.com/user-attachments/assets/6557eecd-1f39-406a-9289-feec4d7d91a4" />
+<img width="1383" height="845" alt="image" src="https://github.com/user-attachments/assets/683327f2-d5bf-4f66-9f59-728e6fbcf25a" />
+
 
 ---
 

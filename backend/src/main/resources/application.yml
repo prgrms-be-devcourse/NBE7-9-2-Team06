@@ -75,7 +75,7 @@ logging:
 
 jwt:
   secret-key: ${jwt.secret-key}
-  access-expiration-ms: "#{1000L * 60 * 15000}" # 개발을 위해 만료시간을 약 10일로 설정
+  access-expiration-ms: "#{1000L * 60 * 60}" # 60분
 
 management:
   endpoints:

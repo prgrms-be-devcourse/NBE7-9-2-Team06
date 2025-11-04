@@ -79,6 +79,11 @@ public class UserService {
       throw new BusinessException(ErrorCode.BAD_CREDENTIAL);
     }
 
+    // TODO: return할 때, Refresh Token도 같이 반환 + DB에 저장
     return new UserLoginResponse(jwtTokenProvider.generateAccessToken(user.getId()));
   }
+
+  //TODO: 서버에서 리프레시 토큰 검증 후 재발급
+  // 서버는 DB의 리프레시 토큰과 일치하는지 확인하고,
+  // 유효하면 새로운 액세스 토큰을 발급해준다.
 }

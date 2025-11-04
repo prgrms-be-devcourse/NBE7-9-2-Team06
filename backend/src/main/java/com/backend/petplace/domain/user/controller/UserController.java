@@ -63,4 +63,6 @@ public class UserController implements UserSpecification {
     UserLoginResponse response = userService.login(request);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
+
+  // TODO: POST /api/auth/refresh
 }

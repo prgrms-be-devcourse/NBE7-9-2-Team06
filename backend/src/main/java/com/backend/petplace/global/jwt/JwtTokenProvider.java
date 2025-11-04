@@ -56,6 +56,8 @@ public class JwtTokenProvider {
         .compact();
   }
 
+  // TODO: generate refresh token()
+
   public void validateToken(String token) {
     try {
       Jwts.parser()

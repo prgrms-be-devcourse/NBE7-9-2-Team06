@@ -14,6 +14,7 @@ import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,5 +93,9 @@ public class JwtTokenProvider {
         .getPayload();
 
     return String.valueOf(claims.get("userId"));
+  }
+
+  public String generateRefreshToken() {
+    return UUID.randomUUID().toString();
   }
 }

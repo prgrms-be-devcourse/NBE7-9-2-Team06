@@ -80,7 +80,7 @@ logging:
 jwt:
   secret-key: ${jwt.secret-key}
   access-expiration-ms: "#{1000L * 60 * 60}" # 60분
-  refresh-expiration-ms: "#{1000L * 60 * 60 * 168}" # 7일
+  refresh-expiration-ms: "#{7 * 24 * 60 * 60 * 1000L}" # 7일
 
 management:
   endpoints:

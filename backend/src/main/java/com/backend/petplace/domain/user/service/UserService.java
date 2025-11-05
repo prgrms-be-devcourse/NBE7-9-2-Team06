@@ -12,7 +12,11 @@ import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.jwt.JwtTokenProvider;
 import com.backend.petplace.global.response.ErrorCode;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,10 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
   private final EmailAuthCodeRepository emailAuthCodeRepository;
+  private final RedisService redisService;
+
+  @Value("${jwt.refresh-expiration-ms}")
+  private long refreshExpiration;
 
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
@@ -70,8 +78,8 @@ public class UserService {
     return new BoolResultResponse(true);
   }
 
-  @Transactional(readOnly = true)
-  public UserLoginResponse login(UserLoginRequest request) {
+  @Transactional
+  public UserLoginResponse login(UserLoginRequest request, HttpServletResponse response) {
     User user = userRepository.findByNickName(request.getNickName())
         .orElseThrow(() -> new BusinessException(ErrorCode.BAD_CREDENTIAL));
 
@@ -79,8 +87,28 @@ public class UserService {
       throw new BusinessException(ErrorCode.BAD_CREDENTIAL);
     }
 
-    // TODO: return할 때, Refresh Token도 같이 반환 + DB에 저장
-    return new UserLoginResponse(jwtTokenProvider.generateAccessToken(user.getId()));
+    String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
+    String refreshToken = jwtTokenProvider.generateRefreshToken();
+
+    // Redis에 Refresh Token 저장 (7일 만료)
+    redisService.saveRefreshToken(user.getId(), refreshToken, refreshExpiration);
+
+    // Refresh Token을 쿠키에 저장
+    addRefreshTokenCookie(refreshToken, response);
+
+    return new UserLoginResponse(accessToken);
+  }
+
+  private static void addRefreshTokenCookie(String refreshToken,  HttpServletResponse response) {
+    ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("None")
+        .path("/")
+        .maxAge(7 * 24 * 60 * 60) // 7일
+        .build();
+
+    response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
   }
 
   //TODO: 서버에서 리프레시 토큰 검증 후 재발급

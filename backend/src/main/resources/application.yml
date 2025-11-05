@@ -1,4 +1,8 @@
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   output:
     ansi:
       enabled: always
@@ -76,6 +80,7 @@ logging:
 jwt:
   secret-key: ${jwt.secret-key}
   access-expiration-ms: "#{1000L * 60 * 60}" # 60분
+  refresh-expiration-ms: "#{1000L * 60 * 60 * 168}" # 7일
 
 management:
   endpoints:

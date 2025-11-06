@@ -7,6 +7,8 @@ import com.backend.petplace.domain.user.dto.response.UserLoginResponse;
 import com.backend.petplace.domain.user.dto.response.UserSignupResponse;
 import com.backend.petplace.domain.user.service.UserService;
 import com.backend.petplace.global.response.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -58,11 +60,16 @@ public class UserController implements UserSpecification {
 
   @PostMapping("/login")
   public ResponseEntity<ApiResponse<UserLoginResponse>> login(
-      @Valid @RequestBody UserLoginRequest request) {
+      @Valid @RequestBody UserLoginRequest request,
+      HttpServletResponse res) {
 
-    UserLoginResponse response = userService.login(request);
+    UserLoginResponse response = userService.login(request, res);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
-  // TODO: POST /api/auth/refresh
+  @PostMapping("/auth/refresh")
+  public ResponseEntity<ApiResponse<UserLoginResponse>> refreshAccessToken(HttpServletRequest request) {
+    UserLoginResponse response = userService.refreshAccessToken(request);
+    return ResponseEntity.ok(ApiResponse.success(response));
+  }
 }

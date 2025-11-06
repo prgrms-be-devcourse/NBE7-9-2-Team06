@@ -16,13 +16,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -33,8 +34,7 @@ public class UserService {
   private final EmailAuthCodeRepository emailAuthCodeRepository;
   private final RedisService redisService;
 
-  @Value("${jwt.refresh-expiration-ms}")
-  private long refreshExpiration;
+  private static final int MAX_AGE_SECONDS = 7 * 24 * 60 * 60; // 7일
 
   @Transactional
   public UserSignupResponse signup(UserSignupRequest request) {
@@ -93,7 +93,7 @@ public class UserService {
     String refreshToken = jwtTokenProvider.generateRefreshToken();
 
     // Redis에 Refresh Token 저장 (7일 만료)
-    redisService.saveRefreshToken(user.getId(), refreshToken, refreshExpiration);
+    redisService.saveRefreshToken(user.getId(), refreshToken);
 
     // Refresh Token을 쿠키에 저장
     addRefreshTokenCookie(refreshToken, response);
@@ -107,7 +107,7 @@ public class UserService {
         .secure(true)
         .sameSite("None")
         .path("/api/v1/auth/refresh") // 쿠키 전송 범위를 재발급 엔드포인트로 제한
-        .maxAge(7 * 24 * 60 * 60) // 7일
+        .maxAge(MAX_AGE_SECONDS)
         .build();
 
     response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -138,5 +138,37 @@ public class UserService {
       }
     }
     throw new BusinessException(ErrorCode.NOT_LOGIN_ACCESS);
+  }
+
+  @Transactional
+  public void logout(HttpServletRequest request, HttpServletResponse response) {
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    String accessToken = jwtTokenProvider.resolveToken(request);
+
+    if (refreshToken != null && !refreshToken.isBlank()) {
+      redisService.deleteRefreshToken(refreshToken);
+    }
+
+    if (accessToken != null && !accessToken.isBlank()) {
+      try {
+        // 토큰이 유효하면 남은 만료시간(ms)을 구함
+        long remainingMs = jwtTokenProvider.getRemainingMilliseconds(accessToken);
+        if (remainingMs > 0) {
+          redisService.setBlackList(accessToken, remainingMs);
+        }
+      } catch (Exception e) {
+        // 토큰이 이미 만료됐거나 검증 실패면 블랙리스트 등록X, 로그아웃은 처리
+        log.debug("AccessToken 검증 실패 또는 만료: {}", e.getMessage());
+      }
+    }
+
+    ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("None") // 원래 설정에 맞춰 동일하게
+        .path("/api/v1/auth/refresh") // 쿠키 생성 시 사용한 path와 동일해야 함
+        .maxAge(0)
+        .build();
+    response.setHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
   }
 }

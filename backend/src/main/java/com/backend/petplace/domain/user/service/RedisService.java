@@ -13,21 +13,19 @@ public class RedisService {
 
   // RefreshToken 저장
   public void saveRefreshToken(Long userId, String refreshToken, long expirationMillis) {
-    String key = "RefreshToken:" + userId; // 키 이름 예시: RefreshToken:123
-    redisTemplate.opsForValue().set(key, refreshToken, expirationMillis, TimeUnit.MILLISECONDS);
+    String key = "RT:" + refreshToken;
+    redisTemplate.opsForValue().set(key, userId.toString(), expirationMillis, TimeUnit.MILLISECONDS);
   }
 
   // RefreshToken 조회
-  public String getRefreshToken(Long userId) {
-    String key = "RefreshToken:" + userId;
-    Object value = redisTemplate.opsForValue().get(key);
-    return value != null ? value.toString() : null;
+  public Long getUserIdByRefreshToken(String refreshToken) {
+    String value = (String) redisTemplate.opsForValue().get("RT:" + refreshToken);
+    return value != null ? Long.parseLong(value) : null;
   }
 
   // RefreshToken 삭제 (로그아웃 시)
-  public void deleteRefreshToken(Long userId) {
-    String key = "RefreshToken:" + userId;
-    redisTemplate.delete(key);
+  public void deleteRefreshToken(String refreshToken) {
+    redisTemplate.delete("RT:" + refreshToken);
   }
 
   // AccessToken 블랙리스트 등록

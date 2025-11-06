@@ -16,6 +16,7 @@ import com.backend.petplace.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -56,6 +57,7 @@ public interface UserSpecification {
   @ApiErrorCodeExamples({BAD_CREDENTIAL})
   @Operation(summary = "로그인", description = "이용자가 로그인을 합니다. 이름, 비밀번호 필수입니다.")
   ResponseEntity<ApiResponse<UserLoginResponse>> login(
-      @Parameter(description = "이름, 비밀번호", required = true) @Valid UserLoginRequest request
+      @Parameter(description = "이름, 비밀번호", required = true) @Valid UserLoginRequest request,
+      HttpServletResponse response
   );
 }

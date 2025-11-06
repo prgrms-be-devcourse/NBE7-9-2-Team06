@@ -12,6 +12,8 @@ import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.jwt.JwtTokenProvider;
 import com.backend.petplace.global.response.ErrorCode;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -99,19 +101,42 @@ public class UserService {
     return new UserLoginResponse(accessToken);
   }
 
-  private static void addRefreshTokenCookie(String refreshToken,  HttpServletResponse response) {
+  private void addRefreshTokenCookie(String refreshToken,  HttpServletResponse response) {
     ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
         .httpOnly(true)
         .secure(true)
         .sameSite("None")
-        .path("/")
+        .path("/api/v1/auth/refresh") // 쿠키 전송 범위를 재발급 엔드포인트로 제한
         .maxAge(7 * 24 * 60 * 60) // 7일
         .build();
 
     response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
   }
 
-  //TODO: 서버에서 리프레시 토큰 검증 후 재발급
-  // 서버는 DB의 리프레시 토큰과 일치하는지 확인하고,
-  // 유효하면 새로운 액세스 토큰을 발급해준다.
+  @Transactional(readOnly = true)
+  public UserLoginResponse refreshAccessToken(HttpServletRequest request) {
+    String refreshToken = extractRefreshTokenFromCookie(request);
+
+    // Redis에 저장된 토큰 확인
+    Long userId = redisService.getUserIdByRefreshToken(refreshToken);
+    if (userId == null) {
+      throw new BusinessException(ErrorCode.NOT_LOGIN_ACCESS);
+    }
+
+    // 새로운 Access Token 발급
+    String newAccessToken = jwtTokenProvider.generateAccessToken(userId);
+    return new UserLoginResponse(newAccessToken);
+  }
+
+  private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+    if (request.getCookies() == null) {
+      throw new BusinessException(ErrorCode.NOT_LOGIN_ACCESS);
+    }
+    for (Cookie cookie : request.getCookies()) {
+      if ("refreshToken".equals(cookie.getName())) {
+        return cookie.getValue();
+      }
+    }
+    throw new BusinessException(ErrorCode.NOT_LOGIN_ACCESS);
+  }
 }

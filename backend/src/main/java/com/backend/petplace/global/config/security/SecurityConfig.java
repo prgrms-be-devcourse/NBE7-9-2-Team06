@@ -1,5 +1,6 @@
 package com.backend.petplace.global.config.security;
 
+import com.backend.petplace.domain.user.service.RedisService;
 import com.backend.petplace.global.jwt.JwtAuthenticationFilter;
 import com.backend.petplace.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final JwtTokenProvider jwtTokenProvider;
+  private final RedisService redisService;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,6 +41,7 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .requestMatchers("/api/v1/signup", "/api/v1/login").permitAll()
             .requestMatchers("/api/v1/signup-username", "/api/v1/signup-email", "/api/v1/email/auth").permitAll()
+            .requestMatchers("/api/v1/auth/refresh").permitAll()
             .requestMatchers("/api/v1/places/{placeId}/reviews", "/api/v1/places/search", "api/v1/places/{placeId}").permitAll()
             .requestMatchers("/api/v1/presigned-url").permitAll()
             .requestMatchers("/api/v1/reviews").permitAll() // 프론트 jwt 연결 오류로 임시 허용 (백엔드 이상없음)
@@ -50,7 +53,7 @@ public class SecurityConfig {
 
     http
         .addFilterBefore(
-            new JwtAuthenticationFilter(jwtTokenProvider),
+            new JwtAuthenticationFilter(jwtTokenProvider, redisService),
             UsernamePasswordAuthenticationFilter.class
         );
 

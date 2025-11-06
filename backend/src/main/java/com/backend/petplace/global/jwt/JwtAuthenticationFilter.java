@@ -1,7 +1,9 @@
 package com.backend.petplace.global.jwt;
 
+import com.backend.petplace.domain.user.service.RedisService;
 import com.backend.petplace.global.exception.BusinessException;
 import com.backend.petplace.global.response.ApiResponse;
+import com.backend.petplace.global.response.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,12 +19,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
+  private final RedisService  redisService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
     String token = jwtTokenProvider.resolveToken(request);
+
+    if (redisService.isBlackListed(token)) {
+      sendErrorResponse(response, new BusinessException(ErrorCode.BLACKLIST_TOKEN));
+      return;
+    }
 
     if (token != null) {
       try {
@@ -32,16 +40,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
       } catch (BusinessException ex) {
-        // 메서드로 분리할 예정
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(ex.getErrorCode().getStatus().value());
-        ApiResponse<Void> apiResponse = ApiResponse.error(ex.getErrorCode());
-        response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
+        sendErrorResponse(response, ex);
         return;
       }
     }
     filterChain.doFilter(request, response);
   }
+
+  private static void sendErrorResponse(HttpServletResponse response, BusinessException ex)
+      throws IOException {
+    response.setCharacterEncoding("UTF-8");
+    response.setStatus(ex.getErrorCode().getStatus().value());
+    ApiResponse<Void> apiResponse = ApiResponse.error(ex.getErrorCode());
+    response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
+  }
 }
-
-

@@ -20,6 +20,7 @@ public enum ErrorCode {
   MEMBER_ACCESS_DENIED("U008", HttpStatus.UNAUTHORIZED, "올바른 사용자가 아닙니다. 접근할 수 없습니다."),
   UNSUPPORTED_TOKEN("U009", HttpStatus.UNAUTHORIZED, "지원되지 않는 토큰 형식입니다."),
   EMPTY_TOKEN("U010", HttpStatus.UNAUTHORIZED, "토큰이 비어있습니다."),
+  BLACKLIST_TOKEN("U011", HttpStatus.UNAUTHORIZED, "블랙리스트 토큰입니다."),
 
   // 장소
   NOT_FOUND_PLACE("P001", HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),

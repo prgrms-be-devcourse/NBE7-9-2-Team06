@@ -72,4 +72,12 @@ public class UserController implements UserSpecification {
     UserLoginResponse response = userService.refreshAccessToken(request);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
+
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request, HttpServletResponse response) {
+
+    userService.logout(request, response);
+
+    return ResponseEntity.ok(ApiResponse.success());
+  }
 }

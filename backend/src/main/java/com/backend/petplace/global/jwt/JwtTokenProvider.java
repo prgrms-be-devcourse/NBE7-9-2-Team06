@@ -11,6 +11,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,8 +58,6 @@ public class JwtTokenProvider {
         .compact();
   }
 
-  // TODO: generate refresh token()
-
   public void validateToken(String token) {
     try {
       Jwts.parser()
@@ -97,5 +96,24 @@ public class JwtTokenProvider {
 
   public String generateRefreshToken() {
     return UUID.randomUUID().toString();
+  }
+
+  public String resolveToken(HttpServletRequest request) {
+    String bearerToken = request.getHeader("Authorization");
+    if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+      return bearerToken.substring(7);
+    }
+    return null;
+  }
+
+  public long getRemainingMilliseconds(String accessToken) {
+    Claims claims = Jwts.parser()
+        .verifyWith(key)
+        .build()
+        .parseSignedClaims(accessToken)
+        .getPayload();
+
+    Date expiration = claims.getExpiration();
+    return expiration.getTime() - System.currentTimeMillis();
   }
 }

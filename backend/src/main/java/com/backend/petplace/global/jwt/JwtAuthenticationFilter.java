@@ -22,7 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
-    String token = resolveToken(request);
+    String token = jwtTokenProvider.resolveToken(request);
 
     if (token != null) {
       try {
@@ -40,17 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return;
       }
     }
-
     filterChain.doFilter(request, response);
-  }
-
-  private String resolveToken(HttpServletRequest request) {
-    String bearerToken = request.getHeader("Authorization");
-    if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-      logger.info("Bearer Token: " + bearerToken);
-      return bearerToken.substring(7);
-    }
-    return null;
   }
 }
 

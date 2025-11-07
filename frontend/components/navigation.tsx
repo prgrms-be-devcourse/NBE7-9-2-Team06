@@ -5,14 +5,34 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { removeAuthToken } from "@/lib/auth"
 import { useRouter } from "next/navigation"
+import {getAuthToken} from "../lib/auth";
 
 export function Navigation() {
   const pathname = usePathname()
   const router = useRouter()
 
-  const handleLogout = () => {
-    removeAuthToken()
-    router.push("/login")
+  const handleLogout = async () => {
+    try {
+      // 🔥 백엔드 로그아웃 API 호출 (쿠키도 함께 전송)
+      const accessToken = getAuthToken()
+      const response = await fetch("https://localhost:8443/api/v1/logout", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+        },
+        credentials: "include", // 쿠키 전송 필수
+      })
+
+      if (response.ok) {
+        console.log("✅ 서버 로그아웃 성공")
+        removeAuthToken()
+        router.push("/login")
+      } else {
+        console.error("🚨 로그아웃 실패", await response.text())
+      }
+    } catch (error) {
+      console.error("🚨 로그아웃 중 에러:", error)
+    }
   }
 
   const navItems = [

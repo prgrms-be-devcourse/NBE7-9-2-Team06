@@ -72,7 +72,7 @@ export default function SignupPage() {
     setCheckingEmail(true)
     try {
       const response = await fetch(
-          `http://localhost:8080/api/v1/signup-email?email=${encodeURIComponent(fullEmail)}`,
+          `https://localhost:8443/api/v1/signup-email?email=${encodeURIComponent(fullEmail)}`,
           { method: "GET", headers: { "Content-Type": "application/json" } }
       )
       const data = await response.json()
@@ -149,7 +149,7 @@ export default function SignupPage() {
 
     try {
       const response = await fetch(
-          `http://localhost:8080/api/v1/signup-username?nickName=${encodeURIComponent(username)}`,
+          `https://localhost:8443/api/v1/signup-username?nickName=${encodeURIComponent(username)}`,
           { method: "GET", headers: { "Content-Type": "application/json" } }
       )
 
@@ -197,7 +197,7 @@ export default function SignupPage() {
 
     try {
       const response = await fetch(
-          `http://localhost:8080/api/v1/email/auth?email=${encodeURIComponent(fullEmail)}`,
+          `https://localhost:8443/api/v1/email/auth?email=${encodeURIComponent(fullEmail)}`,
           {
             method: "GET",
           }
@@ -237,7 +237,7 @@ export default function SignupPage() {
     setVerifyingCode(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/email/auth", {
+      const response = await fetch("https://localhost:8443/api/v1/email/auth", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -338,7 +338,7 @@ export default function SignupPage() {
         authCode: verificationCode,
       }
 
-      const response = await fetch("http://localhost:8080/api/v1/signup", {
+      const response = await fetch("https://localhost:8443/api/v1/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -33,7 +33,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/login", {
+      const response = await fetch("https://localhost:8443/api/v1/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nickName: username, password }), // ✅ 백엔드 요청에 맞게 변경

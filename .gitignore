@@ -17,3 +17,15 @@ backend/build/
 
 # package-lock
 frontend/package-lock.json
+
+# SSL 인증서 관련 파일
+localhost+2.pem
+localhost+2-key.pem
+*.pem
+*.key
+*.crt
+cert/
+
+# SSL / HTTPS 인증서 관련
+localhost*.p12
+*.p12

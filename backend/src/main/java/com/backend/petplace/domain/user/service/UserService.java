@@ -106,7 +106,7 @@ public class UserService {
         .httpOnly(true)
         .secure(true)
         .sameSite("None")
-        .path("/api/v1/auth/refresh") // 쿠키 전송 범위를 재발급 엔드포인트로 제한
+        .path("/")
         .maxAge(MAX_AGE_SECONDS)
         .build();
 
@@ -148,6 +148,7 @@ public class UserService {
     if (refreshToken != null && !refreshToken.isBlank()) {
       redisService.deleteRefreshToken(refreshToken);
     }
+    // 리프레시 토큰이 없으면?
 
     if (accessToken != null && !accessToken.isBlank()) {
       try {
@@ -166,7 +167,7 @@ public class UserService {
         .httpOnly(true)
         .secure(true)
         .sameSite("None") // 원래 설정에 맞춰 동일하게
-        .path("/api/v1/auth/refresh") // 쿠키 생성 시 사용한 path와 동일해야 함
+        .path("/") // 쿠키 생성 시 사용한 path와 동일해야 함
         .maxAge(0)
         .build();
     response.setHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());

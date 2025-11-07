@@ -1,5 +1,5 @@
 // 로컬 전용: 환경변수 없이 바로 백엔드 호출
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "https://localhost:8443";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 

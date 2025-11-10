@@ -1,8 +1,10 @@
 package com.backend.petplace.global.config.security;
 
 import com.backend.petplace.domain.user.service.RedisService;
+import com.backend.petplace.global.filter.OriginCheckFilter;
 import com.backend.petplace.global.jwt.JwtAuthenticationFilter;
 import com.backend.petplace.global.jwt.JwtTokenProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,7 @@ public class SecurityConfig {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final RedisService redisService;
+  private final ObjectMapper objectMapper;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -55,6 +58,8 @@ public class SecurityConfig {
         .addFilterBefore(
             new JwtAuthenticationFilter(jwtTokenProvider, redisService),
             UsernamePasswordAuthenticationFilter.class
+        )
+        .addFilterBefore(new OriginCheckFilter(objectMapper), UsernamePasswordAuthenticationFilter.class
         );
 
     return http.build();

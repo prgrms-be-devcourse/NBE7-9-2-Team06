@@ -20,7 +20,6 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!username || !password) {
       toast({
         title: "입력 오류",
@@ -37,6 +36,7 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nickName: username, password }), // ✅ 백엔드 요청에 맞게 변경
+        credentials: "include", // ✅ 쿠키 주고받기 활성화
       })
 
       const data = await response.json()

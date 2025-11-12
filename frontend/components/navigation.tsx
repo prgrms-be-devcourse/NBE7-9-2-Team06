@@ -29,6 +29,8 @@ export function Navigation() {
         router.push("/login")
       } else {
         console.error("🚨 로그아웃 실패", await response.text())
+        removeAuthToken()
+        router.push("/login")
       }
     } catch (error) {
       console.error("🚨 로그아웃 중 에러:", error)

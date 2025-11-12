@@ -37,7 +37,7 @@ export default function ProductsPage() {
   // 함수: 서버에서 포인트 받아오기
   const readUserPoints = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/v1/orders/points", {
+      const response = await axios.get("https://localhost:8443/api/v1/orders/points", {
         headers: { Authorization: token },
       });
       setUserPoints(response.data.data);
@@ -109,7 +109,7 @@ export default function ProductsPage() {
 
     try {
       //서버에 주문 데이터 전송
-      const response = await axios.post("http://localhost:8080/api/v1/orders",
+      const response = await axios.post("https://localhost:8443/api/v1/orders",
         orderData,
         {
           headers: {
@@ -153,7 +153,7 @@ export default function ProductsPage() {
   // 함수: 주문 내역에 표시할 함수 표시
   const readOrders = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/v1/orders", {
+      const response = await axios.get("https://localhost:8443/api/v1/orders", {
         headers: {Authorization: token},
       })
 
@@ -199,7 +199,7 @@ export default function ProductsPage() {
 
     // 주문 취소 요청
     try {
-      const response = await axios.patch(`http://localhost:8080/api/v1/orders/${orderId}/cancel`, null, {
+      const response = await axios.patch(`https://localhost:8443/api/v1/orders/${orderId}/cancel`, null, {
         headers: { Authorization: token },
       });
 

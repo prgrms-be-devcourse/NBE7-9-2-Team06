@@ -3,10 +3,12 @@ package com.backend.petplace.domain.review.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+@AllArgsConstructor
 @Getter
 @Schema(description = "리뷰 등록 요청 DTO")
 public class ReviewCreateRequest {

@@ -18,10 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/bookmark")
 @RequiredArgsConstructor
-public class BookmarkController {
+public class BookmarkController implements BookmarkSpecification{
 
   private final BookmarkService bookmarkService;
 
+  @Override
   @PostMapping("/places/{placeId}")
   public ResponseEntity<ApiResponse<Long>> addBookmark(
       @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -31,6 +32,7 @@ public class BookmarkController {
         bookmarkService.addBookmark(userDetails.getUserId(), placeId)));
   }
 
+  @Override
   @DeleteMapping("/places/{placeId}")
   public ResponseEntity<ApiResponse<Void>> removeBookmark(
       @AuthenticationPrincipal CustomUserDetails userDetails,

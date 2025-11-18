@@ -55,6 +55,10 @@ public class BookmarkService {
     findPlaceById(placeId);
 
     bookmarkRepository.delete(findBookmark(userId, placeId));
+
+    // Redis 캐시 갱신: Set에서 placeId 제거
+    String key = BOOKMARK_USER_KEY_PREFIX + userId;
+    stringRedisTemplate.opsForSet().remove(key, placeId.toString());
   }
 
   @Transactional(readOnly = true)

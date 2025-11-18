@@ -37,7 +37,7 @@ public class Bookmark extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "user_id", nullable = false)
   private Long userId;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)

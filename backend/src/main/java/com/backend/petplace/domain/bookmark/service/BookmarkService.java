@@ -13,7 +13,10 @@ import com.backend.petplace.domain.place.repository.PlaceRepository;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -65,8 +68,43 @@ public class BookmarkService {
   public List<MyBookmarkPlaceResponse> getMyBookmarks(Long userId) {
     findUserById(userId);
 
+    String key = BOOKMARK_USER_KEY_PREFIX + userId;
+
+    // 1) Redis에서 이 유저의 북마크 placeId Set 조회
+    Set<String> cachedIds = stringRedisTemplate.opsForSet().members(key);
+
+    // 1-1) 캐시에 데이터가 있다면 → placeId들로 Place 조회
+    if (cachedIds != null && !cachedIds.isEmpty()) {
+
+      List<Long> placeIds = cachedIds.stream()
+          .map(Long::valueOf)
+          .toList();
+
+      List<Place> places = placeRepository.findAllById(placeIds);
+
+      // Optional: 순서를 정해주고 싶다면 여기서 정렬 (예: 이름 순, 생성일 순 등)
+      places.sort(Comparator.comparing(Place::getName));
+
+      return places.stream()
+          .map(MyBookmarkPlaceResponse::from)
+          .toList();
+    }
+
+    // 1-2) 캐시에 없으면 → DB에서 북마크 + place join으로 조회
     List<Bookmark> bookmarks = bookmarkRepository.findAllByUserIdWithPlace(userId);
 
+    if (bookmarks.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    // 2) Redis에 placeId들 적재
+    List<String> placeIdStrings = bookmarks.stream()
+        .map(b -> b.getPlace().getId().toString())
+        .toList();
+
+    stringRedisTemplate.opsForSet().add(key, placeIdStrings.toArray(String[]::new));
+
+    // 3) 응답 DTO 변환
     return bookmarks.stream()
         .map(bookmark -> MyBookmarkPlaceResponse.from(bookmark.getPlace()))
         .toList();

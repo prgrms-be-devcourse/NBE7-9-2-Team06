@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,19 +23,31 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "bookmark_user_place",
+            columnNames = {"user_id", "place_id"}
+        )
+    }
+)
 public class Bookmark extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "user_id", nullable = false)
   private Long userId;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "place_id")
   private Place place;
 
-  @Column(length = 200)
-  private String memo;
+  public static Bookmark createNewBookmark(Long userId, Place place) {
+    return Bookmark.builder()
+        .userId(userId)
+        .place(place)
+        .build();
+  }
 }

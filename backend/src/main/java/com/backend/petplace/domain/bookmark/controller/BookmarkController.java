@@ -5,7 +5,7 @@ import com.backend.petplace.domain.bookmark.service.BookmarkService;
 import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Positive.List;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,5 +55,4 @@ public class BookmarkController implements BookmarkSpecification{
 
     return ResponseEntity.ok(ApiResponse.success(results));
   }
-
 }

@@ -15,6 +15,7 @@ import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BookmarkService {
 
+  private static final String BOOKMARK_USER_KEY_PREFIX = "bookmark:user:";
+
   private final UserRepository userRepository;
   private final PlaceRepository placeRepository;
   private final BookmarkRepository bookmarkRepository;
+  private final StringRedisTemplate stringRedisTemplate;
 
   public Long addBookmark(Long userId, Long placeId) {
 

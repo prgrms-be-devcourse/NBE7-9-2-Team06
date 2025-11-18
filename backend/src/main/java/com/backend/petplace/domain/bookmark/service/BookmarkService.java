@@ -40,7 +40,7 @@ public class BookmarkService {
 
   public void removeBookmark(Long userId, Long placeId) {
 
-    findPlaceById(userId);
+    findUserById(userId);
     findPlaceById(placeId);
 
     bookmarkRepository.delete(findBookmark(userId, placeId));

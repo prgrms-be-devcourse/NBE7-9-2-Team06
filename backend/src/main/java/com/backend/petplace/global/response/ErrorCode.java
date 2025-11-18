@@ -51,7 +51,8 @@ public enum ErrorCode {
   AUTH_CODE_NOT_VERIFIED("AC003", HttpStatus.UNAUTHORIZED , "인증번호가 인증이 되지 않았습니다"),
 
   // 북마크
-  ALREADY_BOOKMARKED("B001", HttpStatus.CONFLICT, "이미 북마크한 장소입니다.");
+  ALREADY_BOOKMARKED("B001", HttpStatus.CONFLICT, "이미 북마크한 장소입니다."),
+  NOT_FOUND_BOOKMARK("B002", HttpStatus.NOT_FOUND, "존재하지 않는 북마크입니다.");
 
   private final String code;
   private final HttpStatus status;

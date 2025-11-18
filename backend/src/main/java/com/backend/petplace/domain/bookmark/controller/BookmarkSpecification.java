@@ -1,6 +1,7 @@
 package com.backend.petplace.domain.bookmark.controller;
 
 import static com.backend.petplace.global.response.ErrorCode.ALREADY_BOOKMARKED;
+import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_BOOKMARK;
 import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_MEMBER;
 import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_PLACE;
 

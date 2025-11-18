@@ -34,6 +34,4 @@ public class Bookmark extends BaseEntity {
   @JoinColumn(name = "place_id")
   private Place place;
 
-  @Column(length = 200)
-  private String memo;
 }

@@ -22,6 +22,9 @@ public class S3Service {
   @Value("${cloud.aws.s3.bucket}")
   private String bucket;
 
+  @Value("${cloud.aws.cloudfront.domain}")
+  private String cloudFrontDomain;
+
   private static final long PRESIGNED_URL_EXPIRATION_MS = 1000 * 60 * 10;
 
   /**
@@ -46,7 +49,7 @@ public class S3Service {
     if (s3Path == null || s3Path.isEmpty()) {
       return null;
     }
-    return amazonS3Client.getUrl(bucket, s3Path).toString();
+    return cloudFrontDomain + "/" + s3Path;
   }
 
   private String createUniqueFileName(String originalFilename, String dirName) {

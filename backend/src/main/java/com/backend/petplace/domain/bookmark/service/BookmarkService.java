@@ -32,7 +32,7 @@ public class BookmarkService {
       throw new BusinessException(ALREADY_BOOKMARKED);
     }
 
-    Bookmark saved = bookmarkRepository.save(Bookmark.create(user.getId(), place));
+    Bookmark saved = bookmarkRepository.save(Bookmark.createNewBookmark(user.getId(), place));
     return saved.getId();
   }
 

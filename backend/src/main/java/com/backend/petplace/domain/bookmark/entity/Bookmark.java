@@ -44,4 +44,10 @@ public class Bookmark extends BaseEntity {
   @JoinColumn(name = "place_id")
   private Place place;
 
+  public static Bookmark createNewBookmark(Long userId, Place place) {
+    return Bookmark.builder()
+        .userId(userId)
+        .place(place)
+        .build();
+  }
 }

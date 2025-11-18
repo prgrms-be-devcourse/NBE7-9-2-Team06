@@ -54,6 +54,8 @@ cloud:
       auto: false
     stack:
       auto: false
+    cloudfront:
+      domain: ${cloud.aws.cloudfront.domain}
 
 import:
   enabled: false         # 로컬 최초 적재 시 true, 이후 false로 끄기

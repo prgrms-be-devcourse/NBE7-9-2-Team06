@@ -5,6 +5,7 @@ import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_BOOKMARK;
 import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_MEMBER;
 import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_PLACE;
 
+import com.backend.petplace.domain.bookmark.dto.response.MyBookmarkPlaceResponse;
 import com.backend.petplace.domain.bookmark.entity.Bookmark;
 import com.backend.petplace.domain.bookmark.repository.BookmarkRepository;
 import com.backend.petplace.domain.place.entity.Place;
@@ -12,6 +13,7 @@ import com.backend.petplace.domain.place.repository.PlaceRepository;
 import com.backend.petplace.domain.user.entity.User;
 import com.backend.petplace.domain.user.repository.UserRepository;
 import com.backend.petplace.global.exception.BusinessException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,17 @@ public class BookmarkService {
     findPlaceById(placeId);
 
     bookmarkRepository.delete(findBookmark(userId, placeId));
+  }
+
+  @Transactional(readOnly = true)
+  public List<MyBookmarkPlaceResponse> getMyBookmarks(Long userId) {
+    findUserById(userId);
+
+    List<Bookmark> bookmarks = bookmarkRepository.findAllByUserIdWithPlace(userId);
+
+    return bookmarks.stream()
+        .map(bookmark -> MyBookmarkPlaceResponse.from(bookmark.getPlace()))
+        .toList();
   }
 
   private User findUserById(Long userId) {

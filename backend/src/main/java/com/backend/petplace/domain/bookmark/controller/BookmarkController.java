@@ -1,14 +1,17 @@
 package com.backend.petplace.domain.bookmark.controller;
 
+import com.backend.petplace.domain.bookmark.dto.response.MyBookmarkPlaceResponse;
 import com.backend.petplace.domain.bookmark.service.BookmarkService;
 import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,4 +45,14 @@ public class BookmarkController implements BookmarkSpecification{
     return ResponseEntity.ok(ApiResponse.success());
   }
 
+  @Override
+  @GetMapping("/me")
+  public ResponseEntity<ApiResponse<List<MyBookmarkPlaceResponse>>> getMyBookmarks(
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    List<MyBookmarkPlaceResponse> results =
+        bookmarkService.getMyBookmarks(userDetails.getUserId());
+
+    return ResponseEntity.ok(ApiResponse.success(results));
+  }
 }

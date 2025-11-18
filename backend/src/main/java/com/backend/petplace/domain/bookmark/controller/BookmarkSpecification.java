@@ -5,6 +5,7 @@ import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_BOOKMARK;
 import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_MEMBER;
 import static com.backend.petplace.global.response.ErrorCode.NOT_FOUND_PLACE;
 
+import com.backend.petplace.domain.bookmark.dto.response.MyBookmarkPlaceResponse;
 import com.backend.petplace.global.config.swagger.ApiErrorCodeExamples;
 import com.backend.petplace.global.jwt.CustomUserDetails;
 import com.backend.petplace.global.response.ApiResponse;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Bookmark", description = "북마크 API")
@@ -60,6 +62,19 @@ public interface BookmarkSpecification {
           example = "1"
       )
       @Positive Long placeId
+  );
+
+  @ApiErrorCodeExamples({NOT_FOUND_MEMBER})
+  @Operation(
+      summary = "내 북마크 목록 조회",
+      description = """
+          로그인한 사용자가 북마크한 장소 목록을 조회합니다.
+          - 응답에는 장소 ID, 이름, 카테고리, 주소, 좌표, 주차/반려동물 허용 여부, 평점 정보 등이 포함됩니다.
+          """
+  )
+  ResponseEntity<ApiResponse<List<MyBookmarkPlaceResponse>>> getMyBookmarks(
+      @Parameter(hidden = true)
+      CustomUserDetails userDetails
   );
 }
 

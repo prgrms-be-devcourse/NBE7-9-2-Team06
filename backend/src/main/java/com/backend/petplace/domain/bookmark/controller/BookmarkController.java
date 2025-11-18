@@ -45,11 +45,13 @@ public class BookmarkController implements BookmarkSpecification{
     return ResponseEntity.ok(ApiResponse.success());
   }
 
+  @Override
   @GetMapping("/me")
   public ResponseEntity<ApiResponse<List<MyBookmarkPlaceResponse>>> getMyBookmarks(
       @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
-    List<MyBookmarkPlaceResponse> results = bookmarkService.getMyBookmarks(userDetails.getUserId());
+    List<MyBookmarkPlaceResponse> results =
+        bookmarkService.getMyBookmarks(userDetails.getUserId());
 
     return ResponseEntity.ok(ApiResponse.success(results));
   }

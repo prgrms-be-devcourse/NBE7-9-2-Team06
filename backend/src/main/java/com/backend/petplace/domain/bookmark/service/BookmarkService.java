@@ -41,6 +41,11 @@ public class BookmarkService {
     }
 
     Bookmark saved = bookmarkRepository.save(Bookmark.createNewBookmark(user.getId(), place));
+
+    // Redis 캐시 갱신: 이 유저의 북마크 Set에 placeId 추가
+    String key = BOOKMARK_USER_KEY_PREFIX + userId;
+    stringRedisTemplate.opsForSet().add(key, placeId.toString());
+
     return saved.getId();
   }
 

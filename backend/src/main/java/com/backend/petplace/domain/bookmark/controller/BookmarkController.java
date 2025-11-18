@@ -26,9 +26,8 @@ public class BookmarkController {
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable @Positive Long placeId
   ) {
-    Long userId = userDetails.getUserId();
-    Long bookmarkId = bookmarkService.addBookmark(userId, placeId);
-    return ResponseEntity.ok(ApiResponse.create(bookmarkId));
+    return ResponseEntity.ok(ApiResponse.create(
+        bookmarkService.addBookmark(userDetails.getUserId(), placeId)));
   }
 
 }

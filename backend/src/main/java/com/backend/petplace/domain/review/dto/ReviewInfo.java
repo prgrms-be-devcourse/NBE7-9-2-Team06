@@ -3,11 +3,13 @@ package com.backend.petplace.domain.review.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Schema(description = "장소 리뷰 목록에 포함될 개별 리뷰 정보")
 public class ReviewInfo {
 

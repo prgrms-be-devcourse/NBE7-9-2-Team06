@@ -43,6 +43,4 @@ public class PlaceInfoTest {
     assert info.getPlaceName().equals(PLACE_NAME);
     assert info.getFullAddress().equals(ADDRESS);
   }
-
-
 }

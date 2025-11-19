@@ -283,7 +283,6 @@ class BookmarkServiceTest {
       Place placeA = createPlace(10L, "AAA 병원");
       Place placeB = createPlace(20L, "BBB 카페");
 
-      // ✅ 여기 수정
       given(placeRepository.findAllById(anyList()))
           .willReturn(new ArrayList<>(List.of(placeB, placeA)));
       // 또는 Arrays.asList(placeB, placeA) 도 됨

@@ -4,11 +4,13 @@ import com.backend.petplace.domain.point.dto.PlaceInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Schema(description = "내 리뷰 목록 조회 응답 DTO")
 public class MyReviewResponse {
 

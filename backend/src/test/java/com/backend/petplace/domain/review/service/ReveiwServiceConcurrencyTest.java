@@ -26,7 +26,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @SpringBootTest
-public class ReveiwServiceTest {
+public class ReveiwServiceConcurrencyTest {
 
   @Autowired
   private ReviewService reviewService;

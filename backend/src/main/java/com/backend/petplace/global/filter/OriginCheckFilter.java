@@ -3,33 +3,38 @@ package com.backend.petplace.global.filter;
 import com.backend.petplace.global.response.ApiResponse;
 import com.backend.petplace.global.response.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
 @RequiredArgsConstructor
-public class OriginCheckFilter implements Filter {
+public class OriginCheckFilter extends OncePerRequestFilter {
 
   private static final String ALLOWED_ORIGIN = "https://localhost:3001";
   private final ObjectMapper objectMapper;
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    String uri = request.getRequestURI();
+
+    // h2-console, swagger-ui, v3/api-docs 요청은 필터 제외
+    return uri.startsWith("/h2-console")
+        || uri.startsWith("/swagger-ui")
+        || uri.startsWith("/v3/api-docs");
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest req,
+      HttpServletResponse res,
+      FilterChain chain)
       throws IOException, ServletException {
 
-    HttpServletRequest req = (HttpServletRequest) request;
-    HttpServletResponse res = (HttpServletResponse) response;
-
     if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
-      chain.doFilter(request, response);
+      chain.doFilter(req, res);
       return;
     }
 
@@ -52,6 +57,6 @@ public class OriginCheckFilter implements Filter {
       return;
     }
 
-    chain.doFilter(request, response);
+    chain.doFilter(req, res);
   }
 }

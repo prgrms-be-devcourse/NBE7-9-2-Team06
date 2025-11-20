@@ -58,9 +58,9 @@ public class User extends BaseEntity {
   private List<Pet> pets = new ArrayList<>();
 
   @Builder
-  public User(String nickName, String password, String email, String address,
+  public User(Long id, String nickName, String password, String email, String address,
       String zipcode, String addressDetail) {
-
+    this.id = id;
     this.nickName = nickName;
     this.password = password;
     this.email = email;
